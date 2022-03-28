@@ -1,5 +1,10 @@
 package org.mpack;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.types.ObjectId;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,61 +14,67 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.*;
 
 
-class global_Vars_Wrapper {
+class GlobalVarsWrapper {
     final HashSet<String> visitedLinks;  //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
     Integer count;
 
-    public global_Vars_Wrapper() {
-        visitedLinks = new HashSet<String>();
+    public GlobalVarsWrapper() {
+        visitedLinks = new HashSet<>();
         count = 0;
     }
 }
 
 class Crawler implements Runnable {
     // Global Data can be Static too
-    global_Vars_Wrapper Mywrapper;
-    ArrayList<String> initial_strings;
-    int needed_threads = 0;
+    GlobalVarsWrapper myWrapper;
+    ArrayList<String> initialStrings;
+    static String connectionString = "mongodb://localhost:27017";
+    static MongoCollection<org.bson.Document> UrlsCollection;
+    int neededThreads = 0;
+    static MongoCollection<org.bson.Document> myDb;
 
-
-    public Crawler(ArrayList<String> initial_strings, global_Vars_Wrapper Mywrapper, int needed_threads) {
-        this.Mywrapper = Mywrapper;
-        this.initial_strings = initial_strings;
-        this.needed_threads = needed_threads;
-
-    }
-
-    public Crawler(ArrayList<String> initial_strings, global_Vars_Wrapper Mywrapper) {
-        this(initial_strings, Mywrapper, 0);
+    public Crawler(List<String> initialStrings, GlobalVarsWrapper varsWrapper, int neededThreads) {
+        this.myWrapper = varsWrapper;
+        this.initialStrings = (ArrayList<String>) initialStrings;
+        this.neededThreads = neededThreads;
 
     }
 
+    public Crawler(List<String> initialStrings, GlobalVarsWrapper varsWrapper) {
+        this(initialStrings, varsWrapper, 0);
+
+    }
+
+    public static void setUrlsCollection(MongoCollection<org.bson.Document> crawledURLS) {
+        UrlsCollection = crawledURLS;
+    }
 
     @Override
     public void run() {
-        System.out.println(Thread.currentThread().getId());
-        Crawl(initial_strings);
-        //getPageLinks(initial_string);
+        saveState();
+        crawl(initialStrings);
+    }
+
+    private void saveState() {
+
     }
 
     public void getPageLinks(String URL) {
-        if (Mywrapper.count > 1000) {
+        if (myWrapper.count > 1000) {
             return;
         }
         // 4. Check if you have already crawled the URLs
         // (we are intentionally not checking for duplicate content in this example)
-        synchronized (Mywrapper.visitedLinks) {
-            if (Mywrapper.visitedLinks.contains(URL))
+        synchronized (myWrapper.visitedLinks) {
+            if (myWrapper.visitedLinks.contains(URL))
                 return;
-            else if (Mywrapper.visitedLinks.add(URL)) {
-                System.out.println(Mywrapper.count + " " + URL);
-                Mywrapper.count++;
+            else if (myWrapper.visitedLinks.add(URL)) {
+                System.out.println(myWrapper.count + " " + URL);
+                myWrapper.count++;
             }
         }
         try {
@@ -83,46 +94,53 @@ class Crawler implements Runnable {
 
     }
 
-    Stack<String> Unprocessed_URLS_Stack = new Stack<String>();
+    Deque<String> unprocessedUrlsStack = new ArrayDeque<>();
 
-    public void Crawl(ArrayList<String> SeedUrls) {
+    public void crawl(List<String> seedUrls) {
 
-        Unprocessed_URLS_Stack.addAll(SeedUrls);
+        unprocessedUrlsStack.addAll(seedUrls);
 
-        while (!Unprocessed_URLS_Stack.isEmpty()) {
-            if (Mywrapper.count > 1000) {
+        while (!unprocessedUrlsStack.isEmpty()) {
+            if (myWrapper.count > 1000) {
                 return;
             }
             String url;
             //To make sure The Queue is large enough not to make it idle here
-            if (needed_threads > 0 && Unprocessed_URLS_Stack.size() > 10) {
-                url = Unprocessed_URLS_Stack.pop();
-                ArrayList<String> toSend = new ArrayList<String>();
+            if (neededThreads > 0 && unprocessedUrlsStack.size() > 5000) {
+                url = unprocessedUrlsStack.pop();
+                ArrayList<String> toSend = new ArrayList<>();
                 toSend.add(url);
-                new Thread(new Crawler(toSend, Mywrapper)).start();
-                needed_threads--;
+                new Thread(new Crawler(toSend, myWrapper)).start();
+                neededThreads--;
             }
+            url = unprocessedUrlsStack.pop();
 
-            url = Unprocessed_URLS_Stack.pop();
-
-            synchronized (Mywrapper.visitedLinks) {
-                if (Mywrapper.visitedLinks.contains(url))
+            synchronized (myWrapper.visitedLinks) {
+                if (myWrapper.visitedLinks.contains(url))
                     continue;
-                else if (Mywrapper.visitedLinks.add(url)) {
-                    System.out.println(Mywrapper.count + " " + url);
-                    Mywrapper.count++;
+                else {
+                    myWrapper.visitedLinks.add(url);
+                    myWrapper.count++;
                 }
             }
             try {
-
                 Document document = Jsoup.connect(url).get();
                 Elements linksOnPage = document.select("a[href]");
                 for (Element page : linksOnPage) {
-                    Unprocessed_URLS_Stack.add(page.attr("abs:href"));
+                    unprocessedUrlsStack.add(page.attr("abs:href"));
                 }
+                org.bson.Document urlEntry = new org.bson.Document("_id", new ObjectId());
+                urlEntry.append("url_link", url)
+                        .append("html_body", document.html());
+                UrlsCollection.insertOne(urlEntry);
+                //now we really processed a link
+
             } catch (Exception e) {
                 System.err.println("For '" + url + "': " + e.getMessage());
                 System.out.println(e.toString());
+                synchronized (myWrapper.count){
+                myWrapper.count--;
+                }
             }
 
         }
@@ -132,31 +150,47 @@ class Crawler implements Runnable {
 
 public class CrawlerMain {
 
-    static global_Vars_Wrapper wr = new global_Vars_Wrapper();
+    static GlobalVarsWrapper wr = new GlobalVarsWrapper();
+    static String connectionString = "mongodb://localhost:27017";
+    private static MongoClient mongoClient;
+    static MongoDatabase searchEngineDb;
+
+    //connect with the DB
+    public static void initConnection() {
+        try {
+            //SearchEngine
+            //.
+            //CrawledURLS
+            mongoClient = MongoClients.create(connectionString);
+            searchEngineDb = mongoClient.getDatabase("SearchEngine");
+            Crawler.setUrlsCollection(searchEngineDb.getCollection("CrawledURLS"));
 
 
-    public CrawlerMain() {
-
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 
     public static void main(String[] args) {
-        // TODO: Add the option to continue its job from where it left
-        int numThreads = Integer.parseInt(args[0]);
+
+        //initialize Connection with The Database
+        initConnection();
+
+        int numThreads = 10;
         System.out.printf("Number of Threads is: %d%n", numThreads);
         try {
             File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
             FileReader fr = new FileReader(file);   //reads the file
-            BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
-            String line;
-            ArrayList<String> seedsArray = new ArrayList<>();
-            while ((line = br.readLine()) != null) {
-                //Read what in The seed
-                seedsArray.add(line.toString());
-            }
-
-
-
+            ArrayList<String> seedsArray;
+            try (BufferedReader br = new BufferedReader(fr)) {
+                String line;
+                seedsArray = new ArrayList<>();
+                while ((line = br.readLine()) != null) {
+                    //Read what in The seed
+                    seedsArray.add(line);
+                }
+            }  //creates a buffering character input stream
 
             /*
              *
@@ -173,17 +207,13 @@ public class CrawlerMain {
                 //there are enough seeds For The threads
                 for (int i = 0; i < numThreads; i++) {
                     if (i != numThreads - 1) {
-                        // 0 1 2 3 4 5 6 7 8 9
                         ss = new ArrayList<>(seedsArray.subList(i * ratio, (i + 1) * (ratio)));
                         System.out.println(ss);
-                        new Thread(new Crawler(ss, wr)).start();
                     } else {
                         //The last threads takes all the remaining
                         ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
-                        new Thread(new Crawler(ss, wr)).start();
-
-                        System.out.println(ss);
                     }
+                    new Thread(new Crawler(ss, wr)).start();
                 }
 
 
