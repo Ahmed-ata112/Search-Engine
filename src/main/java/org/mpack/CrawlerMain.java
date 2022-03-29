@@ -1,8 +1,14 @@
 package org.mpack;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.io.*;
 import java.util.*;
 
@@ -18,7 +24,6 @@ class Crawler implements Runnable {
     static final int MAX_PAGES = 100;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
-
 
     public Crawler(List<String> initialStrings, int neededThreads) {
         this.initialStrings = (ArrayList<String>) initialStrings;
@@ -148,6 +153,13 @@ public class CrawlerMain {
         int numThreads = 5;
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
+       //testMongo();
+        readAndProcess( numThreads);
+
+
+    }
+
+    private static void readAndProcess(int numThreads) throws FileNotFoundException {
         File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
         FileReader fr = new FileReader(file);   //reads the file
         ArrayList<String> seedsArray;
@@ -164,6 +176,10 @@ public class CrawlerMain {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void testMongo() {
+        MongoDB mm = new MongoDB();
 
     }
 

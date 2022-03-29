@@ -4,11 +4,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.InsertOneOptions;
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 public class MongoDB {
-    MongoCollection<Document> myDb;
     MongoCollection<org.bson.Document> urlsCollection;
     static final  String CONNECTION_STRING = "mongodb://localhost:27017";
     MongoDatabase searchEngineDb;
@@ -30,9 +31,6 @@ public class MongoDB {
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-
-
-
     }
 
     public void insertUrl(String url, String html) {
@@ -42,4 +40,16 @@ public class MongoDB {
         urlsCollection.insertOne(urlEntry);
     }
 
+    // state is 0 if not finished or 1 if finished
+    public void initState(int state){
+        // should be called on a new
+        org.bson.Document urlEntry = new org.bson.Document("Name", "state");
+        org.bson.Document updateEntry = new org.bson.Document("isDone",state );
+        org.bson.Document setEntry = new org.bson.Document("$set", updateEntry);
+
+        UpdateOptions options = new UpdateOptions().upsert(true);
+
+        urlsCollection.updateOne(urlEntry, setEntry, options);
+
+    }
 }
