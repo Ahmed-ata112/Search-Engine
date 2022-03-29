@@ -10,10 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 
@@ -33,7 +30,8 @@ class Crawler implements Runnable {
     GlobalVarsWrapper myWrapper;
     ArrayList<String> initialStrings;
     static String connectionString = "mongodb://localhost:27017";
-    static MongoCollection<org.bson.Document> UrlsCollection;
+    static final int MAX_PAGES = 5000;
+    static MongoCollection<org.bson.Document> urlsCollection;
     int neededThreads = 0;
     static MongoCollection<org.bson.Document> myDb;
 
@@ -50,7 +48,7 @@ class Crawler implements Runnable {
     }
 
     public static void setUrlsCollection(MongoCollection<org.bson.Document> crawledURLS) {
-        UrlsCollection = crawledURLS;
+        urlsCollection = crawledURLS;
     }
 
     @Override
@@ -101,7 +99,7 @@ class Crawler implements Runnable {
         unprocessedUrlsStack.addAll(seedUrls);
 
         while (!unprocessedUrlsStack.isEmpty()) {
-            if (myWrapper.count > 1000) {
+            if (myWrapper.count > MAX_PAGES) {
                 return;
             }
             String url;
@@ -132,7 +130,7 @@ class Crawler implements Runnable {
                 org.bson.Document urlEntry = new org.bson.Document("_id", new ObjectId());
                 urlEntry.append("url_link", url)
                         .append("html_body", document.html());
-                UrlsCollection.insertOne(urlEntry);
+                urlsCollection.insertOne(urlEntry);
                 //now we really processed a link
 
             } catch (Exception e) {
@@ -155,6 +153,7 @@ public class CrawlerMain {
     private static MongoClient mongoClient;
     static MongoDatabase searchEngineDb;
 
+
     //connect with the DB
     public static void initConnection() {
         try {
@@ -170,83 +169,87 @@ public class CrawlerMain {
             System.out.println(e.getMessage());
         }
     }
+    public static void initCrawling(int numThreads, List<String> seedsArray){
+
+        /*
+         *
+         * now All The seeds are in the array
+         * Num of threads and The number of seeds are critical
+         * N_Threads > Seeds? -> That's a Good case where we Can divide them evenly
+         * N_Threads < Seeds? -> give each a one seed and The remaining get them seeds from te working Ones
+         *
+         * */
+        int ratio = seedsArray.size() / numThreads; // how many seeds per a Thread
+        ArrayList<String> ss;
+
+        if (ratio > 0) {
+            //there are enough seeds For The threads
+            for (int i = 0; i < numThreads; i++) {
+                if (i != numThreads - 1) {
+                    ss = new ArrayList<>(seedsArray.subList(i * ratio, (i + 1) * (ratio)));
+                } else {
+                    //The last threads takes all the remaining
+                    ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
+                }
+                new Thread(new Crawler(ss, wr)).start();
+            }
 
 
-    public static void main(String[] args) {
+        } else {
+            //not enough seeds for Threads
+            // take one of the urls and get some from it
+            int neededThreads = numThreads;
+            for (int i = 0; i < seedsArray.size(); i++) {
+                if (i != seedsArray.size() - 1) {
+                    // 0 1 2 3
+                    ss = new ArrayList<>();
+                    ss.add(seedsArray.get(i));
+                    System.out.println(ss);
+                    new Thread(new Crawler(ss, wr)).start();
+                    neededThreads--;
+                } else {
+                    //The last threads takes all the remaining
+                    ss = new ArrayList<>();
+                    ss.add(seedsArray.get(i));
+                    new Thread(new Crawler(ss, wr, neededThreads)).start();
+
+                    System.out.println(ss);
+                }
+            }
+
+        }
+
+        //System.out.println(sb.toString());   //returns a string that textually represents the object
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
 
         //initialize Connection with The Database
         initConnection();
 
-        int numThreads = 10;
+        int numThreads = 5;
         System.out.printf("Number of Threads is: %d%n", numThreads);
-        try {
-            File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
-            FileReader fr = new FileReader(file);   //reads the file
-            ArrayList<String> seedsArray;
-            try (BufferedReader br = new BufferedReader(fr)) {
-                String line;
-                seedsArray = new ArrayList<>();
-                while ((line = br.readLine()) != null) {
-                    //Read what in The seed
-                    seedsArray.add(line);
-                }
-            }  //creates a buffering character input stream
 
-            /*
-             *
-             * now All The seeds are in the array
-             * Num of threads and The number of seeds are critical
-             * N_Threads > Seeds? -> That's a Good case where we Can divide them evenly
-             * N_Threads < Seeds? -> give each a one seed and The remaining get them seeds from te working Ones
-             *
-             * */
-            int ratio = seedsArray.size() / numThreads; // how many seeds per a Thread
-            ArrayList<String> ss;
-
-            if (ratio > 0) {
-                //there are enough seeds For The threads
-                for (int i = 0; i < numThreads; i++) {
-                    if (i != numThreads - 1) {
-                        ss = new ArrayList<>(seedsArray.subList(i * ratio, (i + 1) * (ratio)));
-                        System.out.println(ss);
-                    } else {
-                        //The last threads takes all the remaining
-                        ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
-                    }
-                    new Thread(new Crawler(ss, wr)).start();
-                }
-
-
-            } else {
-                //not enough seeds for Threads
-                // take one of the urls and get some from it
-                int neededThreads = numThreads;
-
-                for (int i = 0; i < seedsArray.size(); i++) {
-                    if (i != seedsArray.size() - 1) {
-                        // 0 1 2 3
-                        ss = new ArrayList<>();
-                        ss.add(seedsArray.get(i));
-                        System.out.println(ss);
-                        new Thread(new Crawler(ss, wr)).start();
-                        neededThreads--;
-                    } else {
-                        //The last threads takes all the remaining
-                        ss = new ArrayList<>();
-                        ss.add(seedsArray.get(i));
-                        new Thread(new Crawler(ss, wr, neededThreads)).start();
-
-                        System.out.println(ss);
-                    }
-                }
-
+        File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
+        FileReader fr = new FileReader(file);   //reads the file
+        ArrayList<String> seedsArray =new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(fr)) {
+            String line;
+            seedsArray = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                //Read what in The seed
+                seedsArray.add(line);
             }
 
+            initCrawling(numThreads, seedsArray);
             fr.close();    //closes the stream and release the resources
-            //System.out.println(sb.toString());   //returns a string that textually represents the object
-        } catch (IOException e) {
+        }  //creates a buffering character input stream
+        catch (IOException e) {
             e.printStackTrace();
         }
+
+
+
 
     }
 

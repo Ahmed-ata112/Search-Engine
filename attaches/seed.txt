@@ -15,7 +15,6 @@ https://www.rottentomatoes.com/
 https://theathletic.com/
 https://www.gameinformer.com/
 https://www.gamesradar.com/uk/
-https://www.ign.com/uk/
 https://www.gamespot.com/
 https://kotaku.com/
 https://www.washingtonpost.com/
@@ -23,4 +22,4 @@ https://www.businessinsider.com/
 https://www.fourfourtwo.com/news
 https://www.goal.com/
 https://www.cnn.com/
-https://www.huffingtonpost.com/
+https://moz.com/top500
