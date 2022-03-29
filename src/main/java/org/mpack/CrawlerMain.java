@@ -1,9 +1,5 @@
 package org.mpack;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,7 +14,7 @@ class Crawler implements Runnable {
     static final HashSet<String> visitedLinks = new HashSet<>();
     //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
-    static Integer count = 0;
+    static int count = 0;
     static final Object cLock = new Object();
     ArrayList<String> initialStrings;
     static final int MAX_PAGES = 100;
@@ -41,6 +37,10 @@ class Crawler implements Runnable {
         crawl(initialStrings);
     }
 
+    static public void setCount(int oldCount){
+        count = oldCount;
+    }
+
     Deque<String> unprocessedUrlsStack = new ArrayDeque<>();
 
     public void crawl(List<String> seedUrls) {
@@ -49,6 +49,8 @@ class Crawler implements Runnable {
 
         while (!unprocessedUrlsStack.isEmpty()) {
             if (count > MAX_PAGES) {
+                //set state to 1 as we finished all the Pages
+                finishState();
                 return;
             }
             String url;
@@ -61,6 +63,8 @@ class Crawler implements Runnable {
                 neededThreads--;
             }
             url = unprocessedUrlsStack.pop();
+            //delete from the unprocessed array
+            mongoDB.removeFromStateArray(url);
 
             synchronized (visitedLinks) {
                 if (visitedLinks.contains(url))
@@ -74,8 +78,14 @@ class Crawler implements Runnable {
                 Document document = Jsoup.connect(url).get();
                 Elements linksOnPage = document.select("a[href]");
                 for (Element page : linksOnPage) {
-                    unprocessedUrlsStack.add(page.attr("abs:href"));
+                    String uu = page.attr("abs:href");
+
+                    unprocessedUrlsStack.add(uu);
+                    // add to the unprocessed array
+                    mongoDB.addToStateArray(uu);
+
                 }
+
                 mongoDB.insertUrl(url, document.html());
                 //now we really processed a link
 
@@ -89,10 +99,18 @@ class Crawler implements Runnable {
 
         }
     }
+
+    private void finishState() {
+
+        //send isDone=1 to the state
+        mongoDB.setState(1);
+
+    }
 }
 
 
 public class CrawlerMain {
+    static final  MongoDB mainMongo = new MongoDB();
 
 
     public static void initCrawling(int numThreads, List<String> seedsArray) {
@@ -154,12 +172,34 @@ public class CrawlerMain {
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
        //testMongo();
-        readAndProcess( numThreads);
 
+        /*
+         * state is -1 |0 | 1
+         *
+         * -1 : never worked before
+         * 0  : worked before but didn't finish
+         * 1  : worked and finished
+         *
+         *
+         * */
+
+        int state = mainMongo.getState();
+        if(state == -1){
+            // never worked
+            readAndProcess(numThreads);
+        }else if(state == 0){
+            continueAndProcess(numThreads);
+        }else if(state == 1){
+            // u should join the reCrawling with this
+
+        }
 
     }
-
+        // take your seeds from the unprocessed Stack
     private static void readAndProcess(int numThreads) throws FileNotFoundException {
+        mainMongo.setState(0); // start crawling
+
+
         File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
         FileReader fr = new FileReader(file);   //reads the file
         ArrayList<String> seedsArray;
@@ -177,10 +217,22 @@ public class CrawlerMain {
             e.printStackTrace();
         }
     }
+    private static void continueAndProcess(int numThreads) throws FileNotFoundException {
+        mainMongo.setState(0); // continue crawling
+        Crawler.setCount((int) mainMongo.getUrlCount());
+        ArrayList<String> seedsArray = (ArrayList<String>) mainMongo.getStateArray();
+        initCrawling(numThreads, seedsArray);
+
+    }
+
+
 
     private static void testMongo() {
-        MongoDB mm = new MongoDB();
 
+        mainMongo.addToStateArray("asda");
+        mainMongo.addToStateArray("asdass");
+        System.out.println(mainMongo.getStateArray());
+       // mm.initState(1);
     }
 
 }
