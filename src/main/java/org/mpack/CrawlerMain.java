@@ -1,95 +1,39 @@
 package org.mpack;
-
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import org.bson.types.ObjectId;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.*;
 import java.util.*;
 
 
-class GlobalVarsWrapper {
-    final HashSet<String> visitedLinks;  //Links That were already crawled -- So That You don't put one twice
-    // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
-    Integer count;
-
-    public GlobalVarsWrapper() {
-        visitedLinks = new HashSet<>();
-        count = 0;
-    }
-}
-
 class Crawler implements Runnable {
     // Global Data can be Static too
-    GlobalVarsWrapper myWrapper;
+    static final HashSet<String> visitedLinks = new HashSet<>();
+    //Links That were already crawled -- So That You don't put one twice
+    // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
+    static Integer count = 0;
+    static final Object cLock = new Object();
     ArrayList<String> initialStrings;
-    static String connectionString = "mongodb://localhost:27017";
-    static final int MAX_PAGES = 5000;
-    static MongoCollection<org.bson.Document> urlsCollection;
-    int neededThreads = 0;
-    static MongoCollection<org.bson.Document> myDb;
+    static final int MAX_PAGES = 100;
+    int neededThreads;
+    static final MongoDB mongoDB = new MongoDB();
 
-    public Crawler(List<String> initialStrings, GlobalVarsWrapper varsWrapper, int neededThreads) {
-        this.myWrapper = varsWrapper;
+
+    public Crawler(List<String> initialStrings, int neededThreads) {
         this.initialStrings = (ArrayList<String>) initialStrings;
         this.neededThreads = neededThreads;
 
     }
 
-    public Crawler(List<String> initialStrings, GlobalVarsWrapper varsWrapper) {
-        this(initialStrings, varsWrapper, 0);
+    public Crawler(List<String> initialStrings) {
+        this(initialStrings, 0);
 
-    }
-
-    public static void setUrlsCollection(MongoCollection<org.bson.Document> crawledURLS) {
-        urlsCollection = crawledURLS;
     }
 
     @Override
     public void run() {
-        saveState();
         crawl(initialStrings);
-    }
-
-    private void saveState() {
-
-    }
-
-    public void getPageLinks(String URL) {
-        if (myWrapper.count > 1000) {
-            return;
-        }
-        // 4. Check if you have already crawled the URLs
-        // (we are intentionally not checking for duplicate content in this example)
-        synchronized (myWrapper.visitedLinks) {
-            if (myWrapper.visitedLinks.contains(URL))
-                return;
-            else if (myWrapper.visitedLinks.add(URL)) {
-                System.out.println(myWrapper.count + " " + URL);
-                myWrapper.count++;
-            }
-        }
-        try {
-            // 4. (i) If not add it to the index
-            // 2. Fetch the HTML code
-            Document document = Jsoup.connect(URL).get();
-            // 3. Parse the HTML to extract links to other URLs
-            Elements linksOnPage = document.select("a[href]");
-            // 5. For each extracted URL... go back to Step 4.
-            for (Element page : linksOnPage) {
-                getPageLinks(page.attr("abs:href"));
-            }
-        } catch (Exception e) {
-            // System.err.println("For '" + URL + "': " + e.getMessage());
-            System.out.println(e.toString());
-        }
-
     }
 
     Deque<String> unprocessedUrlsStack = new ArrayDeque<>();
@@ -99,7 +43,7 @@ class Crawler implements Runnable {
         unprocessedUrlsStack.addAll(seedUrls);
 
         while (!unprocessedUrlsStack.isEmpty()) {
-            if (myWrapper.count > MAX_PAGES) {
+            if (count > MAX_PAGES) {
                 return;
             }
             String url;
@@ -108,17 +52,17 @@ class Crawler implements Runnable {
                 url = unprocessedUrlsStack.pop();
                 ArrayList<String> toSend = new ArrayList<>();
                 toSend.add(url);
-                new Thread(new Crawler(toSend, myWrapper)).start();
+                new Thread(new Crawler(toSend)).start();
                 neededThreads--;
             }
             url = unprocessedUrlsStack.pop();
 
-            synchronized (myWrapper.visitedLinks) {
-                if (myWrapper.visitedLinks.contains(url))
+            synchronized (visitedLinks) {
+                if (visitedLinks.contains(url))
                     continue;
                 else {
-                    myWrapper.visitedLinks.add(url);
-                    myWrapper.count++;
+                    visitedLinks.add(url);
+                    count++;
                 }
             }
             try {
@@ -127,17 +71,14 @@ class Crawler implements Runnable {
                 for (Element page : linksOnPage) {
                     unprocessedUrlsStack.add(page.attr("abs:href"));
                 }
-                org.bson.Document urlEntry = new org.bson.Document("_id", new ObjectId());
-                urlEntry.append("url_link", url)
-                        .append("html_body", document.html());
-                urlsCollection.insertOne(urlEntry);
+                mongoDB.insertUrl(url, document.html());
                 //now we really processed a link
 
             } catch (Exception e) {
                 System.err.println("For '" + url + "': " + e.getMessage());
-                System.out.println(e.toString());
-                synchronized (myWrapper.count){
-                myWrapper.count--;
+                System.out.println(e.getMessage());
+                synchronized (cLock) {
+                    count--;
                 }
             }
 
@@ -148,28 +89,8 @@ class Crawler implements Runnable {
 
 public class CrawlerMain {
 
-    static GlobalVarsWrapper wr = new GlobalVarsWrapper();
-    static String connectionString = "mongodb://localhost:27017";
-    private static MongoClient mongoClient;
-    static MongoDatabase searchEngineDb;
 
-
-    //connect with the DB
-    public static void initConnection() {
-        try {
-            //SearchEngine
-            //.
-            //CrawledURLS
-            mongoClient = MongoClients.create(connectionString);
-            searchEngineDb = mongoClient.getDatabase("SearchEngine");
-            Crawler.setUrlsCollection(searchEngineDb.getCollection("CrawledURLS"));
-
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-    public static void initCrawling(int numThreads, List<String> seedsArray){
+    public static void initCrawling(int numThreads, List<String> seedsArray) {
 
         /*
          *
@@ -191,7 +112,7 @@ public class CrawlerMain {
                     //The last threads takes all the remaining
                     ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
                 }
-                new Thread(new Crawler(ss, wr)).start();
+                new Thread(new Crawler(ss)).start();
             }
 
 
@@ -205,13 +126,13 @@ public class CrawlerMain {
                     ss = new ArrayList<>();
                     ss.add(seedsArray.get(i));
                     System.out.println(ss);
-                    new Thread(new Crawler(ss, wr)).start();
+                    new Thread(new Crawler(ss)).start();
                     neededThreads--;
                 } else {
                     //The last threads takes all the remaining
                     ss = new ArrayList<>();
                     ss.add(seedsArray.get(i));
-                    new Thread(new Crawler(ss, wr, neededThreads)).start();
+                    new Thread(new Crawler(ss, neededThreads)).start();
 
                     System.out.println(ss);
                 }
@@ -219,20 +140,17 @@ public class CrawlerMain {
 
         }
 
-        //System.out.println(sb.toString());   //returns a string that textually represents the object
     }
 
     public static void main(String[] args) throws FileNotFoundException {
 
         //initialize Connection with The Database
-        initConnection();
-
         int numThreads = 5;
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
         File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
         FileReader fr = new FileReader(file);   //reads the file
-        ArrayList<String> seedsArray =new ArrayList<>();
+        ArrayList<String> seedsArray;
         try (BufferedReader br = new BufferedReader(fr)) {
             String line;
             seedsArray = new ArrayList<>();
@@ -240,16 +158,12 @@ public class CrawlerMain {
                 //Read what in The seed
                 seedsArray.add(line);
             }
-
             initCrawling(numThreads, seedsArray);
             fr.close();    //closes the stream and release the resources
         }  //creates a buffering character input stream
         catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
 
     }
 
