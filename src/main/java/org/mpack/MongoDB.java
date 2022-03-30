@@ -2,6 +2,7 @@ package org.mpack;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.UpdateOptions;
+import java.util.Collections;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -93,7 +94,7 @@ public class MongoDB {
         Document doc =  stateCollection.find(searchEntry).projection(op).first();
         if (doc == null){
             //no state document is found
-            return  null;
+            return Collections.emptyList();
         }
         return doc.getList("links", String.class);
 
