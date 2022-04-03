@@ -7,6 +7,10 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+import static java.lang.Thread.sleep;
 
 
 class Crawler implements Runnable {
@@ -21,31 +25,38 @@ class Crawler implements Runnable {
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
+    public static void setIsReCrawling(boolean isReCrawling) {
+        Crawler.isReCrawling = isReCrawling;
+    }
+
+    static boolean isReCrawling = false;
+    static final List<String> reCrawlingList = List.of("https://www.cnn.com/", "https://abc.com/");
+
     public Crawler(List<String> initialStrings, int neededThreads) {
         this.initialStrings = (ArrayList<String>) initialStrings;
         this.neededThreads = neededThreads;
-
     }
 
     public Crawler(List<String> initialStrings) {
         this(initialStrings, 0);
-
     }
 
     @Override
     public void run() {
-        crawl(initialStrings);
+        if (isReCrawling)
+            reCrawl(reCrawlingList);
+        else
+            crawl(initialStrings);
     }
 
-    static public void setCount(int oldCount){
+    public static void setCount(int oldCount) {
         count = oldCount;
     }
 
-    Deque<String> unprocessedUrlsStack = new ArrayDeque<>();
 
     public void crawl(List<String> seedUrls) {
 
-        unprocessedUrlsStack.addAll(seedUrls);
+        Deque<String> unprocessedUrlsStack = new ArrayDeque<>(seedUrls);
 
         while (!unprocessedUrlsStack.isEmpty()) {
             if (count > MAX_PAGES) {
@@ -55,7 +66,7 @@ class Crawler implements Runnable {
             }
             String url;
             //To make sure The Queue is large enough not to make it idle here
-            if (neededThreads > 0 && unprocessedUrlsStack.size() > 5000) {
+            if (neededThreads > 0 && unprocessedUrlsStack.size() > 10) {
                 url = unprocessedUrlsStack.pop();
                 ArrayList<String> toSend = new ArrayList<>();
                 toSend.add(url);
@@ -93,15 +104,64 @@ class Crawler implements Runnable {
                 System.err.println("For '" + url + "': " + e.getMessage());
                 System.out.println(e.getMessage());
                 synchronized (cLock) {
+                    //a bad Link is detected
                     count--;
                 }
+            }
+
+        }
+        // Out but with links less than Count
+        //state should Remain 0
+    }
+
+
+    public void reCrawl(List<String> seedUrls) {
+
+        Deque<String> unprocessedUrlsStack = new ArrayDeque<>(seedUrls);
+
+        while (!unprocessedUrlsStack.isEmpty()) {
+
+            String url;
+            //To make sure The Queue is large enough not to make it idle here
+            if (neededThreads > 0 && unprocessedUrlsStack.size() > 10) {
+                url = unprocessedUrlsStack.pop();
+                ArrayList<String> toSend = new ArrayList<>();
+                toSend.add(url);
+                new Thread(new Crawler(toSend)).start();
+                neededThreads--;
+            }
+            url = unprocessedUrlsStack.pop();
+            //delete from the unprocessed array
+            synchronized (visitedLinks) {
+
+                if (!reCrawlingList.contains(url) && visitedLinks.contains(url)) {
+                    continue;
+                }
+            }
+            try {
+                Document document = Jsoup.connect(url).get();
+                Elements linksOnPage = document.select("a[href]");
+
+                for (Element page : linksOnPage) {
+                    String uu = page.attr("abs:href");
+                    unprocessedUrlsStack.add(uu);
+
+                }
+                synchronized (visitedLinks) {
+                    if (!visitedLinks.contains(url)) {
+                        mongoDB.insertUrl(url, document.html());
+                        visitedLinks.add(url);
+                    }//now we really processed a link
+                }
+            } catch (Exception e) {
+                System.err.println("For '" + url + "': " + e.getMessage());
+                System.out.println(e.getMessage());
             }
 
         }
     }
 
     private void finishState() {
-
         //send isDone=1 to the state
         mongoDB.setState(1);
 
@@ -110,18 +170,15 @@ class Crawler implements Runnable {
 
 
 public class CrawlerMain {
-    static final  MongoDB mainMongo = new MongoDB();
-
+    static final MongoDB mainMongo = new MongoDB();
 
     public static void initCrawling(int numThreads, List<String> seedsArray) {
 
         /*
-         *
          * now All The seeds are in the array
          * Num of threads and The number of seeds are critical
          * N_Threads > Seeds? -> That's a Good case where we Can divide them evenly
          * N_Threads < Seeds? -> give each a one seed and The remaining get them seeds from te working Ones
-         *
          * */
         int ratio = seedsArray.size() / numThreads; // how many seeds per a Thread
         ArrayList<String> ss;
@@ -165,15 +222,17 @@ public class CrawlerMain {
 
     }
 
+    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws FileNotFoundException {
 
         //initialize Connection with The Database
         int numThreads = 5;
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
-       //testMongo();
+        //testMongo();
 
         /*
+         *
          * state is -1 |0 | 1
          *
          * -1 : never worked before
@@ -184,18 +243,28 @@ public class CrawlerMain {
          * */
 
         int state = mainMongo.getState();
-        if(state == -1){
+        if (state == -1) {
             // never worked
             readAndProcess(numThreads);
-        }else if(state == 0){
+        } else if (state == 0) {
+            //continue what it started
             continueAndProcess(numThreads);
-        }else if(state == 1){
-            // u should join the reCrawling with this
-
         }
 
+
+        while (true) {
+            try {
+                sleep(10000);
+                reCrawl(numThreads);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
     }
-        // take your seeds from the unprocessed Stack
+
+    // take your seeds from the unprocessed Stack
     private static void readAndProcess(int numThreads) throws FileNotFoundException {
         mainMongo.setState(0); // start crawling
 
@@ -217,22 +286,37 @@ public class CrawlerMain {
             e.printStackTrace();
         }
     }
-    private static void continueAndProcess(int numThreads) throws FileNotFoundException {
-        mainMongo.setState(0); // continue crawling
-        Crawler.setCount((int) mainMongo.getUrlCount());
+
+    private static void continueAndProcess(int numThreads) {
+        //mainMongo.setState(0); // continue crawling
+
+        mainMongo.getVisitedLinks(Crawler.visitedLinks);
+
+        Crawler.setCount(Crawler.visitedLinks.size());
+
+        //Get The previous State array
         ArrayList<String> seedsArray = (ArrayList<String>) mainMongo.getStateArray();
+
         initCrawling(numThreads, seedsArray);
 
     }
 
+    private static void reCrawl(int numThreads) {
+        mainMongo.getVisitedLinks(Crawler.visitedLinks);
+
+        Crawler.setCount((int) mainMongo.getUrlCount());
+
+        Crawler.setIsReCrawling(true);
+
+        initCrawling(numThreads, new ArrayList<>());
+
+    }
 
 
     private static void testMongo() {
-
-        mainMongo.addToStateArray("asda");
-        mainMongo.addToStateArray("asdass");
-        System.out.println(mainMongo.getStateArray());
-       // mm.initState(1);
+        HashSet<String> arr = new HashSet<>();
+        mainMongo.getVisitedLinks(arr);
+        System.out.println(arr.size());
     }
 
 }

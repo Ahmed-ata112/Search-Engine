@@ -6,7 +6,9 @@ import java.util.Collections;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MongoDB {
     MongoCollection<org.bson.Document> urlsCollection;
@@ -98,5 +100,13 @@ public class MongoDB {
         }
         return doc.getList("links", String.class);
 
+    }
+
+    public void getVisitedLinks(Set<String> arr){
+
+        arr.clear();
+        for (String s : urlsCollection.distinct("url_link", String.class)) {
+            arr.add(s);
+        }
     }
 }
