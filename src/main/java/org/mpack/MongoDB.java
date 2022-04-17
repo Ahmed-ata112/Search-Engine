@@ -5,8 +5,6 @@ import com.mongodb.client.model.UpdateOptions;
 import java.util.Collections;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

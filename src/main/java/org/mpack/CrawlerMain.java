@@ -4,7 +4,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
+import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import java.io.*;
 import java.util.*;
 
@@ -30,6 +33,12 @@ class Crawler implements Runnable {
     static boolean isReCrawling = false;
     static final List<String> reCrawlingList = List.of("https://www.cnn.com/", "https://abc.com/");
 
+    static Logger root = (Logger) LoggerFactory
+            .getLogger(Logger.ROOT_LOGGER_NAME);
+
+    static {
+        root.setLevel(Level.OFF);
+    }
     public Crawler(List<String> initialStrings, int neededThreads) {
         this.initialStrings = (ArrayList<String>) initialStrings;
         this.neededThreads = neededThreads;
@@ -41,6 +50,7 @@ class Crawler implements Runnable {
 
     @Override
     public void run() {
+
         if (isReCrawling)
             reCrawl(reCrawlingList);
         else
@@ -92,7 +102,6 @@ class Crawler implements Runnable {
                     unprocessedUrlsStack.add(uu);
                     // add to the unprocessed array
                     mongoDB.addToStateArray(uu);
-
                 }
 
                 mongoDB.insertUrl(url, document.html());
@@ -227,7 +236,7 @@ public class CrawlerMain {
         int numThreads = 5;
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
-        testMongo();
+        //testMongo();
 
         /*
          *
@@ -240,24 +249,25 @@ public class CrawlerMain {
          *
          * */
 
-//        int state = mainMongo.getState();
-//        if (state == -1) {
-//            // never worked
-//            readAndProcess(numThreads);
-//        } else if (state == 0) {
-//            //continue what it started
-//            continueAndProcess(numThreads);
-//        }
-//
-//
-//        while (true) {
-//            try {
-//                sleep(10000);
-//                reCrawl(numThreads);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        int state = mainMongo.getState();
+
+        if (state == -1 || true) {
+            // never worked
+            readAndProcess(numThreads);
+        } else if (state == 0) {
+            //continue what it started
+            continueAndProcess(numThreads);
+        }
+
+
+        while (true) {
+            try {
+                sleep(10000);
+                reCrawl(numThreads);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
 
     }
