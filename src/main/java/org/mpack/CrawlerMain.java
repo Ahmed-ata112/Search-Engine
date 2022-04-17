@@ -7,8 +7,6 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static java.lang.Thread.sleep;
 
@@ -229,7 +227,7 @@ public class CrawlerMain {
         int numThreads = 5;
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
-        //testMongo();
+        testMongo();
 
         /*
          *
@@ -242,24 +240,24 @@ public class CrawlerMain {
          *
          * */
 
-        int state = mainMongo.getState();
-        if (state == -1) {
-            // never worked
-            readAndProcess(numThreads);
-        } else if (state == 0) {
-            //continue what it started
-            continueAndProcess(numThreads);
-        }
-
-
-        while (true) {
-            try {
-                sleep(10000);
-                reCrawl(numThreads);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        int state = mainMongo.getState();
+//        if (state == -1) {
+//            // never worked
+//            readAndProcess(numThreads);
+//        } else if (state == 0) {
+//            //continue what it started
+//            continueAndProcess(numThreads);
+//        }
+//
+//
+//        while (true) {
+//            try {
+//                sleep(10000);
+//                reCrawl(numThreads);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
 
     }
@@ -314,9 +312,10 @@ public class CrawlerMain {
 
 
     private static void testMongo() {
-        HashSet<String> arr = new HashSet<>();
-        mainMongo.getVisitedLinks(arr);
-        System.out.println(arr.size());
+
+        var ss  = mainMongo.getSuggestionsArray();
+
+        System.out.println(ss);
     }
 
 }

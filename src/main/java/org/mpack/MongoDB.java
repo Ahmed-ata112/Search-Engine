@@ -72,7 +72,6 @@ public class MongoDB {
         return urlsCollection.countDocuments();
 
     }
-
     public void addToStateArray(String url){
         org.bson.Document urlEntry = new org.bson.Document("Name", "unprocessed");
         // push the url to the links
@@ -99,6 +98,26 @@ public class MongoDB {
             return Collections.emptyList();
         }
         return doc.getList("links", String.class);
+
+    }
+    public void addToSuggestionsArray(String query){
+        org.bson.Document urlEntry = new org.bson.Document("Name", "suggestions");
+        // TODO: ensure addToSet  is working
+        org.bson.Document updateEntry = new org.bson.Document("$addToSet", new org.bson.Document("old_searches",query));
+        UpdateOptions options = new UpdateOptions().upsert(true);
+
+        stateCollection.updateOne(urlEntry,updateEntry,options);
+    }
+    public List<String> getSuggestionsArray(){
+        org.bson.Document searchEntry = new org.bson.Document("Name", "suggestions");
+        org.bson.Document op = Document.parse("{old_searches: 1 ,_id: 0}"); //only get the array of links
+
+        Document doc =  stateCollection.find(searchEntry).projection(op).first();
+        if (doc == null){
+            //no state document is found
+            return Collections.emptyList();
+        }
+        return doc.getList("old_searches", String.class);
 
     }
 
