@@ -38,6 +38,7 @@ class Api {
         List<Pojo> objectsList =new ArrayList<>();
         //TODO: Remember to add The Word to The future Suggestions List
 
+
         Lorem lorem = LoremIpsum.getInstance();
 
         for (int i = 0; i < 1000; i++) {

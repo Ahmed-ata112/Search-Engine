@@ -1,13 +1,14 @@
 package org.mpack;
-
+import io.mola.galimatias.URL;
+import io.mola.galimatias.canonicalize.CombinedCanonicalizer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
-import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import java.util.concurrent.CountDownLatch;
 import java.io.*;
 import java.util.*;
 
@@ -20,9 +21,10 @@ class Crawler implements Runnable {
     //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
     static int count = 0;
+    static CountDownLatch latch;
     static final Object cLock = new Object();
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 100;
+    static final int MAX_PAGES = 200;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -32,13 +34,14 @@ class Crawler implements Runnable {
 
     static boolean isReCrawling = false;
     static final List<String> reCrawlingList = List.of("https://www.cnn.com/", "https://abc.com/");
+    static CombinedCanonicalizer canonicalized = new CombinedCanonicalizer();
 
-    static Logger root = (Logger) LoggerFactory
-            .getLogger(Logger.ROOT_LOGGER_NAME);
+    static Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
     static {
         root.setLevel(Level.OFF);
     }
+
     public Crawler(List<String> initialStrings, int neededThreads) {
         this.initialStrings = (ArrayList<String>) initialStrings;
         this.neededThreads = neededThreads;
@@ -51,10 +54,13 @@ class Crawler implements Runnable {
     @Override
     public void run() {
 
-        if (isReCrawling)
+        if (isReCrawling) {
             reCrawl(reCrawlingList);
-        else
+        }
+        else {
+            mongoDB.deleteState();
             crawl(initialStrings);
+        }
     }
 
     public static void setCount(int oldCount) {
@@ -85,9 +91,16 @@ class Crawler implements Runnable {
             //delete from the unprocessed array
             mongoDB.removeFromStateArray(url);
 
+            try {
+                url = canonicalized.canonicalize(URL.parse(url)).toString();
+            } catch (Exception e) {
+                //not a valid url
+                System.out.println("Error in Canon");
+                continue;
+            }
+
             synchronized (visitedLinks) {
-                if (visitedLinks.contains(url))
-                    continue;
+                if (visitedLinks.contains(url)) continue;
                 else {
                     visitedLinks.add(url);
                     count++;
@@ -98,11 +111,13 @@ class Crawler implements Runnable {
                 Elements linksOnPage = document.select("a[href]");
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
-
                     unprocessedUrlsStack.add(uu);
                     // add to the unprocessed array
                     mongoDB.addToStateArray(uu);
+
                 }
+
+                System.out.println(count);
 
                 mongoDB.insertUrl(url, document.html());
                 //now we really processed a link
@@ -119,6 +134,8 @@ class Crawler implements Runnable {
         }
         // Out but with links less than Count
         //state should Remain 0
+        latch.countDown();
+
     }
 
 
@@ -171,6 +188,7 @@ class Crawler implements Runnable {
     private void finishState() {
         //send isDone=1 to the state
         mongoDB.setState(1);
+        latch.countDown();
 
     }
 }
@@ -230,10 +248,11 @@ public class CrawlerMain {
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
         //initialize Connection with The Database
         int numThreads = 5;
+        Crawler.latch = new CountDownLatch(numThreads);
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
         //testMongo();
@@ -249,20 +268,23 @@ public class CrawlerMain {
          *
          * */
 
+
         int state = mainMongo.getState();
 
-        if (state == -1 || true) {
+        if (true || state == -1) {
             // never worked
+            System.out.println("here");
             readAndProcess(numThreads);
         } else if (state == 0) {
             //continue what it started
             continueAndProcess(numThreads);
         }
 
-
+        Crawler.latch.await();      // wait for all The Threads to finish
+        System.out.println("Finished Waiting");
         while (true) {
             try {
-                sleep(10000);
+                sleep(100);
                 reCrawl(numThreads);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -323,9 +345,14 @@ public class CrawlerMain {
 
     private static void testMongo() {
 
-        var ss  = mainMongo.getSuggestionsArray();
+   /*
+        URL u = null;
+        u = URL.parse("https://www.PROgramiz.com/java-programming/online-compiler/");
+        CombinedCanonicalizer CC = new CombinedCanonicalizer();
+        String u2 = CC.canonicalize(u).toString();
 
-        System.out.println(ss);
+        System.out.println(u2.toString());
+    */
+
     }
-
 }
