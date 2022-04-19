@@ -24,7 +24,7 @@ class Crawler implements Runnable {
     static CountDownLatch latch;
     static final Object cLock = new Object();
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 50;
+    static final int MAX_PAGES = 200;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -89,7 +89,7 @@ class Crawler implements Runnable {
             }
             url = unprocessedUrlsStack.pop();
             //delete from the unprocessed array
-            //mongoDB.removeFromStateArray(url);
+            mongoDB.removeFromStateArray(url);
 
             try {
                 url = canonicalized.canonicalize(URL.parse(url)).toString();
@@ -113,7 +113,7 @@ class Crawler implements Runnable {
                     String uu = page.attr("abs:href");
                     unprocessedUrlsStack.add(uu);
                     // add to the unprocessed array
-                    //mongoDB.addToStateArray(uu);
+                    mongoDB.addToStateArray(uu);
 
                 }
 
@@ -345,14 +345,14 @@ public class CrawlerMain {
 
     private static void testMongo() {
 
-   /*     URL u = null;
-
+   /*
+        URL u = null;
         u = URL.parse("https://www.PROgramiz.com/java-programming/online-compiler/");
         CombinedCanonicalizer CC = new CombinedCanonicalizer();
         String u2 = CC.canonicalize(u).toString();
 
         System.out.println(u2.toString());
-*/
+    */
 
     }
 }

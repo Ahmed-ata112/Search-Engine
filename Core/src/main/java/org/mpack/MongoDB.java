@@ -3,8 +3,10 @@ package org.mpack;
 import com.mongodb.client.*;
 import com.mongodb.client.model.UpdateOptions;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -85,9 +87,13 @@ public class MongoDB {
     public void addToStateArray(String url) {
         org.bson.Document urlEntry = new org.bson.Document("Name", "unprocessed");
         // push the url to the links
-        org.bson.Document updateEntry = new org.bson.Document("$push", new org.bson.Document("links", url));
-        UpdateOptions options = new UpdateOptions().upsert(true);
 
+
+        UpdateOptions options = new UpdateOptions().upsert(true);
+        ArrayList<String> arr = new ArrayList<String>();
+        arr.add(url);
+        //String json = "{ $push : {\"links\":{$each: [" + url + "],$slice: -500}}}";
+        org.bson.Document updateEntry = new org.bson.Document("$push", new Document("links", new Document("$each",arr).append("$slice", -500)));
         stateCollection.updateOne(urlEntry, updateEntry, options);
     }
 
