@@ -33,24 +33,25 @@ class Pojo {
 @RestController
 class Api {
 
-    @GetMapping(value="/Query/{Qword}")
-    public List<Pojo> index(@PathVariable(value = "Qword") String SearchQ) {
-        List<Pojo> objectsList =new ArrayList<>();
+    @GetMapping(value = "/Query/{Qword}")
+    public List<Pojo> queryProcessor(@PathVariable(value = "Qword") String SearchQ) {
+        List<Pojo> objectsList = new ArrayList<>();
         //TODO: Remember to add The Word to The future Suggestions List
 
 
         Lorem lorem = LoremIpsum.getInstance();
 
+
         for (int i = 0; i < 1000; i++) {
-            Pojo p1 = new Pojo(""+i ,lorem.getParagraphs(1,3));
+            Pojo p1 = new Pojo("" + i, lorem.getParagraphs(1, 3));
             objectsList.add(p1);
         }
 
         return objectsList;
     }
 
-    @GetMapping(value="/suggests")
-    public List<String> getSuggestion(){
+    @GetMapping(value = "/suggests")
+    public List<String> getSuggestion() {
         ArrayList<String> arr = new ArrayList<>();
 
         arr.add("as");
@@ -59,7 +60,6 @@ class Api {
 
         return arr;
     }
-
 
 
 }
