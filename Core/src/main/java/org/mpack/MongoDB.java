@@ -70,6 +70,7 @@ public class MongoDB {
             //no state document is found
             return -1;
         }
+        // json
         return (int) doc.get("isDone");
     }
 
