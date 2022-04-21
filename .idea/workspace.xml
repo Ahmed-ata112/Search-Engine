@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/indexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -118,7 +115,7 @@
       <updated>1650214933938</updated>
       <workItem from="1650214936706" duration="171000" />
       <workItem from="1650215298399" duration="3330000" />
-      <workItem from="1650568203173" duration="1868000" />
+      <workItem from="1650568203173" duration="2259000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
@@ -148,7 +145,14 @@
       <option name="project" value="LOCAL" />
       <updated>1650572725947</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="the indexer file includes functions to do the follwoing :&#10;1-parse the html documents of the crawled urls  --&gt; done by rufaida&#10;2-extract the words from parsed html documents --&gt; done by rufaida&#10;3-construct the stop words and remove them from the tokens list --&gt; done by me&#10;4-stem the word and save it in the database ---&gt; done by me&#10;5-build the inverted file ---&gt; done by me">
+      <created>1650573133884</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1650573133884</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -171,6 +175,7 @@
     <MESSAGE value="stop words" />
     <MESSAGE value="mongodb indexer file&#10;inserting the inverted file into the database&#10;as well as inserting the equivalent words of the stemming word in a separate database &#10;also get the crawled documents from the crawler --&gt; by rufaidah" />
     <MESSAGE value="this is a class carrying the information about the word &lt;token&gt; such as :&#10;term frequency&#10;the positions for this word in the url&#10;the flags which indicates if this word appears as a title, a header or in the body --&gt; as this will help the ranker when sorting the results of the search. i.e., to know which sites have the highest priority to appear first and so on" />
-    <option name="LAST_COMMIT_MESSAGE" value="this is a class carrying the information about the word &lt;token&gt; such as :&#10;term frequency&#10;the positions for this word in the url&#10;the flags which indicates if this word appears as a title, a header or in the body --&gt; as this will help the ranker when sorting the results of the search. i.e., to know which sites have the highest priority to appear first and so on" />
+    <MESSAGE value="the indexer file includes functions to do the follwoing :&#10;1-parse the html documents of the crawled urls  --&gt; done by rufaida&#10;2-extract the words from parsed html documents --&gt; done by rufaida&#10;3-construct the stop words and remove them from the tokens list --&gt; done by me&#10;4-stem the word and save it in the database ---&gt; done by me&#10;5-build the inverted file ---&gt; done by me" />
+    <option name="LAST_COMMIT_MESSAGE" value="the indexer file includes functions to do the follwoing :&#10;1-parse the html documents of the crawled urls  --&gt; done by rufaida&#10;2-extract the words from parsed html documents --&gt; done by rufaida&#10;3-construct the stop words and remove them from the tokens list --&gt; done by me&#10;4-stem the word and save it in the database ---&gt; done by me&#10;5-build the inverted file ---&gt; done by me" />
   </component>
 </project>
