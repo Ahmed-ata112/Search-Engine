@@ -1,13 +1,10 @@
 package org.mpack;
-
-import java.sql.Array;
 import java.util.ArrayList;
 
 public class wordInfo {
     private int TF;
     private ArrayList<Integer> flags;
     private ArrayList<Integer> positions;
-    //private String url;
 
     wordInfo()
     {
@@ -20,7 +17,7 @@ public class wordInfo {
 
     boolean setFlags(short i, int value) {
         if(!(i >= 0 && i < flags.size())) return false;
-        value = value < 0 ? 0 : value;
+        value = Math.max(value, 0);
         flags.set(i, value);
         return true;
     }
@@ -34,7 +31,6 @@ public class wordInfo {
         positions.add(pos);
         return true;
     }
-    //String getUrl(){return url;}
     ArrayList<Integer> getFlags(){return new ArrayList<Integer>(this.flags);}
     ArrayList<Integer> getPositions(){return new ArrayList<Integer>(this.positions);}
 }
