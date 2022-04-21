@@ -94,7 +94,7 @@ public class MongoDB {
         ArrayList<String> arr = new ArrayList<String>();
         arr.add(url);
         //String json = "{ $push : {\"links\":{$each: [" + url + "],$slice: -500}}}";
-        org.bson.Document updateEntry = new org.bson.Document("$push", new Document("links", new Document("$each",arr).append("$slice", -500)));
+        org.bson.Document updateEntry = new org.bson.Document("$push", new Document("links", new Document("$each",arr).append("$slice", -4000)));
         stateCollection.updateOne(urlEntry, updateEntry, options);
     }
 
@@ -141,11 +141,12 @@ public class MongoDB {
 
     }
 
-    public void getVisitedLinks(Set<String> arr) {
-
+    public void getVisitedLinks() {
+        Set<String> arr = Crawler.visitedLinks;
         arr.clear();
         for (String s : urlsCollection.distinct("url_link", String.class)) {
             arr.add(s);
+            Crawler.websites_hashes.add(Crawler.encryptThisString(s));
         }
     }
 }

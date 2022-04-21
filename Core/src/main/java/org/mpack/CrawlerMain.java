@@ -11,20 +11,24 @@ import ch.qos.logback.classic.Logger;
 import java.util.concurrent.CountDownLatch;
 import java.io.*;
 import java.util.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import static java.lang.Thread.sleep;
 
 
 class Crawler implements Runnable {
     // Global Data can be Static too
-    static final HashSet<String> visitedLinks = new HashSet<>();
+    public static final HashSet<String> visitedLinks = new HashSet<>();
+    public static final HashSet<String> websites_hashes = new HashSet<>();
     //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
     static int count = 0;
     static CountDownLatch latch;
     static final Object cLock = new Object();
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 200;
+    static final int MAX_PAGES = 1000;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -56,10 +60,40 @@ class Crawler implements Runnable {
 
         if (isReCrawling) {
             reCrawl(reCrawlingList);
-        }
-        else {
+        } else {
             mongoDB.deleteState();
             crawl(initialStrings);
+        }
+    }
+
+    public static String encryptThisString(String input) {
+        try {
+            // getInstance() method is called with algorithm SHA-1
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+
+            // digest() method is called
+            // to calculate message digest of the input string
+            // returned as array of byte
+            byte[] messageDigest = md.digest(input.getBytes());
+
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+
+//            // Add preceding 0s to make it 32 bit
+//            while (hashtext.length() < 32) {
+//                hashtext = "0" + hashtext;
+//            }
+
+            // return the HashText
+            return hashtext;
+        }
+
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -108,6 +142,13 @@ class Crawler implements Runnable {
             }
             try {
                 Document document = Jsoup.connect(url).get();
+                String hashed = encryptThisString(document.html());
+                synchronized (websites_hashes){
+                    if (websites_hashes.contains(hashed)) {
+                        continue;
+                    } else
+                        websites_hashes.add(hashed);
+                }
                 Elements linksOnPage = document.select("a[href]");
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
@@ -165,7 +206,13 @@ class Crawler implements Runnable {
             try {
                 Document document = Jsoup.connect(url).get();
                 Elements linksOnPage = document.select("a[href]");
-
+                String hashed = encryptThisString(document.html());
+                synchronized (websites_hashes){
+                    if (websites_hashes.contains(hashed)) {
+                        continue;
+                    } else
+                        websites_hashes.add(hashed);
+                }
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
                     unprocessedUrlsStack.add(uu);
@@ -251,7 +298,7 @@ public class CrawlerMain {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
         //initialize Connection with The Database
-        int numThreads = 5;
+        int numThreads = 20;
         Crawler.latch = new CountDownLatch(numThreads);
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
@@ -320,7 +367,7 @@ public class CrawlerMain {
     private static void continueAndProcess(int numThreads) {
         //mainMongo.setState(0); // continue crawling
 
-        mainMongo.getVisitedLinks(Crawler.visitedLinks);
+        mainMongo.getVisitedLinks();
 
         Crawler.setCount(Crawler.visitedLinks.size());
 
@@ -332,7 +379,7 @@ public class CrawlerMain {
     }
 
     private static void reCrawl(int numThreads) {
-        mainMongo.getVisitedLinks(Crawler.visitedLinks);
+        mainMongo.getVisitedLinks();
 
         Crawler.setCount((int) mainMongo.getUrlCount());
 
