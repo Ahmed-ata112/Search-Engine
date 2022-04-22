@@ -34,7 +34,7 @@ public class Indexer {
             docFlags.add(i, new HashMap<String, Integer>());
 //               url     text
         //parse the HTML
-        ArrayList<String> title = new ArrayList<String>(), header = new ArrayList<String>();
+        ArrayList<String> title, header;
         List<String> stopWords = obj.constructStopWords();
 
         for (Map.Entry<String, String> set : htmlDocs.entrySet()) {

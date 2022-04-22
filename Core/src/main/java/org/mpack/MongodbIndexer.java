@@ -6,10 +6,6 @@ import org.bson.Document;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.mongodb.client.model.Projections.fields;
-import static com.mongodb.client.model.Projections.include;
-
-
 public class MongodbIndexer {
     MongoCollection<org.bson.Document> crawledCollection;
     static final String CONNECTION_STRING = "mongodb://localhost:27017";
@@ -49,9 +45,6 @@ public class MongodbIndexer {
         crawledCollection.find().forEach(getContent);
         return HTMLmap;
     }
-    public void terminateConnection() {
-    }
-
 
 
     //--------------------------------------
@@ -59,7 +52,6 @@ public class MongodbIndexer {
     {
         InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
-        List<Document> doc_per_word = new ArrayList<>();
         int k = 0;
         double idf = docCount;
         for(Map.Entry<String, HashMap<String, wordInfo>> set1 : invertedFile.entrySet())
@@ -75,6 +67,7 @@ public class MongodbIndexer {
 
             Document doc = new Document();
             doc.put("token_name", set1.getKey());
+            List<Document> doc_per_word = new ArrayList<>();
             for(Map.Entry<String, wordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
                 d.append("URL",set2.getKey()).append("TF", set2.getValue().getTF()).append("Flags", set2.getValue().getFlags())

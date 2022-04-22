@@ -197,6 +197,15 @@ class Crawler implements Runnable {
                 neededThreads--;
             }
             url = unprocessedUrlsStack.pop();
+
+            try {
+                url = canonicalized.canonicalize(URL.parse(url)).toString();
+
+            } catch (Exception e) {
+                //not a valid url
+                System.out.println("Error in Canon");
+                continue;
+            }
             //delete from the unprocessed array
             synchronized (visitedLinks) {
 
