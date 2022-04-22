@@ -10,14 +10,14 @@ import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 
 
-public class MongoDB_indexer {
+public class MongodbIndexer {
     MongoCollection<org.bson.Document> crawledCollection;
     static final String CONNECTION_STRING = "mongodb://localhost:27017";
     MongoDatabase searchEngineDb;
     MongoClient mongoClient;
     private MongoCollection<Document> InvertedFileCollection;
 
-    MongoDB_indexer() {
+    MongodbIndexer() {
         initConnection();
     }
 
