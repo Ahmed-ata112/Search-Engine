@@ -50,12 +50,10 @@ public class Indexer {
             List<String> tokens = obj.ExtractWords(parsedHTML);
             obj.removeStopWords(tokens, stopWords);
             obj.stemWord(tokens);
-            mongoDB.StoreStemming(obj.equivalentStems);
             obj.invertedFile(set.getKey(), tokens, docFlags);
 
         }
-
-
+        mongoDB.StoreStemming(obj.equivalentStems);
         mongoDB.insertInvertedFile(obj.invertedFile, obj.documentsCount);
 
 

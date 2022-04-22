@@ -127,6 +127,7 @@ class Crawler implements Runnable {
 
             try {
                 url = canonicalized.canonicalize(URL.parse(url)).toString();
+
             } catch (Exception e) {
                 //not a valid url
                 System.out.println("Error in Canon");
