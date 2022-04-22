@@ -15,7 +15,6 @@ public class MongodbIndexer {
     static final String CONNECTION_STRING = "mongodb://localhost:27017";
     MongoDatabase searchEngineDb;
     MongoClient mongoClient;
-    private MongoCollection<Document> InvertedFileCollection;
 
     MongodbIndexer() {
         initConnection();
@@ -55,27 +54,27 @@ public class MongodbIndexer {
 
 
     //--------------------------------------
-    public void insertInvertedFile(HashMap<String, HashMap<String, wordInfo>>  invertedFile, long docCount)
+    public void insertInvertedFile(Map<String, HashMap<String, WordInfo>>  invertedFile, long docCount)
     {
-        InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
+        MongoCollection<Document> invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
         List<Document> doc_per_word = new ArrayList<>();
         int k = 0;
         double idf = docCount;
-        for(Map.Entry<String, HashMap<String, wordInfo>> set1 : invertedFile.entrySet())
+        for(Map.Entry<String, HashMap<String, WordInfo>> set1 : invertedFile.entrySet())
         {
 
             k++;
             if(k == 1000)
             {
                 k = 0;
-                InvertedFileCollection.insertMany(documents);
+                invertedFileCollection.insertMany(documents);
                 documents.clear();
             }
 
             Document doc = new Document();
             doc.put("token_name", set1.getKey());
-            for(Map.Entry<String, wordInfo> set2 : set1.getValue().entrySet()) {
+            for(Map.Entry<String, WordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
                 d.append("URL",set2.getKey()).append("TF", set2.getValue().getTF()).append("Flags", set2.getValue().getFlags())
                         .append("Positions", set2.getValue().getPositions());
@@ -88,13 +87,13 @@ public class MongodbIndexer {
             documents.add(doc);
 
             //set1 -- key <word>     value <Hashmap>
-            //set2 -- key <URL>      value <wordInfo>
+            //set2 -- key <URL>      value <WordInfo>
         }
-        InvertedFileCollection.insertMany(documents);
+        invertedFileCollection.insertMany(documents);
 
 
     }
-    public void StoreStemming(HashMap<String, Set<String>> equivalentStems) {
+    public void StoreStemming(Map<String, Set<String>> equivalentStems) {
         List<Document> documents = new ArrayList<>();
 
         for (Map.Entry<String, Set<String>> set1 : equivalentStems.entrySet()) {
@@ -103,8 +102,7 @@ public class MongodbIndexer {
             doc.append("Equivalent_words", set1.getValue());
             documents.add(doc);
         }
-        MongoCollection<Document> StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
-        StemmingCollection.insertMany(documents);
+        MongoCollection<Document> stemmingCollection = searchEngineDb.getCollection("stemmingCollection");
+        stemmingCollection.insertMany(documents);
     }
 }
-    
