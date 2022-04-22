@@ -3,7 +3,6 @@ package org.mpack;
 import ca.rmen.porterstemmer.PorterStemmer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -133,7 +132,7 @@ public class Indexer {
     }
 
 
-    private void invertedFile(String DocURL, List<String> tokens, ArrayList<HashMap<String, Integer>> docFlags) {
+    private void invertedFile(String docURL, List<String> tokens, ArrayList<HashMap<String, Integer>> docFlags) {
         for (int i = 0; i < tokens.size(); i++) {
 
             if (invertedFile.containsKey(tokens.get(i))) {
@@ -174,7 +173,7 @@ public class Indexer {
 
     private void extractFlags(ArrayList<HashMap<String, Integer>> docFlags, ArrayList<String> title, ArrayList<String> header) {
         List<String> temp;
-        int k = 0;
+        int k;
         for (String item : title) {
             temp = extractWords(item);
             for (String s : temp) {
