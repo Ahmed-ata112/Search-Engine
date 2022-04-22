@@ -6,10 +6,6 @@ import org.bson.Document;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.mongodb.client.model.Projections.fields;
-import static com.mongodb.client.model.Projections.include;
-
-
 public class MongodbIndexer {
     MongoCollection<org.bson.Document> crawledCollection;
     static final String CONNECTION_STRING = "mongodb://localhost:27017";
@@ -48,9 +44,6 @@ public class MongodbIndexer {
         crawledCollection.find().forEach(getContent);
         return HTMLmap;
     }
-    public void terminateConnection() {
-    }
-
 
 
     //--------------------------------------
@@ -58,7 +51,7 @@ public class MongodbIndexer {
     {
         MongoCollection<Document> invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
-        List<Document> doc_per_word = new ArrayList<>();
+        List<Document> doc_per_word;
         int k = 0;
         double idf = docCount;
         for(Map.Entry<String, HashMap<String, WordInfo>> set1 : invertedFile.entrySet())
@@ -74,6 +67,7 @@ public class MongodbIndexer {
 
             Document doc = new Document();
             doc.put("token_name", set1.getKey());
+            doc_per_word = new ArrayList<>();
             for(Map.Entry<String, WordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
                 d.append("URL",set2.getKey()).append("TF", set2.getValue().getTF()).append("Flags", set2.getValue().getFlags())
@@ -87,7 +81,7 @@ public class MongodbIndexer {
             documents.add(doc);
 
             //set1 -- key <word>     value <Hashmap>
-            //set2 -- key <URL>      value <WordInfo>
+            //set2 -- key <URL>      value <wordInfo>
         }
         invertedFileCollection.insertMany(documents);
 
@@ -106,3 +100,4 @@ public class MongodbIndexer {
         stemmingCollection.insertMany(documents);
     }
 }
+    

@@ -133,9 +133,7 @@ public class Indexer {
     }
 
 
-    private void invertedFile(String docURL, List<String> tokens, ArrayList<HashMap<String, Integer>> docFlags) {
-        System.out.println(docFlags);
-        System.out.println("-----------------------------------------------------------------------------------------");
+    private void invertedFile(String DocURL, List<String> tokens, ArrayList<HashMap<String, Integer>> docFlags) {
         for (int i = 0; i < tokens.size(); i++) {
 
             if (invertedFile.containsKey(tokens.get(i))) {
@@ -154,8 +152,7 @@ public class Indexer {
                     for (short k = 0; k < docFlags.size(); k++) {
                         container.setFlags(k, docFlags.get(k).getOrDefault(tokens.get(i), 0));
                     }
-                        invertedFile.get(tokens.get(i)).put(docURL, container);
-                        System.out.println(container.getFlags());
+                    invertedFile.get(tokens.get(i)).put(docURL, container);
                 }
 
             } else {
@@ -168,7 +165,6 @@ public class Indexer {
                 for (short k = 0; k < docFlags.size(); k++) {
                     container.setFlags(k, docFlags.get(k).getOrDefault(tokens.get(i), 0));
                 }
-                    System.out.println(container.getFlags());
                 invertedFile.put(tokens.get(i), docMap);
             }
 
