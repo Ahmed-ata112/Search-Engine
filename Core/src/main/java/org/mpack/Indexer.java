@@ -34,7 +34,7 @@ public class Indexer {
             docFlags.add(i, new HashMap<String, Integer>());
 //               url     text
         //parse the HTML
-        ArrayList<String> title = new ArrayList<String>(), header = new ArrayList<String>();
+        ArrayList<String> title, header;
         List<String> stopWords = obj.constructStopWords();
 
         for (Map.Entry<String, String> set : htmlDocs.entrySet()) {
@@ -50,12 +50,10 @@ public class Indexer {
             List<String> tokens = obj.ExtractWords(parsedHTML);
             obj.removeStopWords(tokens, stopWords);
             obj.stemWord(tokens);
-            mongoDB.StoreStemming(obj.equivalentStems);
             obj.invertedFile(set.getKey(), tokens, docFlags);
 
         }
-
-
+        mongoDB.StoreStemming(obj.equivalentStems);
         mongoDB.insertInvertedFile(obj.invertedFile, obj.documentsCount);
 
 
