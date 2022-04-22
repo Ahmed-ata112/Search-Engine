@@ -59,7 +59,7 @@ public class MongoDB_indexer {
     {
         InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
-        List<Document> doc_per_word = new ArrayList<>();
+        
         int k = 0;
         double idf = docCount;
         for(Map.Entry<String, HashMap<String, wordInfo>> set1 : invertedFile.entrySet())
@@ -75,6 +75,7 @@ public class MongoDB_indexer {
 
             Document doc = new Document();
             doc.put("token_name", set1.getKey());
+            List<Document> doc_per_word = new ArrayList<>();
             for(Map.Entry<String, wordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
                 d.append("URL",set2.getKey()).append("TF", set2.getValue().getTF()).append("Flags", set2.getValue().getFlags())

@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="" />
+    <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,6 +30,8 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/Core/src/main/java/org/mpack" />
@@ -116,6 +120,8 @@
       <workItem from="1650214936706" duration="171000" />
       <workItem from="1650215298399" duration="3330000" />
       <workItem from="1650568203173" duration="2259000" />
+      <workItem from="1650579503727" duration="115000" />
+      <workItem from="1650611424430" duration="1995000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
