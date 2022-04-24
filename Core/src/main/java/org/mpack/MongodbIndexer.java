@@ -50,17 +50,18 @@ public class MongodbIndexer {
 
     public void insertInvertedFile(HashMap<String, HashMap<String, WordInfo>>  invertedFile, long docCount)
     {
+        MongoCollection<Document> invertedFileCollection;
         //drop the collection if exists to create a new one
         boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
                 .into(new ArrayList<String>()).contains("InvertedFile");
         if(collectionExists)
         {
-            InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
-            InvertedFileCollection.drop();
+            invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
+            invertedFileCollection.drop();
 
         }
 
-        InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
+        invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
         
 
