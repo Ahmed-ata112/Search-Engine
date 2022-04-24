@@ -57,6 +57,16 @@ public class MongodbIndexer {
     //--------------------------------------
     public void insertInvertedFile(HashMap<String, HashMap<String, wordInfo>>  invertedFile, long docCount)
     {
+        //drop the collection if exists to create a new one
+        boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
+                .into(new ArrayList<String>()).contains("InvertedFile");
+        if(collectionExists)
+        {
+            InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
+            InvertedFileCollection.drop();
+
+        }
+
         InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
         
@@ -104,7 +114,18 @@ public class MongodbIndexer {
             doc.append("Equivalent_words", set1.getValue());
             documents.add(doc);
         }
-        MongoCollection<Document> StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
+
+        //check if the collection exists, if so then drop it and create a new one
+        MongoCollection<Document> StemmingCollection;
+        boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
+                .into(new ArrayList<String>()).contains("StemmingCollection");
+        if(collectionExists)
+        {
+            StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
+            StemmingCollection.drop();
+
+        }
+        StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
         StemmingCollection.insertMany(documents);
     }
 }
