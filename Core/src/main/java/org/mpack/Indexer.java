@@ -69,7 +69,7 @@ public class Indexer {
     //read the stop words
     private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Search_Engine_new\\Core\\attaches\\stopwords.txt");
+        File file = new File(".\\attaches\\stopwords.txt");
         Scanner scan = new Scanner(file);
 
         HashMap<Character, List<String>> stopWords = new HashMap<>();
