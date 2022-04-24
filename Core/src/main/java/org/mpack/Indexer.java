@@ -18,7 +18,7 @@ public class Indexer {
 
     static final MongodbIndexer mongoDB = new MongodbIndexer();
 
-    HashMap<String, HashMap<String, wordInfo>> invertedFile;
+    HashMap<String, HashMap<String, WordInfo>> invertedFile;
     HashMap<String, Set<String>> equivalentStems = new HashMap<String, Set<String>>();
     long documentsCount;
 
@@ -62,7 +62,7 @@ public class Indexer {
     }
 
     public Indexer() {
-        invertedFile = new HashMap<String, HashMap<String, wordInfo>>();
+        invertedFile = new HashMap<String, HashMap<String, WordInfo>>();
         // id     documents  id       fields & values <TF, POSITION, FLAG>
     }
 
@@ -163,7 +163,7 @@ public class Indexer {
                     invertedFile.get(tokens.get(i)).get(DocURL).incTF();
                 } else {
                     //then create it
-                    wordInfo container = new wordInfo();
+                    WordInfo container = new WordInfo();
                     container.addPosition(i);
                     container.incTF();
 
@@ -176,8 +176,8 @@ public class Indexer {
                 }
 
             } else {
-                HashMap<String, wordInfo> docMap = new HashMap<>();
-                wordInfo container = new wordInfo();
+                HashMap<String, WordInfo> docMap = new HashMap<>();
+                WordInfo container = new WordInfo();
                 container.addPosition(i);
                 container.incTF();
                 docMap.put(DocURL, container);

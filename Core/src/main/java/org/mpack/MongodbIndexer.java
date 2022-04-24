@@ -55,7 +55,7 @@ public class MongodbIndexer {
 
 
     //--------------------------------------
-    public void insertInvertedFile(HashMap<String, HashMap<String, wordInfo>>  invertedFile, long docCount)
+    public void insertInvertedFile(HashMap<String, HashMap<String, WordInfo>>  invertedFile, long docCount)
     {
         //drop the collection if exists to create a new one
         boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
@@ -72,7 +72,7 @@ public class MongodbIndexer {
         
         int k = 0;
         double idf = docCount;
-        for(Map.Entry<String, HashMap<String, wordInfo>> set1 : invertedFile.entrySet())
+        for(Map.Entry<String, HashMap<String, WordInfo>> set1 : invertedFile.entrySet())
         {
 
             k++;
@@ -86,7 +86,7 @@ public class MongodbIndexer {
             Document doc = new Document();
             doc.put("token_name", set1.getKey());
             List<Document> doc_per_word = new ArrayList<>();
-            for(Map.Entry<String, wordInfo> set2 : set1.getValue().entrySet()) {
+            for(Map.Entry<String, WordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
                 d.append("URL",set2.getKey()).append("TF", set2.getValue().getTF()).append("Flags", set2.getValue().getFlags())
                         .append("Positions", set2.getValue().getPositions());

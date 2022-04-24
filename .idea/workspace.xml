@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="the indexer file includes functions to do the follwoing :&#10;1-parse the html documents of the crawled urls  --&gt; done by rufaida&#10;2-extract the words from parsed html documents --&gt; done by rufaida&#10;3-construct the stop words and remove them from the tokens list --&gt; done by me&#10;4-stem the word and save it in the database ---&gt; done by me&#10;5-build the inverted file ---&gt; done by me">
       <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +152,7 @@
       <workItem from="1650635549542" duration="379000" />
       <workItem from="1650675230032" duration="644000" />
       <workItem from="1650683419926" duration="25000" />
-      <workItem from="1650800382932" duration="3945000" />
+      <workItem from="1650800382932" duration="4573000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
@@ -211,7 +210,14 @@
       <option name="project" value="LOCAL" />
       <updated>1650804093647</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="---">
+      <created>1650804378798</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1650804378798</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -238,6 +244,7 @@
     <MESSAGE value="change the structure we store the constructed stop words in&#10;from a list --&gt; to a hashmap&#10;this will improve the complexity of searching for the stop word when removing it from the tokens" />
     <MESSAGE value="--" />
     <MESSAGE value="drop the collection at each run and create a new one &#10;invertedFile and stemmingCollection" />
-    <option name="LAST_COMMIT_MESSAGE" value="drop the collection at each run and create a new one &#10;invertedFile and stemmingCollection" />
+    <MESSAGE value="---" />
+    <option name="LAST_COMMIT_MESSAGE" value="---" />
   </component>
 </project>
