@@ -6,16 +6,11 @@ import org.bson.Document;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.mongodb.client.model.Projections.fields;
-import static com.mongodb.client.model.Projections.include;
-
-
 public class MongodbIndexer {
     MongoCollection<org.bson.Document> crawledCollection;
     static final String CONNECTION_STRING = "mongodb://localhost:27017";
     MongoDatabase searchEngineDb;
     MongoClient mongoClient;
-    private MongoCollection<Document> InvertedFileCollection;
 
     MongodbIndexer() {
         initConnection();
@@ -49,12 +44,10 @@ public class MongodbIndexer {
         crawledCollection.find().forEach(getContent);
         return HTMLmap;
     }
-    public void terminateConnection() {
-    }
-
 
 
     //--------------------------------------
+
     public void insertInvertedFile(HashMap<String, HashMap<String, WordInfo>>  invertedFile, long docCount)
     {
         //drop the collection if exists to create a new one
@@ -70,6 +63,7 @@ public class MongodbIndexer {
         InvertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
         
+
         int k = 0;
         double idf = docCount;
         for(Map.Entry<String, HashMap<String, WordInfo>> set1 : invertedFile.entrySet())
@@ -79,13 +73,15 @@ public class MongodbIndexer {
             if(k == 1000)
             {
                 k = 0;
-                InvertedFileCollection.insertMany(documents);
+                invertedFileCollection.insertMany(documents);
                 documents.clear();
             }
 
             Document doc = new Document();
             doc.put("token_name", set1.getKey());
+
             List<Document> doc_per_word = new ArrayList<>();
+
             for(Map.Entry<String, WordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
                 d.append("URL",set2.getKey()).append("TF", set2.getValue().getTF()).append("Flags", set2.getValue().getFlags())
@@ -101,11 +97,11 @@ public class MongodbIndexer {
             //set1 -- key <word>     value <Hashmap>
             //set2 -- key <URL>      value <wordInfo>
         }
-        InvertedFileCollection.insertMany(documents);
+        invertedFileCollection.insertMany(documents);
 
 
     }
-    public void StoreStemming(HashMap<String, Set<String>> equivalentStems) {
+    public void StoreStemming(Map<String, Set<String>> equivalentStems) {
         List<Document> documents = new ArrayList<>();
 
         for (Map.Entry<String, Set<String>> set1 : equivalentStems.entrySet()) {
@@ -114,6 +110,7 @@ public class MongodbIndexer {
             doc.append("Equivalent_words", set1.getValue());
             documents.add(doc);
         }
+
 
         //check if the collection exists, if so then drop it and create a new one
         MongoCollection<Document> StemmingCollection;
@@ -127,6 +124,7 @@ public class MongodbIndexer {
         }
         StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
         StemmingCollection.insertMany(documents);
+
     }
 }
     

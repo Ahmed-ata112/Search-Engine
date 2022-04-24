@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="the indexer file includes functions to do the follwoing :&#10;1-parse the html documents of the crawled urls  --&gt; done by rufaida&#10;2-extract the words from parsed html documents --&gt; done by rufaida&#10;3-construct the stop words and remove them from the tokens list --&gt; done by me&#10;4-stem the word and save it in the database ---&gt; done by me&#10;5-build the inverted file ---&gt; done by me">
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" afterDir="false" />
+
+    <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="edits">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,9 +22,17 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SET_USER_NAME_GLOBALLY" value="false" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
   </component>
   <component name="ProjectId" id="27vycEmCstNCNi62ZCoITip4oih" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -29,14 +40,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="dart.analysis.tool.window.visible" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../labs_records/lab_5/Lab MPI S21/Examples" />
-    <property name="show.migrate.to.gradle.popup" value="false" />
-  </component>
+
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "dart.analysis.tool.window.visible": "false",
+    "last_opened_file_path": "D:/Second_year/Second_semester/CMP 2050/Project/APTProject",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Problems",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "spring.configuration.checksum": "e368b9938746fa090d6afd3628355133"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mongo"
+    ]
+  }
+}]]></component>
+
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Academic_college\second_year_2nd_term\advanced_programming\Project\APT_Project_Last\Core\src\main\java\org\mpack" />
@@ -79,6 +112,32 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Indexer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mpack.Indexer" />
+      <module name="demo1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.mpack.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="org.mpack.CrawlerMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mpack.CrawlerMain" />
+      <module name="demo1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.mpack.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="generated-requests | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="3" runType="Run single request">
       <method v="2" />
     </configuration>
@@ -97,27 +156,33 @@
       </method>
     </configuration>
     <configuration name="ApiMain (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-      <module name="APTProject" />
+      <option name="ACTIVE_PROFILES" />
+      <module name="demo1" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="org.api.ApiMain" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="ApiMain" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-      <module name="APTProject2" />
+      <option name="ACTIVE_PROFILES" />
+      <module name="demo1" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="org.api.ApiMain" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="AptProject2Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-      <module name="APTProject2" />
+      <option name="ACTIVE_PROFILES" />
+      <option name="ALTERNATIVE_JRE_PATH" value="17" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.aptproject2.AptProject2Application" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.Indexer" />
+      <item itemvalue="Application.org.mpack.CrawlerMain" />
       <item itemvalue="Application.CrawlerMain" />
       <item itemvalue="Application.Indexer" />
       <item itemvalue="HTTP Request.generated-requests | #3" />
@@ -129,6 +194,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.Indexer" />
+
+        <item itemvalue="Application.org.mpack.CrawlerMain" />
+        <item itemvalue="HTTP Request.generated-requests | #4" />
+
         <item itemvalue="Application.CrawlerMain" />
         <item itemvalue="HTTP Request.generated-requests | #4" />
         <item itemvalue="HTTP Request.generated-requests | #3" />
@@ -146,13 +215,13 @@
       <workItem from="1650214936706" duration="171000" />
       <workItem from="1650215298399" duration="3330000" />
       <workItem from="1650568203173" duration="2259000" />
-      <workItem from="1650579503727" duration="115000" />
-      <workItem from="1650611424430" duration="1995000" />
-      <workItem from="1650631774957" duration="2337000" />
-      <workItem from="1650635549542" duration="379000" />
-      <workItem from="1650675230032" duration="644000" />
-      <workItem from="1650683419926" duration="25000" />
-      <workItem from="1650800382932" duration="4573000" />
+
+      <workItem from="1650625048314" duration="472000" />
+      <workItem from="1650625547633" duration="67000" />
+      <workItem from="1650625633585" duration="783000" />
+      <workItem from="1650626440382" duration="4548000" />
+      <workItem from="1650631049136" duration="5437000" />
+
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
@@ -189,35 +258,30 @@
       <option name="project" value="LOCAL" />
       <updated>1650573133884</updated>
     </task>
-    <task id="LOCAL-00006" summary="change the structure we store the constructed stop words in&#10;from a list --&gt; to a hashmap&#10;this will improve the complexity of searching for the stop word when removing it from the tokens">
-      <created>1650803756202</created>
+
+    <task id="LOCAL-00006" summary="first commit">
+      <created>1650628024597</created>
       <option name="number" value="00006" />
       <option name="presentableId" value="LOCAL-00006" />
       <option name="project" value="LOCAL" />
-      <updated>1650803756202</updated>
+      <updated>1650628024597</updated>
     </task>
-    <task id="LOCAL-00007" summary="--">
-      <created>1650803895223</created>
+    <task id="LOCAL-00007" summary=".">
+      <created>1650628147924</created>
       <option name="number" value="00007" />
       <option name="presentableId" value="LOCAL-00007" />
       <option name="project" value="LOCAL" />
-      <updated>1650803895223</updated>
+      <updated>1650628147925</updated>
     </task>
-    <task id="LOCAL-00008" summary="drop the collection at each run and create a new one &#10;invertedFile and stemmingCollection">
-      <created>1650804093647</created>
+    <task id="LOCAL-00008" summary="edits">
+      <created>1650635535970</created>
       <option name="number" value="00008" />
       <option name="presentableId" value="LOCAL-00008" />
       <option name="project" value="LOCAL" />
-      <updated>1650804093647</updated>
+      <updated>1650635535971</updated>
     </task>
-    <task id="LOCAL-00009" summary="---">
-      <created>1650804378798</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1650804378798</updated>
-    </task>
-    <option name="localTasksCounter" value="10" />
+    <option name="localTasksCounter" value="9" />
+
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -233,7 +297,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="All new Project with Spring boot and MongoDBB" />
@@ -241,10 +304,11 @@
     <MESSAGE value="mongodb indexer file&#10;inserting the inverted file into the database&#10;as well as inserting the equivalent words of the stemming word in a separate database &#10;also get the crawled documents from the crawler --&gt; by rufaidah" />
     <MESSAGE value="this is a class carrying the information about the word &lt;token&gt; such as :&#10;term frequency&#10;the positions for this word in the url&#10;the flags which indicates if this word appears as a title, a header or in the body --&gt; as this will help the ranker when sorting the results of the search. i.e., to know which sites have the highest priority to appear first and so on" />
     <MESSAGE value="the indexer file includes functions to do the follwoing :&#10;1-parse the html documents of the crawled urls  --&gt; done by rufaida&#10;2-extract the words from parsed html documents --&gt; done by rufaida&#10;3-construct the stop words and remove them from the tokens list --&gt; done by me&#10;4-stem the word and save it in the database ---&gt; done by me&#10;5-build the inverted file ---&gt; done by me" />
-    <MESSAGE value="change the structure we store the constructed stop words in&#10;from a list --&gt; to a hashmap&#10;this will improve the complexity of searching for the stop word when removing it from the tokens" />
-    <MESSAGE value="--" />
-    <MESSAGE value="drop the collection at each run and create a new one &#10;invertedFile and stemmingCollection" />
-    <MESSAGE value="---" />
-    <option name="LAST_COMMIT_MESSAGE" value="---" />
+
+    <MESSAGE value="first commit" />
+    <MESSAGE value="." />
+    <MESSAGE value="edits" />
+    <option name="LAST_COMMIT_MESSAGE" value="edits" />
+
   </component>
 </project>
