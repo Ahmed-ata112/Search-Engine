@@ -35,7 +35,7 @@ public class Indexer {
 //               url     text
         //parse the HTML
         ArrayList<String> title = new ArrayList<String>(), header = new ArrayList<String>();
-        List<String> stopWords = obj.constructStopWords();
+        HashMap<Character, List<String>> stopWords = obj.constructStopWords();
 
         for (Map.Entry<String, String> set : htmlDocs.entrySet()) {
             docFlags = new ArrayList<>(2);
@@ -50,12 +50,12 @@ public class Indexer {
             List<String> tokens = obj.ExtractWords(parsedHTML);
             obj.removeStopWords(tokens, stopWords);
             obj.stemWord(tokens);
-            mongoDB.StoreStemming(obj.equivalentStems);
+
             obj.invertedFile(set.getKey(), tokens, docFlags);
 
         }
 
-
+        mongoDB.StoreStemming(obj.equivalentStems);
         mongoDB.insertInvertedFile(obj.invertedFile, obj.documentsCount);
 
 
@@ -67,15 +67,24 @@ public class Indexer {
     }
 
     //read the stop words
-    private @NotNull List<String> constructStopWords() throws FileNotFoundException {
+    private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File(".\\attaches\\stopwords.txt");
+        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Search_Engine_new\\Core\\attaches\\stopwords.txt");
         Scanner scan = new Scanner(file);
 
-        List<String> stopWords = new ArrayList<String>();
+        HashMap<Character, List<String>> stopWords = new HashMap<>();
+        //List<String> stopWords = new ArrayList<String>();
         while (scan.hasNextLine()) {
             //append it to the list
-            stopWords.add(scan.nextLine());
+            String stopWord = scan.nextLine();
+            Character key = stopWord.charAt(0);
+            if(!stopWords.containsKey(key))
+            {
+                stopWords.put(key, new ArrayList<String>(Collections.singleton(stopWord)));
+            }
+            else
+                stopWords.get(key).add(stopWord);
+
         }
 
         return stopWords;
@@ -111,10 +120,14 @@ public class Indexer {
 
 
     //remove them
-    public void removeStopWords(@NotNull List<String> tokens, List<String> stopWords) {
+    public void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
         for (int i = 0; i < tokens.size(); i++) {
 
-            if (stopWords.contains(tokens.get(i).toLowerCase(Locale.ROOT))) {
+            if((tokens.get(i).charAt(0) + 48) >= 0 || (tokens.get(i).charAt(0) + 48) <= 9)
+                continue;
+            if(stopWords.get(tokens.get(i).charAt(0)).contains(tokens.get(i).toLowerCase(Locale.ROOT)))
+            //if (stopWords.contains(tokens.get(i).toLowerCase(Locale.ROOT)))
+            {
                 //then remove it
                 tokens.remove(i);
                 i--;
