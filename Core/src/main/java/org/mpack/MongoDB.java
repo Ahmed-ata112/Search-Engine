@@ -1,21 +1,23 @@
 package org.mpack;
 
-import com.mongodb.client.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateOptions;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class MongoDB {
     MongoCollection<org.bson.Document> urlsCollection;
+
     MongoCollection<org.bson.Document> stateCollection;
+    MongoCollection<org.bson.Document> stateUrlsCollection;
 
     static final String CONNECTION_STRING = "mongodb://localhost:27017";
     MongoDatabase searchEngineDb;
@@ -36,6 +38,9 @@ public class MongoDB {
 
             urlsCollection = searchEngineDb.getCollection("CrawledURLS");
             stateCollection = searchEngineDb.getCollection("State");
+            stateUrlsCollection = searchEngineDb.getCollection("StateURLS");
+            stateUrlsCollection.createIndex(new Document(new org.bson.Document("url_link", -1)));
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -74,9 +79,9 @@ public class MongoDB {
         return (int) doc.get("isDone");
     }
 
-    public void deleteState() {
-        org.bson.Document searchEntry = new org.bson.Document("Name", "unprocessed");
-        stateCollection.deleteOne(searchEntry);
+    public void resetStateForReCrawling() {
+        stateUrlsCollection.drop();
+        urlsCollection.drop();
     }
 
     public long getUrlCount() {
@@ -85,7 +90,7 @@ public class MongoDB {
 
     }
 
-    public void addToStateArray(String url) {
+  /*  public void addToStateArray(String url) {
         org.bson.Document urlEntry = new org.bson.Document("Name", "unprocessed");
         // push the url to the links
 
@@ -94,19 +99,38 @@ public class MongoDB {
         ArrayList<String> arr = new ArrayList<String>();
         arr.add(url);
         //String json = "{ $push : {\"links\":{$each: [" + url + "],$slice: -500}}}";
-        org.bson.Document updateEntry = new org.bson.Document("$push", new Document("links", new Document("$each",arr).append("$slice", -4000)));
+        org.bson.Document updateEntry = new org.bson.Document("$push", new Document("links", new Document("$each", arr).append("$slice", -4000)));
         stateCollection.updateOne(urlEntry, updateEntry, options);
+    }*/
+
+    public void addToStateUrls(String url) {
+        org.bson.Document urlEntry = new org.bson.Document("_id", new ObjectId());
+        urlEntry.append("url_link", url);
+        stateUrlsCollection.insertOne(urlEntry);
     }
 
-    public void removeFromStateArray(String url) {
+    public void removeFromStateUrls(String url) {
+        org.bson.Document urlEntry = new org.bson.Document("url_link", url);
+        stateUrlsCollection.deleteOne(urlEntry);
+    }
+
+    public List<String> getStateURLs() {
+        ArrayList<String> arr = new ArrayList<>();
+        for (String s : stateUrlsCollection.distinct("url_link", String.class)) {
+            arr.add(s);
+        }
+        return arr;
+    }
+
+  /*  public void removeFromStateArray(String url) {
         org.bson.Document urlEntry = new org.bson.Document("Name", "unprocessed");
         // push the url to the links
         org.bson.Document updateEntry = new org.bson.Document("$pull", new org.bson.Document("links", url));
 
         stateCollection.updateOne(urlEntry, updateEntry);
-    }
+    }*/
 
-    public List<String> getStateArray() {
+  /*  public List<String> getStateArray() {
         org.bson.Document searchEntry = new org.bson.Document("Name", "unprocessed");
         org.bson.Document op = Document.parse("{links: 1 ,_id: 0}"); //only get the array of links
 
@@ -117,7 +141,7 @@ public class MongoDB {
         }
         return doc.getList("links", String.class);
 
-    }
+    }*/
 
     public void addToSuggestionsArray(String query) {
         org.bson.Document urlEntry = new org.bson.Document("Name", "suggestions");
@@ -149,4 +173,6 @@ public class MongoDB {
             Crawler.websites_hashes.add(Crawler.encryptThisString(s));
         }
     }
+
+
 }
