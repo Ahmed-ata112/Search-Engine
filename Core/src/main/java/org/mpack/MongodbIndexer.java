@@ -47,11 +47,24 @@ public class MongodbIndexer {
 
 
     //--------------------------------------
-    public void insertInvertedFile(Map<String, HashMap<String, WordInfo>>  invertedFile, long docCount)
+
+    public void insertInvertedFile(HashMap<String, HashMap<String, WordInfo>>  invertedFile, long docCount)
     {
-        MongoCollection<Document> invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
+        MongoCollection<Document> invertedFileCollection;
+        //drop the collection if exists to create a new one
+        boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
+                .into(new ArrayList<String>()).contains("InvertedFile");
+        if(collectionExists)
+        {
+            invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
+            invertedFileCollection.drop();
+
+        }
+
+        invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
         List<Document> documents = new ArrayList<>();
-        List<Document> doc_per_word;
+        
+
         int k = 0;
         double idf = docCount;
         for(Map.Entry<String, HashMap<String, WordInfo>> set1 : invertedFile.entrySet())
@@ -67,7 +80,9 @@ public class MongodbIndexer {
 
             Document doc = new Document();
             doc.put("token_name", set1.getKey());
-            doc_per_word = new ArrayList<>();
+
+            List<Document> doc_per_word = new ArrayList<>();
+
             for(Map.Entry<String, WordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
                 d.append("URL",set2.getKey()).append("TF", set2.getValue().getTF()).append("Flags", set2.getValue().getFlags())
@@ -96,8 +111,21 @@ public class MongodbIndexer {
             doc.append("Equivalent_words", set1.getValue());
             documents.add(doc);
         }
-        MongoCollection<Document> stemmingCollection = searchEngineDb.getCollection("stemmingCollection");
-        stemmingCollection.insertMany(documents);
+
+
+        //check if the collection exists, if so then drop it and create a new one
+        MongoCollection<Document> StemmingCollection;
+        boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
+                .into(new ArrayList<String>()).contains("StemmingCollection");
+        if(collectionExists)
+        {
+            StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
+            StemmingCollection.drop();
+
+        }
+        StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
+        StemmingCollection.insertMany(documents);
+
     }
 }
     
