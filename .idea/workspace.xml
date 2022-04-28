@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="edits">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/APTProject2.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +46,8 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -188,6 +191,7 @@
       <workItem from="1650625633585" duration="783000" />
       <workItem from="1650626440382" duration="4548000" />
       <workItem from="1650631049136" duration="5437000" />
+      <workItem from="1651122187713" duration="30000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
