@@ -1,4 +1,7 @@
 package org.mpack;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import io.mola.galimatias.URL;
 import io.mola.galimatias.canonicalize.CombinedCanonicalizer;
 import org.jsoup.Jsoup;
@@ -6,14 +9,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import java.util.concurrent.CountDownLatch;
+
 import java.io.*;
-import java.util.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Thread.sleep;
 
@@ -25,10 +28,11 @@ class Crawler implements Runnable {
     //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
     static int count = 0;
+    static AtomicInteger atomicCount = new AtomicInteger(0);
     static CountDownLatch latch;
     static final Object cLock = new Object();
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 1000;
+    static final int MAX_PAGES = 100;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -61,7 +65,7 @@ class Crawler implements Runnable {
         if (isReCrawling) {
             reCrawl(reCrawlingList);
         } else {
-            mongoDB.deleteState();
+            mongoDB.resetStateForReCrawling();
             crawl(initialStrings);
         }
     }
@@ -80,25 +84,19 @@ class Crawler implements Runnable {
             BigInteger no = new BigInteger(1, messageDigest);
 
             // Convert message digest into hex value
-            String hashtext = no.toString(16);
-
-//            // Add preceding 0s to make it 32 bit
-//            while (hashtext.length() < 32) {
-//                hashtext = "0" + hashtext;
-//            }
 
             // return the HashText
-            return hashtext;
+            return no.toString(16);
         }
-
         // For specifying wrong message digest algorithms
         catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            System.out.println("No algorithm found");
+            return "";
         }
     }
 
     public static void setCount(int oldCount) {
-        count = oldCount;
+        atomicCount.set(oldCount);
     }
 
 
@@ -107,7 +105,7 @@ class Crawler implements Runnable {
         Deque<String> unprocessedUrlsStack = new ArrayDeque<>(seedUrls);
 
         while (!unprocessedUrlsStack.isEmpty()) {
-            if (count > MAX_PAGES) {
+            if (atomicCount.get() > MAX_PAGES) {
                 //set state to 1 as we finished all the Pages
                 finishState();
                 return;
@@ -123,7 +121,7 @@ class Crawler implements Runnable {
             }
             url = unprocessedUrlsStack.pop();
             //delete from the unprocessed array
-            mongoDB.removeFromStateArray(url);
+            mongoDB.removeFromStateUrls(url);
 
             try {
                 url = canonicalized.canonicalize(URL.parse(url)).toString();
@@ -135,16 +133,16 @@ class Crawler implements Runnable {
             }
 
             synchronized (visitedLinks) {
-                if (visitedLinks.contains(url)) continue;
+                if (visitedLinks.contains(url))
+                    continue;
                 else {
                     visitedLinks.add(url);
-                    count++;
                 }
             }
             try {
                 Document document = Jsoup.connect(url).get();
                 String hashed = encryptThisString(document.html());
-                synchronized (websites_hashes){
+                synchronized (websites_hashes) {
                     if (websites_hashes.contains(hashed)) {
                         continue;
                     } else
@@ -154,23 +152,16 @@ class Crawler implements Runnable {
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
                     unprocessedUrlsStack.add(uu);
-                    // add to the unprocessed array
-                    mongoDB.addToStateArray(uu);
-
+                    mongoDB.addToStateUrls(uu);
                 }
-
-                System.out.println(count);
-
-                mongoDB.insertUrl(url, document.html());
                 //now we really processed a link
+                atomicCount.incrementAndGet();
+                mongoDB.insertUrl(url, document.html());
+
 
             } catch (Exception e) {
                 System.err.println("For '" + url + "': " + e.getMessage());
                 System.out.println(e.getMessage());
-                synchronized (cLock) {
-                    //a bad Link is detected
-                    count--;
-                }
             }
 
         }
@@ -197,6 +188,7 @@ class Crawler implements Runnable {
                 neededThreads--;
             }
             url = unprocessedUrlsStack.pop();
+            mongoDB.removeFromStateUrls(url);
 
             try {
                 url = canonicalized.canonicalize(URL.parse(url)).toString();
@@ -217,7 +209,7 @@ class Crawler implements Runnable {
                 Document document = Jsoup.connect(url).get();
                 Elements linksOnPage = document.select("a[href]");
                 String hashed = encryptThisString(document.html());
-                synchronized (websites_hashes){
+                synchronized (websites_hashes) {
                     if (websites_hashes.contains(hashed)) {
                         continue;
                     } else
@@ -226,6 +218,8 @@ class Crawler implements Runnable {
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
                     unprocessedUrlsStack.add(uu);
+                    mongoDB.addToStateUrls(uu);
+
 
                 }
                 synchronized (visitedLinks) {
@@ -295,7 +289,6 @@ public class CrawlerMain {
                     ss = new ArrayList<>();
                     ss.add(seedsArray.get(i));
                     new Thread(new Crawler(ss, neededThreads)).start();
-
                     System.out.println(ss);
                 }
             }
@@ -312,22 +305,15 @@ public class CrawlerMain {
         Crawler.latch = new CountDownLatch(numThreads);
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
-        //testMongo();
-
         /*
-         *
          * state is -1 |0 | 1
-         *
          * -1 : never worked before
          * 0  : worked before but didn't finish
          * 1  : worked and finished
-         *
-         *
          * */
 
-
         int state = mainMongo.getState();
-
+        System.out.printf("state is: %d%n", state);
         if (true || state == -1) {
             // never worked
             System.out.println("here");
@@ -339,10 +325,14 @@ public class CrawlerMain {
 
         Crawler.latch.await();      // wait for all The Threads to finish
         System.out.println("Finished Waiting");
+
         while (true) {
             try {
                 sleep(100);
+                Crawler.latch = new CountDownLatch(numThreads); // puts a count down of 20
                 reCrawl(numThreads);
+                Crawler.latch.await();      // wait for all The Threads to finish
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -355,8 +345,7 @@ public class CrawlerMain {
     private static void readAndProcess(int numThreads) throws FileNotFoundException {
         mainMongo.setState(0); // start crawling
 
-
-        File file = new File("D:\\Second_year\\Second_semester\\CMP 2050\\Project\\APTProject\\Core\\attaches\\seed.txt");    //creates a new file instance
+        File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
         FileReader fr = new FileReader(file);   //reads the file
         ArrayList<String> seedsArray;
         try (BufferedReader br = new BufferedReader(fr)) {
@@ -375,28 +364,18 @@ public class CrawlerMain {
     }
 
     private static void continueAndProcess(int numThreads) {
-        //mainMongo.setState(0); // continue crawling
-
         mainMongo.getVisitedLinks();
-
         Crawler.setCount(Crawler.visitedLinks.size());
-
-        //Get The previous State array
-        ArrayList<String> seedsArray = (ArrayList<String>) mainMongo.getStateArray();
-
+        System.out.printf("will continue my work with %n count %d", Crawler.count);
+        ArrayList<String> seedsArray = (ArrayList<String>) mainMongo.getStateURLs();
         initCrawling(numThreads, seedsArray);
-
     }
 
     private static void reCrawl(int numThreads) {
         mainMongo.getVisitedLinks();
-
         Crawler.setCount((int) mainMongo.getUrlCount());
-
         Crawler.setIsReCrawling(true);
-
         initCrawling(numThreads, new ArrayList<>());
-
     }
 
 
