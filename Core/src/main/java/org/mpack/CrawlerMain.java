@@ -27,6 +27,8 @@ class Crawler implements Runnable {
     public static final HashSet<String> websites_hashes = new HashSet<>();
     //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
+
+    static final Map<String, List<String>> pagesEdges = new HashMap<>();
     static int count = 0;
     static AtomicInteger atomicCount = new AtomicInteger(0);
     static CountDownLatch latch;
@@ -149,13 +151,16 @@ class Crawler implements Runnable {
                         websites_hashes.add(hashed);
                 }
                 Elements linksOnPage = document.select("a[href]");
+                ArrayList<String> neis = new ArrayList<>();
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
+                    neis.add(uu);
                     unprocessedUrlsStack.add(uu);
                     mongoDB.addToStateUrls(uu);
                 }
                 //now we really processed a link
                 atomicCount.incrementAndGet();
+                pagesEdges.put(url, neis);
                 mongoDB.insertUrl(url, document.html());
 
 
@@ -318,6 +323,7 @@ public class CrawlerMain {
             // never worked
             System.out.println("here");
             readAndProcess(numThreads);
+
         } else if (state == 0) {
             //continue what it started
             continueAndProcess(numThreads);
@@ -325,6 +331,9 @@ public class CrawlerMain {
 
         Crawler.latch.await();      // wait for all The Threads to finish
         System.out.println("Finished Waiting");
+        PageRank p = new PageRank();
+        p.initRankMatrix(Crawler.visitedLinks, Crawler.pagesEdges);
+        p.run();
 
         while (true) {
             try {
@@ -338,7 +347,7 @@ public class CrawlerMain {
             }
         }
 
-
+        // testMongo();
     }
 
     // take your seeds from the unprocessed Stack
@@ -381,14 +390,8 @@ public class CrawlerMain {
 
     private static void testMongo() {
 
-   /*
-        URL u = null;
-        u = URL.parse("https://www.PROgramiz.com/java-programming/online-compiler/");
-        CombinedCanonicalizer CC = new CombinedCanonicalizer();
-        String u2 = CC.canonicalize(u).toString();
-
-        System.out.println(u2.toString());
-    */
+        MongoDB m = new MongoDB();
+        m.setPageRank("https://www.bbc.co.uk/", 1.01);
 
     }
 }
