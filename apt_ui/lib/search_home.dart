@@ -129,7 +129,7 @@ class _SearchHomeState extends State<SearchHome> {
         onPressed:
             // If not yet listening for speech start, otherwise stop
             _speechToText.isNotListening ? _startListening : _stopListening,
-        tooltip: 'Listen',
+        tooltip: _speechToText.isNotListening ? 'Listen' : "Stop",
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
     );

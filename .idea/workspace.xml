@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="edits">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+
       <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,6 +40,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -45,6 +48,8 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -66,6 +71,7 @@
     ]
   }
 }]]></component>
+
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Academic_college\second_year_2nd_term\advanced_programming\Project\APT_Project_Last\Core\src\main\java\org\mpack" />
@@ -84,7 +90,20 @@
   <component name="RunManager" selected="Application.Indexer">
     <configuration name="CrawlerMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.mpack.CrawlerMain" />
-      <module name="APTProject" />
+      <module name="APTProject2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.mpack.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Indexer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mpack.Indexer" />
+      <module name="APTProject2" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="org.mpack.*" />
@@ -127,6 +146,17 @@
     <configuration name="generated-requests | #4" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="4" runType="Run single request">
       <method v="2" />
     </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ApiMain (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <option name="ACTIVE_PROFILES" />
       <module name="demo1" />
@@ -156,6 +186,7 @@
       <item itemvalue="Application.Indexer" />
       <item itemvalue="Application.org.mpack.CrawlerMain" />
       <item itemvalue="Application.CrawlerMain" />
+      <item itemvalue="Application.Indexer" />
       <item itemvalue="HTTP Request.generated-requests | #3" />
       <item itemvalue="HTTP Request.generated-requests | #4" />
       <item itemvalue="Spring Boot.ApiMain (1)" />
@@ -165,9 +196,12 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.Indexer" />
+
         <item itemvalue="Application.org.mpack.CrawlerMain" />
         <item itemvalue="HTTP Request.generated-requests | #4" />
+
         <item itemvalue="Application.CrawlerMain" />
+        <item itemvalue="HTTP Request.generated-requests | #4" />
         <item itemvalue="HTTP Request.generated-requests | #3" />
       </list>
     </recent_temporary>
@@ -183,6 +217,7 @@
       <workItem from="1650214936706" duration="171000" />
       <workItem from="1650215298399" duration="3330000" />
       <workItem from="1650568203173" duration="2259000" />
+
       <workItem from="1650625048314" duration="472000" />
       <workItem from="1650625547633" duration="67000" />
       <workItem from="1650625633585" duration="783000" />
@@ -224,6 +259,7 @@
       <option name="project" value="LOCAL" />
       <updated>1650573133884</updated>
     </task>
+
     <task id="LOCAL-00006" summary="first commit">
       <created>1650628024597</created>
       <option name="number" value="00006" />
@@ -246,6 +282,7 @@
       <updated>1650635535971</updated>
     </task>
     <option name="localTasksCounter" value="9" />
+
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -268,9 +305,11 @@
     <MESSAGE value="mongodb indexer file&#10;inserting the inverted file into the database&#10;as well as inserting the equivalent words of the stemming word in a separate database &#10;also get the crawled documents from the crawler --&gt; by rufaidah" />
     <MESSAGE value="this is a class carrying the information about the word &lt;token&gt; such as :&#10;term frequency&#10;the positions for this word in the url&#10;the flags which indicates if this word appears as a title, a header or in the body --&gt; as this will help the ranker when sorting the results of the search. i.e., to know which sites have the highest priority to appear first and so on" />
     <MESSAGE value="the indexer file includes functions to do the follwoing :&#10;1-parse the html documents of the crawled urls  --&gt; done by rufaida&#10;2-extract the words from parsed html documents --&gt; done by rufaida&#10;3-construct the stop words and remove them from the tokens list --&gt; done by me&#10;4-stem the word and save it in the database ---&gt; done by me&#10;5-build the inverted file ---&gt; done by me" />
+
     <MESSAGE value="first commit" />
     <MESSAGE value="." />
     <MESSAGE value="edits" />
     <option name="LAST_COMMIT_MESSAGE" value="edits" />
+
   </component>
 </project>

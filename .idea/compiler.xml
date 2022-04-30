@@ -11,11 +11,13 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="APTProject2" target="17" />
       <module name="demo1" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="APTProject2" options="-parameters" />
       <module name="demo1" options="-parameters" />
     </option>
   </component>
