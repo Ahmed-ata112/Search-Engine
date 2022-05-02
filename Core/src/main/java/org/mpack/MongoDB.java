@@ -23,7 +23,7 @@ public class MongoDB {
     MongoDatabase searchEngineDb;
     MongoClient mongoClient;
 
-    MongoDB() {
+    public MongoDB() {
         initConnection();
 
     }
