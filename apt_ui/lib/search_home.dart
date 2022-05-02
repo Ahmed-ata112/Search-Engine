@@ -113,6 +113,7 @@ class _SearchHomeState extends State<SearchHome> {
                         /// Close it if still Open
                         _stopListening();
                         _formKey.currentState!.save();
+                        BackendService.addToSuggestions(_wordSearched!);
                         Navigator.pushNamed(context, '/load_page', arguments: {
                           '_wordSearched': _wordSearched,
                         });
@@ -144,6 +145,10 @@ class BackendService {
     for (String word in result) {
       allWords.add(word);
     }
+  }
+
+  static addToSuggestions(String word) {
+    allWords.add(word);
   }
 
   static getSuggestions(String pattern) {

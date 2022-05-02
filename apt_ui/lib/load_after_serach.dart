@@ -18,7 +18,7 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
       /// Call The search Query Here and Get Results as a List of Sites and Their paragraph
       List<String> resultsUrls = [];
       List<String> resultsParagraphs = [];
-      dynamic result = await DBManager.executeQuery("searchQ");
+      dynamic result = await DBManager.executeQuery(searchQ);
 
       for (var e in result) {
         resultsUrls.add(e["url"]);
