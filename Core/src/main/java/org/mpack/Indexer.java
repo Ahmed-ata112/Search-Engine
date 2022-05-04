@@ -31,6 +31,7 @@ public class Indexer {
         //get crawled docs
 
         HashMap<String, String> htmlDocs = mongoDB.getHTML();
+        ///      url     body
 
         ArrayList<HashMap<String, Integer>> docFlags;
         ArrayList<String> title;
@@ -49,6 +50,7 @@ public class Indexer {
             String parsedHTML = obj.parseHTML(set.getValue(), title, header);
             obj.extractFlags(docFlags, title, header);
             List<String> tokens = obj.extractWords(parsedHTML);
+            mongoDB.StoreTextUrl(parsedHTML, set.getKey());
             obj.removeStopWords(tokens, stopWords);
             obj.stemWord(tokens);
 
@@ -56,6 +58,23 @@ public class Indexer {
 
         }
 
+        //////////////////////////////test ranker:
+
+        Ranker ranker = new Ranker();
+        HashMap<Integer, ArrayList<String>> retDoc = new HashMap<>();
+        ArrayList<String> words = new ArrayList<String> ();
+        int i = 0;
+        for(Map.Entry<String, HashMap<String, WordInfo>> entry : obj.invertedFile.entrySet())
+        {
+            words.add(entry.getKey());
+            i++;
+            if(i == 5) break;
+        }
+        retDoc.put(0, words);
+        retDoc.put(1, new ArrayList<>());
+        //System.out.println(ranker.ranker(retDoc));
+
+///////////////////////////////////////////////////////////////
         mongoDB.StoreStemming(obj.equivalentStems);
         mongoDB.insertInvertedFile(obj.invertedFile, obj.documentsCount);
 
@@ -72,7 +91,7 @@ public class Indexer {
     //read the stop words
     private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File(".\\attaches\\stopwords.txt");
+        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Project_delete_except\\Core\\attaches\\stopwords.txt");
         Scanner scan = new Scanner(file);
 
 
