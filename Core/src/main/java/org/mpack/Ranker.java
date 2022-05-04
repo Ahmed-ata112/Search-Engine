@@ -81,7 +81,7 @@ public class Ranker {
                         List<Integer> _flags = new ArrayList<>(2);
                         _flags.set(0, 0);
                         _flags.set(1, 0);
-                        TF = Double.parseDouble(d.get("TF").toString());  // to make sure -48 ?
+                        TF = Double.parseDouble(d.get("normalized_TF").toString());  // to make sure -48 ?
                         char[] flags  = d.get("Flags").toString().toCharArray();
                         if(flags[0] - 48 > 0) // to convert from char to int --> to make sure ??????
                             _flags.set(0, flags[0] - 48);
@@ -114,7 +114,7 @@ public class Ranker {
                         List<Integer> _flags = new ArrayList<>(2);
                         _flags.set(0, 0);
                         _flags.set(1, 0);
-                        TF = Double.parseDouble(d.get("TF").toString());  // to make sure -48 ?
+                        TF = Double.parseDouble(d.get("normalized_TF").toString());  // to make sure -48 ?
                         char[] flags  = d.get("Flags").toString().toCharArray();
                         if(flags[0] - 48 > 0) // to convert from char to int --> to make sure ??????
                             _flags.set(0, flags[0] - 48);
