@@ -73,6 +73,20 @@ class _SearchHomeState extends State<SearchHome> {
                   const Text('Type something to search for'),
                   TypeAheadFormField(
                     textFieldConfiguration: TextFieldConfiguration(
+                        onSubmitted: (input) {
+                          print(input);
+                          if (_formKey.currentState!.validate()) {
+                            /// Close it if still Open
+                            _stopListening();
+                            _formKey.currentState!.save();
+                            String? t = _wordSearched?.trim();
+                            BackendService.addToSuggestions(t!);
+                            Navigator.pushNamed(context, '/load_page',
+                                arguments: {
+                                  '_wordSearched': t,
+                                });
+                          }
+                        },
                         autofocus: true,
                         controller: _typeAheadController,
                         decoration: const InputDecoration(labelText: 'search')),
@@ -113,9 +127,11 @@ class _SearchHomeState extends State<SearchHome> {
                         /// Close it if still Open
                         _stopListening();
                         _formKey.currentState!.save();
-                        BackendService.addToSuggestions(_wordSearched!);
+                        String? t = _wordSearched?.trim();
+
+                        BackendService.addToSuggestions(t!);
                         Navigator.pushNamed(context, '/load_page', arguments: {
-                          '_wordSearched': _wordSearched,
+                          '_wordSearched': t,
                         });
                       }
                     },
@@ -139,6 +155,7 @@ class _SearchHomeState extends State<SearchHome> {
 
 class BackendService {
   static final Set<String> allWords = {};
+
   static Future<void> initWords() async {
     List result = await DBManager.getSuggestionsList();
 

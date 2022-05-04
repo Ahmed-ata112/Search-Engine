@@ -28,7 +28,10 @@ public class ApiMain {
 @AllArgsConstructor
 class Pojo {
     private String url;
+    private String header;
+    private String[] tokens;
     private String paragraph;
+
 }
 
 @RestController
@@ -46,10 +49,10 @@ class Api {
 
 
         Lorem lorem = LoremIpsum.getInstance();
-        for (int i = 0; i < 1000; i++) {
-            Pojo p1 = new Pojo("" + i, lorem.getParagraphs(1, 3));
-            objectsList.add(p1);
-        }
+//        for (int i = 0; i < 1000; i++) {
+//            Pojo p1 = new Pojo("www.google.com" + i, "header", new String[]{"h1", "h2"}, lorem.getParagraphs(1, 1) + "h1" + lorem.getParagraphs(1, 1));
+//            objectsList.add(p1);
+//        }
 
         return objectsList;
     }
