@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:highlight_text/highlight_text.dart';
+import 'package:number_paginator/number_paginator.dart';
 
 Widget resultCard(ResultTile art, context) {
   Map<String, HighlightedWord> words = <String, HighlightedWord>{};
