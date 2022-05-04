@@ -3,6 +3,7 @@ import 'package:apt_ui/search_home.dart';
 import 'package:flutter/material.dart';
 import 'api.dart';
 import 'load_after_serach.dart';
+import 'no_results_found.dart';
 
 void try_api() async {
   List<String> resultsUrls = [];
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/search_home': (context) => const SearchHome(),
         '/load_page': (context) => const LoadAfterLogin(),
         '/results_page': (context) => ResultsPage(),
+        '/no_results': (context) => NoResultsFound(),
       },
     );
   }
