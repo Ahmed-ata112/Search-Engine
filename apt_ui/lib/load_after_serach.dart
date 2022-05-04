@@ -18,16 +18,30 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
       /// Call The search Query Here and Get Results as a List of Sites and Their paragraph
       List<String> resultsUrls = [];
       List<String> resultsParagraphs = [];
-      dynamic result = await DBManager.executeQuery("searchQ");
+      List<String> headers = [];
+      List<List<dynamic>> tokens = [];
+      dynamic result = await DBManager.executeQuery(searchQ);
 
       for (var e in result) {
         resultsUrls.add(e["url"]);
+        headers.add(e["header"]);
+        tokens.add(e["tokens"]);
         resultsParagraphs.add(e["paragraph"]);
       }
       ///////////////////////////////////////////////
+
+      if (resultsUrls.isEmpty) {
+        Navigator.popAndPushNamed(context, '/no_results', arguments: {
+          '_wordSearched': searchQ,
+        });
+        return;
+      }
+
       Navigator.popAndPushNamed(context, '/results_page', arguments: {
         '_wordSearched': searchQ,
         '_urls': resultsUrls,
+        '_headers': headers,
+        '_tokens': tokens,
         '_paragraphs': resultsParagraphs,
         '_id': 0
       });
