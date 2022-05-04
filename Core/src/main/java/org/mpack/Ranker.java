@@ -41,7 +41,7 @@ public class Ranker {
             else if (url1.getSecond().getSecond().getFirst() > url2.getSecond().getSecond().getFirst())
                 return 1;
 
-            else if (url1.getSecond().getSecond().getFirst() > url2.getSecond().getSecond().getFirst())
+            else if (url1.getSecond().getSecond().getFirst() < url2.getSecond().getSecond().getFirst())
                 return -1;
 
             else
