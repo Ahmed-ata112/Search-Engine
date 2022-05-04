@@ -74,7 +74,6 @@ class _SearchHomeState extends State<SearchHome> {
                   TypeAheadFormField(
                     textFieldConfiguration: TextFieldConfiguration(
                         onSubmitted: (input) {
-                          print(input);
                           if (_formKey.currentState!.validate()) {
                             /// Close it if still Open
                             _stopListening();

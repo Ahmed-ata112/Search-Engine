@@ -1,4 +1,5 @@
 import 'package:apt_ui/results_page.dart';
+import 'package:apt_ui/results_page2.dart';
 import 'package:apt_ui/search_home.dart';
 import 'package:flutter/material.dart';
 import 'api.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/search_home': (context) => const SearchHome(),
         '/load_page': (context) => const LoadAfterLogin(),
-        '/results_page': (context) => ResultsPage(),
+        '/results_page': (context) => const ResultsPage(),
         '/no_results': (context) => NoResultsFound(),
       },
     );
