@@ -73,6 +73,19 @@ class _SearchHomeState extends State<SearchHome> {
                   const Text('Type something to search for'),
                   TypeAheadFormField(
                     textFieldConfiguration: TextFieldConfiguration(
+                        onSubmitted: (input) {
+                          if (_formKey.currentState!.validate()) {
+                            /// Close it if still Open
+                            _stopListening();
+                            _formKey.currentState!.save();
+                            String? t = _wordSearched?.trim();
+                            BackendService.addToSuggestions(t!);
+                            Navigator.pushNamed(context, '/load_page',
+                                arguments: {
+                                  '_wordSearched': t,
+                                });
+                          }
+                        },
                         autofocus: true,
                         controller: _typeAheadController,
                         decoration: const InputDecoration(labelText: 'search')),
@@ -113,8 +126,11 @@ class _SearchHomeState extends State<SearchHome> {
                         /// Close it if still Open
                         _stopListening();
                         _formKey.currentState!.save();
+                        String? t = _wordSearched?.trim();
+
+                        BackendService.addToSuggestions(t!);
                         Navigator.pushNamed(context, '/load_page', arguments: {
-                          '_wordSearched': _wordSearched,
+                          '_wordSearched': t,
                         });
                       }
                     },
@@ -129,7 +145,7 @@ class _SearchHomeState extends State<SearchHome> {
         onPressed:
             // If not yet listening for speech start, otherwise stop
             _speechToText.isNotListening ? _startListening : _stopListening,
-        tooltip: 'Listen',
+        tooltip: _speechToText.isNotListening ? 'Listen' : "Stop",
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
     );
@@ -138,12 +154,17 @@ class _SearchHomeState extends State<SearchHome> {
 
 class BackendService {
   static final Set<String> allWords = {};
+
   static Future<void> initWords() async {
     List result = await DBManager.getSuggestionsList();
 
     for (String word in result) {
       allWords.add(word);
     }
+  }
+
+  static addToSuggestions(String word) {
+    allWords.add(word);
   }
 
   static getSuggestions(String pattern) {

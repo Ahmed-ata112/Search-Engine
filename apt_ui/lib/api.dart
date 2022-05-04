@@ -25,6 +25,7 @@ class DBManager {
     var response = await http.get(Uri.parse('$baseUrl/suggests'));
     if (response.statusCode == 200) {
       List ret = json.decode(response.body); // list<list<dynamic>>
+      print(ret);
       return ret; // List of JsonMaps
     } else {
       print(response.statusCode);

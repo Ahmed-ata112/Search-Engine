@@ -23,7 +23,7 @@ public class MongoDB {
     MongoDatabase searchEngineDb;
     MongoClient mongoClient;
 
-    MongoDB() {
+    public MongoDB() {
         initConnection();
 
     }
@@ -49,8 +49,19 @@ public class MongoDB {
     public void insertUrl(String url, String html) {
         org.bson.Document urlEntry = new org.bson.Document("_id", new ObjectId());
         urlEntry.append("url_link", url)
+                .append("page_rank", 0.0)
                 .append("html_body", html);
         urlsCollection.insertOne(urlEntry);
+    }
+
+    public void setPageRank(String url, double rank) {
+
+        org.bson.Document urlEntry = new org.bson.Document("url_link", url);
+        org.bson.Document updateEntry = new org.bson.Document("$set", new org.bson.Document("page_rank", rank));
+        //UpdateOptions options = new UpdateOptions().upsert(true);
+
+        urlsCollection.updateOne(urlEntry, updateEntry);
+
     }
 
     // state is 0 if not finished or 1 if finished
@@ -164,6 +175,7 @@ public class MongoDB {
         return doc.getList("old_searches", String.class);
 
     }
+
 
     public void getVisitedLinks() {
         Set<String> arr = Crawler.visitedLinks;
