@@ -61,6 +61,7 @@ class _SearchHomeState extends State<SearchHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white70,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -70,7 +71,27 @@ class _SearchHomeState extends State<SearchHome> {
               padding: const EdgeInsets.all(32.0),
               child: Column(
                 children: <Widget>[
-                  const Text('Type something to search for'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/search.png",
+                        height: 100,
+                        width: 100,
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      const Text(
+                        "Googlio",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            color: Color.fromARGB(255, 0, 193, 255)),
+                      )
+                    ],
+                  ),
                   TypeAheadFormField(
                     textFieldConfiguration: TextFieldConfiguration(
                         onSubmitted: (input) {
@@ -88,7 +109,11 @@ class _SearchHomeState extends State<SearchHome> {
                         },
                         autofocus: true,
                         controller: _typeAheadController,
-                        decoration: const InputDecoration(labelText: 'search')),
+                        style: const TextStyle(color: Colors.black),
+                        decoration: const InputDecoration(
+                          labelText: 'search',
+                        ),
+                        cursorColor: Colors.cyan),
                     suggestionsCallback: (pattern) {
                       return BackendService.getSuggestions(pattern);
                     },
