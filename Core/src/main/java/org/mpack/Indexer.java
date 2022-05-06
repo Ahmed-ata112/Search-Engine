@@ -92,7 +92,7 @@ public class Indexer {
     }
 
     //read the stop words
-    private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
+    public static @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
         File file = new File(".\\attaches\\stopwords.txt");
 
@@ -158,7 +158,7 @@ public class Indexer {
 
 
     //remove them
-    public void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
+    public static void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
         for (int i = 0; i < tokens.size(); i++) {
 
             if((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
