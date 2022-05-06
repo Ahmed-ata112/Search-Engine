@@ -48,7 +48,7 @@ public class QueryProcessor {
     public HashMap<Integer, ArrayList<Document>> QueryProcessingFunction(String SearchQuery) throws FileNotFoundException {
         stopWords = Indexer.constructStopWords();
 
-        SearchTokens = List.of(SearchQuery.split(" "));
+         SearchTokens = List.of(SearchQuery.toLowerCase().split(" "));
         Indexer.removeStopWords(SearchTokens,stopWords);
 
         ArrayList<Document> OriginalWords = new ArrayList<>();
