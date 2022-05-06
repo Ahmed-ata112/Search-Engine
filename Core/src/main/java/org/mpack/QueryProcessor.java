@@ -14,7 +14,9 @@ import java.util.*;
 public class QueryProcessor {
     static HashMap<Integer, ArrayList<Document>> result = new HashMap<>();
     String Phrase;
-    static HashMap<Character, List<String>> stopWords = new HashMap<>();
+
+    List<String> SearchTokens;
+    HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
     static MongoCollection<org.bson.Document> InvertedDocs;
@@ -37,11 +39,18 @@ public class QueryProcessor {
         StemmedWord = stem.stemWord(Word);
         return StemmedWord.toLowerCase();
     }
+    
+    public List<String> GetSearchTokens()
+    {
+        return SearchTokens;
+    }
 
     public HashMap<Integer, ArrayList<Document>> QueryProcessingFunction(String SearchQuery) throws FileNotFoundException {
         stopWords = Indexer.constructStopWords();
-        List<String> SearchTokens = List.of(SearchQuery.split(" "));
-        Indexer.removeStopWords(SearchTokens, stopWords);
+
+        SearchTokens = List.of(SearchQuery.split(" "));
+        Indexer.removeStopWords(SearchTokens,stopWords);
+
         ArrayList<Document> OriginalWords = new ArrayList<>();
         ArrayList<Document> StemmedWords = new ArrayList<>();
         for (int i = 0; i < SearchTokens.size(); i++) {
@@ -69,21 +78,17 @@ public class QueryProcessor {
 
         }
 
-
+    public HashMap<Integer,ArrayList<Document>> PhraseProcessing (String SearchQuery) {
+        //1-construct and remove stop words
+        //2-split the phrase into array of words
+        //3-search for a certain word in the database
+        //4-parse retrieved URLs
+        //5- if it contain the whole phrase put it into the hashmap else parse the next URL
         return result;
     }
 
-//    public HashMap<Integer,Document> PhraseProcessing (String SearchQuery) {
-//        //1-construct and remove stop words
-//        //2-split the phrase into array of words
-//        //3-search for a certain word in the database
-//        //4-parse retrieved URLs
-//        //5- if it contain the whole phrase put it into the hashmap else parse the next URL
-//        return result;
-//    }
-
-
-    public static void main(String[] arg) {
+    public static void main(String[] arg) throws FileNotFoundException {
         QueryProcessor q = new QueryProcessor();
+        q.QueryProcessingFunction("salary");
     }
 }
