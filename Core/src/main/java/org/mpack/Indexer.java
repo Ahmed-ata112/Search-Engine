@@ -94,7 +94,7 @@ public class Indexer {
     //read the stop words
     private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File("D:\\Second_year\\Second_semester\\CMP 2050\\Project\\APTProject\\Core\\attaches\\stopwords.txt");
+        File file = new File(".\\attaches\\stopwords.txt");
 
         Scanner scan = new Scanner(file);
 
@@ -124,8 +124,10 @@ public class Indexer {
         if(!parsed.getElementsByTag("main").isEmpty()) parsed = Jsoup.parse(parsed.getElementsByTag("main").first().toString());
         parsed.select("button").remove();
         parsed.select("input").remove();
+
         List<String> pText = parsed.getElementsByTag("p").eachText();
-        pText.add(0, parsed.getElementsByTag("meta").attr("description"));
+        pText.add(0, parsed.getElementsByTag("title").first().text());
+        pText.add(1, parsed.getElementsByTag("meta").attr("description"));
         //parsed.select("style").remove();
         //parsed.select("script").remove();
 
