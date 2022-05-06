@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 
 public class Ranker {
-    static final MongodbIndexer mongoDB = new MongodbIndexer();
+    final MongodbIndexer mongoDB = new MongodbIndexer();
     Comparator<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Double>>>> urlPriority = (url1, url2) -> {
         //title
         if (url1.getSecond().getFirst().get(0) > url2.getSecond().getFirst().get(0))
@@ -94,7 +94,9 @@ public class Ranker {
                         //search in the hashmap for this url or insert it if not found
                         if (url_priority.containsKey(d.getString("URL"))) {
                             //then update the priority
-                            url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, url_priority.get(d.getString("URL")).getSecond().getSecond() + priority)));
+                            double prePriority = url_priority.get(d.getString("URL")).getSecond().getSecond();
+                            //then update the priority
+                            url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, prePriority + priority)));
                         } else {
                             url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, priority)));
                         }
@@ -121,7 +123,9 @@ public class Ranker {
                         if (!url_priority.containsKey(d.getString("URL"))) {
                             if (url_priority_stem.containsKey(d.getString("URL"))) {
                                 //then update the priority
-                                url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, url_priority.get(d.getString("URL")).getSecond().getSecond() + priority)));
+                                double prePriority = url_priority_stem.get(d.getString("URL")).getSecond().getSecond();
+                                //then update the priority
+                                url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, prePriority + priority)));
                             } else {
                                 url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, priority)));
                             }
