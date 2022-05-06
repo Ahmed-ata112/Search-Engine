@@ -2,24 +2,23 @@ package org.mpack;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RobotHandler {
-    HashMap<String,RobotRules> PreVisitedUrls = new HashMap<>();
+    static HashMap<String, RobotRules> preVisitedUrls = new HashMap<>();
 
-    boolean ReadRobotFile(URL url)
-    {
+    static boolean ReadRobotFile(URL url) {
         //define an object of RobotRules
         RobotRules robotrules = new RobotRules();
 
         //form the link of robot file
         //protocol://host/robot.txt
-        String RobotUrl = url.getProtocol()+"://"+url.getHost()+"/robots.txt";
+        String RobotUrl = url.getProtocol() + "://" + url.getHost() + "/robots.txt";
 
         //access robot.txt file as html file and parse it using jsoup library
         Document Robothtml;
@@ -36,8 +35,7 @@ public class RobotHandler {
         //i = 0 --> User-Agent
         //i = 1 --> *
         //i = 2 --> start of the rules
-        for (int i=2;i<rules.length;i++)
-        {
+        for (int i = 2; i < rules.length; i++) {
             switch (rules[i]) {
                 case "Disallow:" -> {
                     i++;
@@ -55,48 +53,30 @@ public class RobotHandler {
                 }
             }
         }
-        PreVisitedUrls.put(url.getHost(), robotrules);
+        preVisitedUrls.put(url.getHost(), robotrules);
         return true;
     }
 
-    public boolean isDisallowed (URL url)
-    {
-        if (!PreVisitedUrls.containsKey(url.getHost()))
-        {
+    public static boolean isDisallowed(URL url) {
+        if (!preVisitedUrls.containsKey(url.getHost())) {
             ReadRobotFile(url);
         }
-        RobotRules robotrules = PreVisitedUrls.get(url.getHost());
+        RobotRules robotrules = preVisitedUrls.get(url.getHost());
         String UrlFile;
-        if (url.getQuery() == null)
-        {
+        if (url.getQuery() == null) {
             UrlFile = url.getPath();
-        }
-        else
-        {
+        } else {
             UrlFile = url.getFile();
         }
         return (robotrules.isDisallowed(UrlFile));
     }
 
-    public static void main(String[] args) {
 
-        URL url = null;
-        try {
-            url = new URL("https://www.geeksforgeeks.org");
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        RobotHandler robot = new RobotHandler();
-        if (url != null) {
-            robot.ReadRobotFile(url);
-        }
-    }
 }
 
 class RobotRules {
-    HashSet <Pattern> disallowed = new HashSet<>();
-    HashSet <Pattern> Allowed = new HashSet<>();
+    HashSet<Pattern> disallowed = new HashSet<>();
+    HashSet<Pattern> Allowed = new HashSet<>();
 
 
     public boolean addDisallowed(String path) {
