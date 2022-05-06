@@ -162,7 +162,8 @@ public class Indexer {
     public static void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
         for (int i = 0; i < tokens.size(); i++) {
 
-            if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
+            //if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
+            if(stopWords.get(tokens.get(i).charAt(0)) == null)
                 continue;
             if (stopWords.get(tokens.get(i).charAt(0)).contains(tokens.get(i).toLowerCase(Locale.ROOT)))
             //if (stopWords.contains(tokens.get(i).toLowerCase(Locale.ROOT)))
