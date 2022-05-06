@@ -65,13 +65,12 @@ public class Indexer {
 
         Ranker ranker = new Ranker();
         HashMap<Integer, ArrayList<String>> retDoc = new HashMap<>();
-        ArrayList<String> words = new ArrayList<String> ();
+        ArrayList<String> words = new ArrayList<String>();
         int i = 0;
-        for(Map.Entry<String, HashMap<String, WordInfo>> entry : obj.invertedFile.entrySet())
-        {
+        for (Map.Entry<String, HashMap<String, WordInfo>> entry : obj.invertedFile.entrySet()) {
             words.add(entry.getKey());
             i++;
-            if(i == 5) break;
+            if (i == 5) break;
         }
         retDoc.put(0, words);
         retDoc.put(1, new ArrayList<>());
@@ -106,11 +105,9 @@ public class Indexer {
             //append it to the list
             String stopWord = scan.nextLine();
             Character key = stopWord.charAt(0);
-            if(!stopWords.containsKey(key))
-            {
+            if (!stopWords.containsKey(key)) {
                 stopWords.put(key, new ArrayList<String>(Collections.singleton(stopWord)));
-            }
-            else
+            } else
                 stopWords.get(key).add(stopWord);
 
         }
@@ -121,12 +118,16 @@ public class Indexer {
     Pair<String, List<String>> parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
         org.jsoup.nodes.Document parsed;
         parsed = Jsoup.parse(HTMLText);
-        if(!parsed.getElementsByTag("main").isEmpty()) parsed = Jsoup.parse(parsed.getElementsByTag("main").first().toString());
+        if (!parsed.getElementsByTag("main").isEmpty())
+            parsed = Jsoup.parse(parsed.getElementsByTag("main").first().toString());
         parsed.select("button").remove();
         parsed.select("input").remove();
 
         List<String> pText = parsed.getElementsByTag("p").eachText();
-        pText.add(0, parsed.getElementsByTag("title").first().text());
+        if (parsed.getElementsByTag("title").first() != null)
+            pText.add(0, parsed.getElementsByTag("title").first().text());
+        else
+            pText.add(0, "");
         pText.add(1, parsed.getElementsByTag("meta").attr("description"));
         //parsed.select("style").remove();
         //parsed.select("script").remove();
@@ -161,9 +162,9 @@ public class Indexer {
     public void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
         for (int i = 0; i < tokens.size(); i++) {
 
-            if((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
+            if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
                 continue;
-            if(stopWords.get(tokens.get(i).charAt(0)).contains(tokens.get(i).toLowerCase(Locale.ROOT)))
+            if (stopWords.get(tokens.get(i).charAt(0)).contains(tokens.get(i).toLowerCase(Locale.ROOT)))
             //if (stopWords.contains(tokens.get(i).toLowerCase(Locale.ROOT)))
             {
                 //then remove it

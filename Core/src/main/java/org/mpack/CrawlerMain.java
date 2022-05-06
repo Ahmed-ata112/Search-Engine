@@ -33,7 +33,7 @@ class Crawler implements Runnable {
     static CountDownLatch latch;
 
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 200;
+    static final int MAX_PAGES = 500;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
