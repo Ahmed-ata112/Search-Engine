@@ -178,10 +178,9 @@ public class MongoDB {
 
 
     public void getVisitedLinks() {
-        Set<String> arr = Crawler.visitedLinks;
-        arr.clear();
+        Crawler.visitedLinks.clear();
         for (String s : urlsCollection.distinct("url_link", String.class)) {
-            arr.add(s);
+            Crawler.visitedLinks.add(s);
             Crawler.websites_hashes.add(Crawler.encryptThisString(s));
         }
     }
