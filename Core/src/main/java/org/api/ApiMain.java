@@ -36,7 +36,7 @@ public class ApiMain {
 class Pojo {
     private String url;
     private String header;
-    private String[] tokens;
+    private List<String> tokens;
     private String paragraph;
 
 }
@@ -66,11 +66,25 @@ class Api {
         System.out.println(K);
         System.out.println("PRIORITY1");
         System.out.println(P);
-
-
-        Lorem lorem = LoremIpsum.getInstance();
-        for (int i = 0; i < 986; i++) {
-            Pojo p1 = new Pojo("www.google.com" + i, "header", new String[]{"h1", "h2"}, lorem.getParagraphs(1, 1) + "h1" + lorem.getParagraphs(1, 1));
+        var ts = Q.GetSearchTokens();
+        for (var p : K) {
+            // p (   <url,pair<para,header>>     |                           )
+            var f = p.getFirst();
+            String url = f.getFirst();
+            var ss = f.getSecond();
+            String header = ss.getFirst();
+            String para = ss.getSecond();
+            Pojo p1 = new Pojo(url, header, ts, para);
+            objectsList.add(p1);
+        }
+        for (var p : P) {
+            // p (   <url,pair<para,header>>     |                           )
+            var f = p.getFirst();
+            String url = f.getFirst();
+            var ss = f.getSecond();
+            String header = ss.getFirst();
+            String para = ss.getSecond();
+            Pojo p1 = new Pojo(url, header, ts, para);
             objectsList.add(p1);
         }
 
