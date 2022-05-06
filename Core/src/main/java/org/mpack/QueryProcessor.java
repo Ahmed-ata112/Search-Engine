@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class QueryProcessor {
-    HashMap<Integer,Document> result = new HashMap<>();
+    HashMap<Integer,ArrayList<Document>> result = new HashMap<>();
     String Phrase;
     HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
@@ -39,15 +39,17 @@ public class QueryProcessor {
         return StemmedWord.toLowerCase();
     }
 
-    public HashMap<Integer,Document> QueryProcessingFunction (String SearchQuery) throws FileNotFoundException {
+    public HashMap<Integer,ArrayList<Document>> QueryProcessingFunction (String SearchQuery) throws FileNotFoundException {
         stopWords = Indexer.constructStopWords();
         List<String> SearchTokens = List.of(SearchQuery.split(" "));
         Indexer.removeStopWords(SearchTokens,stopWords);
+        ArrayList<Document> OriginalWords = new ArrayList<>();
+        ArrayList<Document> StemmedWords = new ArrayList<>();
         for (int i=0;i<SearchTokens.size();i++) {
             //1- retrieve the original word document and put it in hashmap
             Document Doc = InvertedDocs.find(new Document("token_name", SearchTokens.get(i))).first();
             if (Doc != null) {
-                result.putIfAbsent(0, Doc);
+                OriginalWords.add(Doc);
             }
             //2-stemming process
             String StemmedWord = Stem(SearchTokens.get(i));
@@ -59,9 +61,11 @@ public class QueryProcessor {
                 for (String s : arr) {
                     //5- retrieve documents for stemmed words from inverted file and put it in the hashmap
                     Doc = InvertedDocs.find(new Document("token_name", s)).first();
-                    result.putIfAbsent(1, Doc);
+                    StemmedWords.add(Doc);
                 }
             }
+            result.putIfAbsent(0,OriginalWords);
+            result.putIfAbsent(1,StemmedWords);
         }
         return result;
     }
