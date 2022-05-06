@@ -159,7 +159,12 @@ class _SearchHomeState extends State<SearchHome> {
                         });
                       }
                     },
-                  )
+                    style: ElevatedButton.styleFrom(
+                        primary: const Color.fromARGB(255, 16, 211, 255),
+                        fixedSize: const Size(200, 40),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50))),
+                  ),
                 ],
               ),
             ),
