@@ -1,6 +1,7 @@
 package org.mpack;
 
 import org.bson.Document;
+import org.jsoup.Jsoup;
 import org.springframework.data.util.Pair;
 
 
@@ -81,7 +82,7 @@ public class Ranker {
                         List<Integer> _flags = new ArrayList<>(2);
                         _flags.set(0, 0);
                         _flags.set(1, 0);
-                        TF = Double.parseDouble(d.get("normalized_TF").toString());  // to make sure -48 ?
+                        TF = Double.parseDouble(d.get("normalizedTF").toString());  // to make sure -48 ?
                         char[] flags  = d.get("Flags").toString().toCharArray();
                         if(flags[0] - 48 > 0) // to convert from char to int --> to make sure ??????
                             _flags.set(0, flags[0] - 48);
@@ -114,7 +115,7 @@ public class Ranker {
                         List<Integer> _flags = new ArrayList<>(2);
                         _flags.set(0, 0);
                         _flags.set(1, 0);
-                        TF = Double.parseDouble(d.get("normalized_TF").toString());  // to make sure -48 ?
+                        TF = Double.parseDouble(d.get("normalizedTF").toString());  // to make sure -48 ?
                         char[] flags  = d.get("Flags").toString().toCharArray();
                         if(flags[0] - 48 > 0) // to convert from char to int --> to make sure ??????
                             _flags.set(0, flags[0] - 48);
@@ -149,8 +150,55 @@ public class Ranker {
     }
 
 
+    //phrase is array of query words without stop words, the whole phrase is at index 0.
+    Pair<Integer, String> getParagraph(String url, ArrayList<String> phrase, boolean ps)
+    {
+        ArrayList<String> text = mongoDB.getTextUrl(url);
+        boolean found = false;
+        int i = -1, j;
+        for(j = 1; j < text.size(); j++) {
+            for (i = 0; i < phrase.size(); i++) {
+                found = text.contains(phrase.get(i));
+                if (found)
+                    return Pair.of(i, text.get(j));
+            }
+        }
+        //not found --> return description
+            return Pair.of(-1, text.get(0));
+    }
 
+    // --> the whole phrase is at index 0.
+    //phrase array is sorted according to importance of the word.
+/*    Pair<ArrayList<String>, String> getParagraph(String url, ArrayList<String> phrase, boolean ps)
+    {
+       String text = mongoDB.getTextUrl(url);
+       ArrayList<ArrayList<Integer>> indecies = new ArrayList<ArrayList<Integer>>();
+       int index;
+    *//*   if(ps) {
+           ArrayList<Integer> list = new ArrayList<>();
+           list.add(0, text.indexOf(phrase.get(0)));
+           indecies.add(0, list);
+           return new String(text.substring(indecies.get(0).get(0) - 50, indecies.get(0).get(0) + 50)); //TODO: change limits
+       }
+       else
+       {*//*
+        for (String s : phrase) {
+            index = 0;
+            ArrayList<Integer> list = new ArrayList<>();
+            do {
+                index = text.indexOf(s, index);
+                list.add(index);
+            } while (index != -1);
+            indecies.add(list);
+        }
+       *//*}*//*
 
+        for(int i = 0; i < indecies.size(); i++)
+        {
+
+        }
+       return text;
+    }*/
 
 
 

@@ -10,6 +10,8 @@ import java.util.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,7 @@ public class Indexer {
         obj.documentsCount = mongoDB.getDocCount();
         //get crawled docs
 
-        HashMap<String, String> htmlDocs = mongoDB.getHTML();
+        HashMap<String, Pair<Float, String>> htmlDocs = mongoDB.getHTML();
         ///      url     body
 
         ArrayList<HashMap<String, Integer>> docFlags;
@@ -39,7 +41,7 @@ public class Indexer {
         HashMap<Character, List<String>> stopWords = obj.constructStopWords();
 
 
-        for (Map.Entry<String, String> set : htmlDocs.entrySet()) {
+        for (Map.Entry<String, Pair<Float, String>> set : htmlDocs.entrySet()) {
             docFlags = new ArrayList<>(2);
             for (int i = 0; i < 2; i++)
                 docFlags.add(i, new HashMap<>());
@@ -47,14 +49,15 @@ public class Indexer {
             header = new ArrayList<>();
 
 
-            String parsedHTML = obj.parseHTML(set.getValue(), title, header);
+            Pair<String, List<String>> parsedHTML = obj.parseHTML(set.getValue().getSecond(), title, header);
+
             obj.extractFlags(docFlags, title, header);
-            List<String> tokens = obj.extractWords(parsedHTML);
-            mongoDB.StoreTextUrl(parsedHTML, set.getKey());
+            List<String> tokens = obj.extractWords(parsedHTML.getFirst());
+            mongoDB.StoreTextUrl(parsedHTML.getSecond(), set.getKey());
             obj.removeStopWords(tokens, stopWords);
             obj.stemWord(tokens);
 
-            obj.invertedFile(set.getKey(), tokens, docFlags);
+            obj.invertedFile(set.getKey(), tokens, docFlags, set.getValue().getFirst());
 
         }
 
@@ -91,7 +94,7 @@ public class Indexer {
     //read the stop words
     private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File(".\\attaches\\stopwords.txt");
+        File file = new File("D:\\Second_year\\Second_semester\\CMP 2050\\Project\\APTProject\\Core\\attaches\\stopwords.txt");
 
         Scanner scan = new Scanner(file);
 
@@ -115,13 +118,22 @@ public class Indexer {
         return stopWords;
     }
 
-    String parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
+    Pair<String, List<String>> parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
         org.jsoup.nodes.Document parsed;
         parsed = Jsoup.parse(HTMLText);
+        if(!parsed.getElementsByTag("main").isEmpty()) parsed = Jsoup.parse(parsed.getElementsByTag("main").first().toString());
+        parsed.select("button").remove();
+        parsed.select("input").remove();
+        List<String> pText = parsed.getElementsByTag("p").eachText();
+        pText.add(0, parsed.getElementsByTag("meta").attr("description"));
+        //parsed.select("style").remove();
+        //parsed.select("script").remove();
+
         title.addAll(parsed.getElementsByTag("title").eachText());
         header.addAll(parsed.getElementsByTag("header").eachText());
+        header.addAll(parsed.getElementsByTag("h1").eachText());
 
-        return parsed.text();
+        return Pair.of(parsed.text(), pText);
     }
 
     List<String> extractWords(@NotNull String text) {
@@ -175,7 +187,7 @@ public class Indexer {
     }
 
 
-    private void invertedFile(String docURL, List<String> tokens, ArrayList<HashMap<String, Integer>> docFlags) {
+    private void invertedFile(String docURL, List<String> tokens, ArrayList<HashMap<String, Integer>> docFlags, float pageRank) {
         for (int i = 0; i < tokens.size(); i++) {
 
             if (invertedFile.containsKey(tokens.get(i))) {
@@ -190,7 +202,7 @@ public class Indexer {
                     WordInfo container = new WordInfo();
                     container.addPosition(i);
                     container.incTF();
-
+                    container.setPageRank(pageRank);
                     for (short k = 0; k < docFlags.size(); k++) {
                         container.setFlags(k, docFlags.get(k).getOrDefault(tokens.get(i), 0));
                     }
@@ -202,6 +214,7 @@ public class Indexer {
                 WordInfo container = new WordInfo();
                 container.addPosition(i);
                 container.incTF();
+                container.setPageRank(pageRank);
                 docMap.put(docURL, container);
 
                 for (short k = 0; k < docFlags.size(); k++) {
