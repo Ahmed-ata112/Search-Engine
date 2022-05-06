@@ -27,12 +27,13 @@ class Crawler implements Runnable {
     public static final HashSet<String> websites_hashes = new HashSet<>();
     //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
-    static int count = 0;
+
+    static final Map<String, List<String>> pagesEdges = new HashMap<>();
     static AtomicInteger atomicCount = new AtomicInteger(0);
     static CountDownLatch latch;
-    static final Object cLock = new Object();
+
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 100;
+    static final int MAX_PAGES = 200;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -41,6 +42,13 @@ class Crawler implements Runnable {
     }
 
     static boolean isReCrawling = false;
+
+    public static void setIsContinuing(boolean isContinuing) {
+        Crawler.isContinuing = isContinuing;
+    }
+
+    static boolean isContinuing = false;
+
     static final List<String> reCrawlingList = List.of("https://www.cnn.com/", "https://abc.com/");
     static CombinedCanonicalizer canonicalized = new CombinedCanonicalizer();
 
@@ -49,6 +57,7 @@ class Crawler implements Runnable {
     static {
         root.setLevel(Level.OFF);
     }
+
 
     public Crawler(List<String> initialStrings, int neededThreads) {
         this.initialStrings = (ArrayList<String>) initialStrings;
@@ -65,7 +74,9 @@ class Crawler implements Runnable {
         if (isReCrawling) {
             reCrawl(reCrawlingList);
         } else {
-            mongoDB.resetStateForReCrawling();
+            if (!isContinuing)
+                mongoDB.resetStateForReCrawling();
+
             crawl(initialStrings);
         }
     }
@@ -149,13 +160,16 @@ class Crawler implements Runnable {
                         websites_hashes.add(hashed);
                 }
                 Elements linksOnPage = document.select("a[href]");
+                ArrayList<String> neis = new ArrayList<>();
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
+                    neis.add(uu);
                     unprocessedUrlsStack.add(uu);
                     mongoDB.addToStateUrls(uu);
                 }
                 //now we really processed a link
                 atomicCount.incrementAndGet();
+                pagesEdges.put(url, neis);
                 mongoDB.insertUrl(url, document.html());
 
 
@@ -234,6 +248,8 @@ class Crawler implements Runnable {
             }
 
         }
+        latch.countDown();
+
     }
 
     private void finishState() {
@@ -314,22 +330,26 @@ public class CrawlerMain {
 
         int state = mainMongo.getState();
         System.out.printf("state is: %d%n", state);
-        if (true || state == -1) {
+        if (state == -1) {
             // never worked
             System.out.println("here");
             readAndProcess(numThreads);
+
         } else if (state == 0) {
             //continue what it started
             continueAndProcess(numThreads);
         }
-
         Crawler.latch.await();      // wait for all The Threads to finish
         System.out.println("Finished Waiting");
+        PageRank p = new PageRank();
+        p.initRankMatrix(Crawler.visitedLinks, Crawler.pagesEdges);
+        p.run();
 
+        //Re crawl
         while (true) {
             try {
                 sleep(100);
-                Crawler.latch = new CountDownLatch(numThreads); // puts a count down of 20
+                Crawler.latch = new CountDownLatch(numThreads); // puts a Countdown for threads
                 reCrawl(numThreads);
                 Crawler.latch.await();      // wait for all The Threads to finish
 
@@ -338,7 +358,7 @@ public class CrawlerMain {
             }
         }
 
-
+        // testMongo();
     }
 
     // take your seeds from the unprocessed Stack
@@ -366,7 +386,8 @@ public class CrawlerMain {
     private static void continueAndProcess(int numThreads) {
         mainMongo.getVisitedLinks();
         Crawler.setCount(Crawler.visitedLinks.size());
-        System.out.printf("will continue my work with %n count %d", Crawler.count);
+        Crawler.setIsContinuing(true);
+        System.out.printf("will continue my work with count %d", Crawler.atomicCount.get());
         ArrayList<String> seedsArray = (ArrayList<String>) mainMongo.getStateURLs();
         initCrawling(numThreads, seedsArray);
     }
@@ -381,14 +402,8 @@ public class CrawlerMain {
 
     private static void testMongo() {
 
-   /*
-        URL u = null;
-        u = URL.parse("https://www.PROgramiz.com/java-programming/online-compiler/");
-        CombinedCanonicalizer CC = new CombinedCanonicalizer();
-        String u2 = CC.canonicalize(u).toString();
-
-        System.out.println(u2.toString());
-    */
+        MongoDB m = new MongoDB();
+        m.setPageRank("https://www.bbc.co.uk/", 1.01);
 
     }
 }

@@ -61,6 +61,7 @@ class _SearchHomeState extends State<SearchHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white70,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -70,12 +71,49 @@ class _SearchHomeState extends State<SearchHome> {
               padding: const EdgeInsets.all(32.0),
               child: Column(
                 children: <Widget>[
-                  const Text('Type something to search for'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/search.png",
+                        height: 100,
+                        width: 100,
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      const Text(
+                        "Googlio",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            color: Color.fromARGB(255, 0, 193, 255)),
+                      )
+                    ],
+                  ),
                   TypeAheadFormField(
                     textFieldConfiguration: TextFieldConfiguration(
+                        onSubmitted: (input) {
+                          if (_formKey.currentState!.validate()) {
+                            /// Close it if still Open
+                            _stopListening();
+                            _formKey.currentState!.save();
+                            String? t = _wordSearched?.trim();
+                            BackendService.addToSuggestions(t!);
+                            Navigator.pushNamed(context, '/load_page',
+                                arguments: {
+                                  '_wordSearched': t,
+                                });
+                          }
+                        },
                         autofocus: true,
                         controller: _typeAheadController,
-                        decoration: const InputDecoration(labelText: 'search')),
+                        style: const TextStyle(color: Colors.black),
+                        decoration: const InputDecoration(
+                          labelText: 'search',
+                        ),
+                        cursorColor: Colors.cyan),
                     suggestionsCallback: (pattern) {
                       return BackendService.getSuggestions(pattern);
                     },
@@ -113,12 +151,20 @@ class _SearchHomeState extends State<SearchHome> {
                         /// Close it if still Open
                         _stopListening();
                         _formKey.currentState!.save();
+                        String? t = _wordSearched?.trim();
+
+                        BackendService.addToSuggestions(t!);
                         Navigator.pushNamed(context, '/load_page', arguments: {
-                          '_wordSearched': _wordSearched,
+                          '_wordSearched': t,
                         });
                       }
                     },
-                  )
+                    style: ElevatedButton.styleFrom(
+                        primary: const Color.fromARGB(255, 16, 211, 255),
+                        fixedSize: const Size(200, 40),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50))),
+                  ),
                 ],
               ),
             ),
@@ -138,12 +184,17 @@ class _SearchHomeState extends State<SearchHome> {
 
 class BackendService {
   static final Set<String> allWords = {};
+
   static Future<void> initWords() async {
     List result = await DBManager.getSuggestionsList();
 
     for (String word in result) {
       allWords.add(word);
     }
+  }
+
+  static addToSuggestions(String word) {
+    allWords.add(word);
   }
 
   static getSuggestions(String pattern) {
