@@ -12,8 +12,9 @@ import java.util.regex.Pattern;
 public class RobotHandler {
     HashMap<String,RobotRules> PreVisitedUrls = new HashMap<>();
 
-    boolean ReadRobotFile(URL url)
-    {
+    boolean ReadRobotFile(String Link) throws MalformedURLException {
+        
+        URl url = new URL(Link);
         //define an object of RobotRules
         RobotRules robotrules = new RobotRules();
 
