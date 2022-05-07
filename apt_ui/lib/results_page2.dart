@@ -52,8 +52,8 @@ Widget resultCard(ResultTile art, context) {
           onPressed: () {
             //Go to the URLs
             //TODO: Change this to the Url
-            // _launchURL(art.url);
-            _launchURL("https://www.google.com/");
+            _launchURL(art.url);
+            //_launchURL("https://www.google.com/");
           },
           text: "Read",
           blockButton: true,
