@@ -45,15 +45,15 @@ public class Indexer {
             docFlags = new ArrayList<>(2);
             for (int i = 0; i < 2; i++)
                 docFlags.add(i, new HashMap<>());
+
             title = new ArrayList<>();
             header = new ArrayList<>();
 
-
-            Pair<String, List<String>> parsedHTML = obj.parseHTML(set.getValue().getSecond(), title, header);
+            Pair<String, ArrayList<List<String>>> parsedHTML = obj.parseHTML(set.getValue().getSecond(), title, header);
 
             obj.extractFlags(docFlags, title, header);
             List<String> tokens = obj.extractWords(parsedHTML.getFirst());
-            mongoDB.StoreTextUrl(parsedHTML.getSecond(), set.getKey());
+            mongoDB.storeTextUrl(parsedHTML.getSecond(), set.getKey());
             obj.removeStopWords(tokens, stopWords);
             obj.stemWord(tokens);
 
@@ -61,40 +61,20 @@ public class Indexer {
 
         }
 
-        //////////////////////////////test ranker:
-
-        Ranker ranker = new Ranker();
-        HashMap<Integer, ArrayList<String>> retDoc = new HashMap<>();
-        ArrayList<String> words = new ArrayList<String> ();
-        int i = 0;
-        for(Map.Entry<String, HashMap<String, WordInfo>> entry : obj.invertedFile.entrySet())
-        {
-            words.add(entry.getKey());
-            i++;
-            if(i == 5) break;
-        }
-        retDoc.put(0, words);
-        retDoc.put(1, new ArrayList<>());
-        //System.out.println(ranker.ranker(retDoc));
-
-///////////////////////////////////////////////////////////////
         mongoDB.StoreStemming(obj.equivalentStems);
         mongoDB.insertInvertedFile(obj.invertedFile, obj.documentsCount);
 
 
     }
-
     public Indexer() {
 
         invertedFile = new HashMap<>();
-
-        // id     documents  id       fields & values <TF, POSITION, FLAG>
     }
 
     //read the stop words
     private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File(".\\attaches\\stopwords.txt");
+        File file = new File("D:\\Second_year\\Second_semester\\CMP 2050\\Project\\APTProject\\Core\\attaches\\stopwords.txt");
 
         Scanner scan = new Scanner(file);
 
@@ -118,20 +98,29 @@ public class Indexer {
         return stopWords;
     }
 
-    Pair<String, List<String>> parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
+    Pair<String, ArrayList<List<String>>> parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
+
+        String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg"};
+        String[] toStore = {"header", "p", "div"};
         org.jsoup.nodes.Document parsed;
         parsed = Jsoup.parse(HTMLText);
-        if(!parsed.getElementsByTag("main").isEmpty()) parsed = Jsoup.parse(parsed.getElementsByTag("main").first().toString());
-        parsed.select("button").remove();
-        parsed.select("input").remove();
 
-        List<String> pText = parsed.getElementsByTag("p").eachText();
-        pText.add(0, parsed.getElementsByTag("title").first().text());
-        pText.add(1, parsed.getElementsByTag("meta").attr("description"));
-        //parsed.select("style").remove();
-        //parsed.select("script").remove();
+        if (!parsed.getElementsByTag("main").isEmpty())
+            parsed = Jsoup.parse(Objects.requireNonNull(parsed.getElementsByTag("main").first()).toString());
 
-        title.addAll(parsed.getElementsByTag("title").eachText());
+        for(String s : toRemove)
+            parsed.select(s).remove();
+        ArrayList<List<String>> pText = new ArrayList<>();
+        title.add(parsed.title());
+        pText.add(title);
+        List<String> list;
+        for(String s : toStore) {
+            list = parsed.getElementsByTag(s).eachText();
+            pText.add(list);
+        }
+
+        pText.get(2).add(0, parsed.getElementsByTag("meta").attr("name","description").attr("content"));
+
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 

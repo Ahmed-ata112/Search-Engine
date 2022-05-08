@@ -162,20 +162,38 @@ public class Ranker {
 
 
     //phrase is array of query words without stop words, the whole phrase is at index 0.
-    Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, boolean ps)
-    {
-        ArrayList<String> text = mongoDB.getTextUrl(url);
+    Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, boolean ps) {
+
+        ArrayList<ArrayList<String>> text = mongoDB.getTextUrl(url);
         boolean found = false;
+        int index;
         int i = -1, j;
-        for(j = 2; j < text.size(); j++) {
+
+
+        if(ps)
+        {
+            for (j = 0; j < text.size(); j++) {
+                for (i = 0; i < text.get(j).size(); i++) {
+                    index = text.get(j).get(i).indexOf(phrase.get(0));
+                    if(index != -1)
+                    {
+
+                    }
+                    if (found)
+                        return Pair.of(i, Pair.of(text.get(0).get(0), text.get(2).get(j)));
+                }
+            }
+        }
+
+        for (j = 2; j < text.size(); j++) {
             for (i = 0; i < phrase.size(); i++) {
                 found = text.contains(phrase.get(i));
                 if (found)
-                    return Pair.of(i, Pair.of(text.get(0), text.get(j)));
+                    return Pair.of(i, Pair.of(text.get(0).get(0), text.get(2).get(j)));
             }
         }
         //not found --> return description
-            return Pair.of(-1, Pair.of(text.get(0), text.get(1)));
+        return Pair.of(-1, Pair.of(text.get(0).get(0), text.get(2).get(0)));
     }
 
     // --> the whole phrase is at index 0.
