@@ -38,7 +38,7 @@ Widget resultCard(ResultTile art, context) {
           words: words, // Your dictionary words
           textStyle: const TextStyle(
             // You can set the general style, like a Text()
-            fontSize: 10,
+            fontSize: 16,
             color: Colors.black,
           ),
           textAlign: TextAlign
