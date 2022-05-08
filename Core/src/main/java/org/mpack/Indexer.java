@@ -72,7 +72,7 @@ public class Indexer {
     }
 
     //read the stop words
-    private @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
+    public static @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
         File file = new File("D:\\Second_year\\Second_semester\\CMP 2050\\Project\\APTProject\\Core\\attaches\\stopwords.txt");
 
@@ -86,11 +86,9 @@ public class Indexer {
             //append it to the list
             String stopWord = scan.nextLine();
             Character key = stopWord.charAt(0);
-            if(!stopWords.containsKey(key))
-            {
+            if (!stopWords.containsKey(key)) {
                 stopWords.put(key, new ArrayList<String>(Collections.singleton(stopWord)));
-            }
-            else
+            } else
                 stopWords.get(key).add(stopWord);
 
         }
@@ -147,12 +145,13 @@ public class Indexer {
 
 
     //remove them
-    public void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
+    public static void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
         for (int i = 0; i < tokens.size(); i++) {
 
-            if((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
+            //if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
+            if(stopWords.get(tokens.get(i).charAt(0)) == null)
                 continue;
-            if(stopWords.get(tokens.get(i).charAt(0)).contains(tokens.get(i).toLowerCase(Locale.ROOT)))
+            if (stopWords.get(tokens.get(i).charAt(0)).contains(tokens.get(i).toLowerCase(Locale.ROOT)))
             //if (stopWords.contains(tokens.get(i).toLowerCase(Locale.ROOT)))
             {
                 //then remove it
