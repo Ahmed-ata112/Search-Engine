@@ -136,7 +136,7 @@ public class Ranker {
             }
         }
         for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Double>>> entry : url_priority.entrySet()) {
-            Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, phrase.isEmpty()).getSecond();
+            Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, !phrase.isEmpty()).getSecond();
             rankedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), entry.getValue().getSecond())));
         }
 
@@ -166,20 +166,31 @@ public class Ranker {
 
                     }
                     if (found)
+                        return Pair.of(i, Pair.of(text.get(0).get(0), "text.get(2).get(j)"));
+                }
+            }
+        }
+        else {
+            System.out.println("ps = 0");
+            for (j = 1; j < text.get(2).size(); j++) {
+                for (i = 0; i < phrase.size(); i++) {
+                    if(phrase.get(i).isEmpty()) continue;
+                    index = text.get(2).get(j).indexOf(phrase.get(i));
+                    if(index != -1)
+                    {
+                        System.out.println("index != -1");
+                        char b = ' ';
+                        if(index != 0) text.get(2).get(j).charAt(index - 1);
+                        char a = text.get(2).get(j).charAt(index + phrase.get(i).length());
+                        if(!((b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z') || (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z'))) found = true;
+                    }
+                    if (found)
                         return Pair.of(i, Pair.of(text.get(0).get(0), text.get(2).get(j)));
                 }
             }
         }
-
-        for (j = 2; j < text.size(); j++) {
-            for (i = 0; i < phrase.size(); i++) {
-                found = text.contains(phrase.get(i));
-                if (found)
-                    return Pair.of(i, Pair.of(text.get(0).get(0), text.get(2).get(j)));
-            }
-        }
-        //not found --> return description
-        return Pair.of(-1, Pair.of(text.get(0).get(0), text.get(2).get(0)));
+            //not found --> return description
+            return Pair.of(-1, Pair.of(text.get(0).get(0), "text.get(2).get(0)"));
     }
 
     // --> the whole phrase is at index 0.

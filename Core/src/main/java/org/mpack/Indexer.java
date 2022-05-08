@@ -103,13 +103,14 @@ public class Indexer {
         org.jsoup.nodes.Document parsed;
         parsed = Jsoup.parse(HTMLText);
 
+        title.add(parsed.title());
+
         if (!parsed.getElementsByTag("main").isEmpty())
             parsed = Jsoup.parse(Objects.requireNonNull(parsed.getElementsByTag("main").first()).toString());
 
         for(String s : toRemove)
             parsed.select(s).remove();
         ArrayList<List<String>> pText = new ArrayList<>();
-        title.add(parsed.title());
         pText.add(title);
         List<String> list;
         for(String s : toStore) {

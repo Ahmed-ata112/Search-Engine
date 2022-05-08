@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +73,7 @@ class Api {
             // p (   <url,pair<para,header>>     |                           )
             var f = p.getFirst();
             String url = f.getFirst();
+
             var ss = f.getSecond();
             String header = ss.getFirst();
             String para = ss.getSecond();

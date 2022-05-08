@@ -151,7 +151,7 @@ public class MongodbIndexer {
         map.put("header", text.get(1));
         map.put("p", text.get(2));
         map.put("div", text.get(3));
-        document.append("_id", url).append("Text_of_URL", map);
+        document.append("_id", url).append("Text_of_URL", text);
         textURLCollection.insertOne(document);
     }
 

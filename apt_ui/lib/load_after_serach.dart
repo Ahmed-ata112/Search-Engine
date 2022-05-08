@@ -21,7 +21,6 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
       List<String> headers = [];
       List<List<dynamic>> tokens = [];
       dynamic result = await DBManager.executeQuery(searchQ);
-
       for (var e in result) {
         resultsUrls.add(e["url"]);
         headers.add(e["header"]);
