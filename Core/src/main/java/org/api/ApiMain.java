@@ -60,8 +60,8 @@ class Api {
         System.out.println(documents);
 
         Ranker R = new Ranker();
-        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Double>>>> P = new PriorityQueue<>();
-        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Double>>>> K = R.ranker("", documents, P);
+        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> P = new PriorityQueue<>();
+        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> K = R.ranker("", documents, P);
         System.out.println("PRIORITY0");
         System.out.println(K);
         System.out.println("PRIORITY1");
