@@ -24,9 +24,9 @@ public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
     Comparator<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> urlPriority = (url1, url2) -> {
         //title
-        if(url1.getSecond().getSecond().getSecond().getSecond() > url2.getSecond().getSecond().getSecond().getSecond())
+        if (url1.getSecond().getSecond().getSecond().getSecond() > url2.getSecond().getSecond().getSecond().getSecond())
             return 1;
-        else if(url1.getSecond().getSecond().getSecond().getSecond() < url2.getSecond().getSecond().getSecond().getSecond())
+        else if (url1.getSecond().getSecond().getSecond().getSecond() < url2.getSecond().getSecond().getSecond().getSecond())
             return -1;
 
         else if (url1.getSecond().getFirst().get(0) > url2.getSecond().getFirst().get(0))
@@ -54,7 +54,7 @@ public class Ranker {
 
 
     public PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> ranker(String phrase, HashMap<Integer, ArrayList<Document>> retDoc,
-                                                                                                                     PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> stemmedPages) {
+                                                                                                                                    PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> stemmedPages) {
         PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> rankedPages = new PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>(urlPriority);
         //                       url         paragraph   header          flags         pagerank      priority   tokenCount
 
@@ -70,9 +70,9 @@ public class Ranker {
         query.add(phrase);
 
 
-        double IDF = Double.valueOf(0);
-        double TF = Double.valueOf(0);
-        double priority = Double.valueOf(0);
+        double IDF = 0;
+        double TF = 0;
+        double priority = 0;
         double pagRank;
         for (int i = 0; i < 2; i++) {
             //actual words
@@ -104,7 +104,7 @@ public class Ranker {
                             double prePriority = url_priority.get(d.getString("URL")).getSecond().getSecond().getFirst();
                             int preTokenCount = url_priority.get(d.getString("URL")).getSecond().getSecond().getSecond();
                             //then update the priority
-                            url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1) )));
+                            url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1))));
                         } else {
                             url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(priority, 1))));
                         }
@@ -132,9 +132,9 @@ public class Ranker {
                             if (url_priority_stem.containsKey(d.getString("URL"))) {
                                 //then update the priority
                                 double prePriority = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getFirst();
-                                int preTokenCount = url_priority.get(d.getString("URL")).getSecond().getSecond().getSecond();
+                                int preTokenCount = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getSecond();
                                 //then update the priority
-                                url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1) )));
+                                url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1))));
                             } else {
                                 url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(priority, 1))));
                             }
