@@ -81,6 +81,7 @@ class Api {
             objectsList.add(p1);
         }
         for (var p : P) {
+
             // p (   <url,pair<para,header>>     |                           )
             var f = p.getFirst();
             String url = f.getFirst();
