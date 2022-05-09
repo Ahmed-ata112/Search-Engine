@@ -1,5 +1,6 @@
 package org.mpack;
 
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.*;
@@ -10,16 +11,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RobotHandler {
-    HashMap<String,RobotRules> PreVisitedUrls = new HashMap<>();
+    static HashMap<String, RobotRules> preVisitedUrls = new HashMap<>();
 
-    boolean ReadRobotFile(URL url)
-    {
+    static boolean ReadRobotFile(String Link) throws MalformedURLException {
+        URL url = new URL(Link);
         //define an object of RobotRules
         RobotRules robotrules = new RobotRules();
 
         //form the link of robot file
         //protocol://host/robot.txt
-        String RobotUrl = url.getProtocol()+"://"+url.getHost()+"/robots.txt";
+        String RobotUrl = url.getProtocol() + "://" + url.getHost() + "/robots.txt";
 
         //access robot.txt file as html file and parse it using jsoup library
         Document Robothtml;
@@ -27,6 +28,7 @@ public class RobotHandler {
             Robothtml = Jsoup.connect(RobotUrl).get();
         } catch (IOException e) {
             e.printStackTrace();
+            preVisitedUrls.putIfAbsent(url.getHost(),null);
             return false;
         }
         String Robottxt = Robothtml.body().text();
@@ -36,8 +38,7 @@ public class RobotHandler {
         //i = 0 --> User-Agent
         //i = 1 --> *
         //i = 2 --> start of the rules
-        for (int i=2;i<rules.length;i++)
-        {
+        for (int i = 2; i < rules.length; i++) {
             switch (rules[i]) {
                 case "Disallow:" -> {
                     i++;
@@ -55,42 +56,31 @@ public class RobotHandler {
                 }
             }
         }
-        PreVisitedUrls.put(url.getHost(), robotrules);
+        preVisitedUrls.put(url.getHost(), robotrules);
         return true;
     }
 
-    public boolean isDisallowed (URL url)
-    {
-        if (!PreVisitedUrls.containsKey(url.getHost()))
-        {
-            ReadRobotFile(url);
-        }
-        RobotRules robotrules = PreVisitedUrls.get(url.getHost());
-        String UrlFile;
-        if (url.getQuery() == null)
-        {
-            UrlFile = url.getPath();
-        }
-        else
-        {
-            UrlFile = url.getFile();
-        }
-        return (robotrules.isDisallowed(UrlFile));
-    }
-
-    public static void main(String[] args) {
-
+    public static boolean isDisallowed(String Link) {
         URL url = null;
         try {
-            url = new URL("https://www.geeksforgeeks.org");
+            url = new URL(Link);
+            if (!preVisitedUrls.containsKey(url.getHost())) {
+                ReadRobotFile(Link);
+            }
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            return true;
         }
-        RobotHandler robot = new RobotHandler();
-        if (url != null) {
-            robot.ReadRobotFile(url);
+        RobotRules robotrules = preVisitedUrls.get(url.getHost());
+        if (robotrules == null)
+            return false;
+        String UrlFile;
+        if (url.getQuery() == null) {
+            UrlFile = url.getPath();
+        } else {
+            UrlFile = url.getFile();
         }
+
+        return (robotrules.isDisallowed(UrlFile));
     }
 }
 
@@ -99,7 +89,7 @@ class RobotRules {
     HashSet <Pattern> Allowed = new HashSet<>();
 
 
-    public boolean addDisallowed(String path) {
+    public boolean addDisallowed(@NotNull String path) {
         // Ignore Directive if path is empty
         if (path.isEmpty() || !path.startsWith("/"))
             return false;
@@ -107,7 +97,7 @@ class RobotRules {
         return true;
     }
 
-    public boolean addAllowed(String path) {
+    public boolean addAllowed(@NotNull String path) {
         // Ignore Directive if path is empty
         if (path.isEmpty() || !path.startsWith("/"))
             return false;
@@ -127,7 +117,7 @@ class RobotRules {
         return false;
     }
 
-    public Pattern createPattern(String path) {
+    public Pattern createPattern(@NotNull String path) {
         // * in robots.txt --> zero or more character
         // .*in regex --> zero or more character
         // note to escape especial characters

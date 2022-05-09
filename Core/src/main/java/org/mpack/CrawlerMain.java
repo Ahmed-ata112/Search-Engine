@@ -144,14 +144,20 @@ class Crawler implements Runnable {
             }
 
             synchronized (visitedLinks) {
-                if (visitedLinks.contains(url))
+                if (visitedLinks.contains(url) || RobotHandler.isDisallowed(url))
                     continue;
                 else {
                     visitedLinks.add(url);
                 }
             }
+
+
             try {
                 Document document = Jsoup.connect(url).get();
+                if (!document.select("html").attr("lang").contains("en")) {
+                    // not an english website
+                    continue;
+                }
                 String hashed = encryptThisString(document.html());
                 synchronized (websites_hashes) {
                     if (websites_hashes.contains(hashed)) {
@@ -221,6 +227,10 @@ class Crawler implements Runnable {
             }
             try {
                 Document document = Jsoup.connect(url).get();
+                if (!document.select("html").attr("lang").contains("en")) {
+                    // not an english website
+                    continue;
+                }
                 Elements linksOnPage = document.select("a[href]");
                 String hashed = encryptThisString(document.html());
                 synchronized (websites_hashes) {
@@ -401,9 +411,13 @@ public class CrawlerMain {
 
 
     private static void testMongo() {
+        String url = "https://time.com/";
+        try {
+            Document document = Jsoup.connect(url).get();
+            System.out.println(document.select("html").attr("lang").contains("en"));
 
-        MongoDB m = new MongoDB();
-        m.setPageRank("https://www.bbc.co.uk/", 1.01);
-
+        } catch (Exception e) {
+            System.out.println("ERROR");
+        }
     }
 }
