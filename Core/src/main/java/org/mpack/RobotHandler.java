@@ -11,9 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RobotHandler {
-    HashMap<String, RobotRules> PreVisitedUrls = new HashMap<>();
+    static HashMap<String, RobotRules> preVisitedUrls = new HashMap<>();
 
-    boolean ReadRobotFile(String Link) throws MalformedURLException {
+    static boolean ReadRobotFile(String Link) throws MalformedURLException {
         URL url = new URL(Link);
         //define an object of RobotRules
         RobotRules robotrules = new RobotRules();
@@ -28,6 +28,7 @@ public class RobotHandler {
             Robothtml = Jsoup.connect(RobotUrl).get();
         } catch (IOException e) {
             e.printStackTrace();
+            preVisitedUrls.putIfAbsent(url.getHost(),null);
             return false;
         }
         String Robottxt = Robothtml.body().text();
@@ -55,16 +56,23 @@ public class RobotHandler {
                 }
             }
         }
-        PreVisitedUrls.put(url.getHost(), robotrules);
+        preVisitedUrls.put(url.getHost(), robotrules);
         return true;
     }
 
-    public boolean isDisallowed(String Link) throws MalformedURLException {
-        URL url = new URL(Link);
-        if (!PreVisitedUrls.containsKey(url.getHost())) {
-            ReadRobotFile(Link);
+    public static boolean isDisallowed(String Link) {
+        URL url = null;
+        try {
+            url = new URL(Link);
+            if (!preVisitedUrls.containsKey(url.getHost())) {
+                ReadRobotFile(Link);
+            }
+        } catch (MalformedURLException e) {
+            return true;
         }
-        RobotRules robotrules = PreVisitedUrls.get(url.getHost());
+        RobotRules robotrules = preVisitedUrls.get(url.getHost());
+        if (robotrules == null)
+            return false;
         String UrlFile;
         if (url.getQuery() == null) {
             UrlFile = url.getPath();
