@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
-    Comparator<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> urlPriority = (url1, url2) -> {
+    Comparator<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> urlPriority = (url2, url1) -> {
         if(url1.getSecond().getSecond().getSecond().getSecond() > url2.getSecond().getSecond().getSecond().getSecond())
             return 1;
         else if(url1.getSecond().getSecond().getSecond().getSecond() < url2.getSecond().getSecond().getSecond().getSecond())
