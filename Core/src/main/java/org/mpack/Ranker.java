@@ -58,13 +58,12 @@ public class Ranker {
     };
 
 
-    public PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> ranker(String phrase, HashMap<Integer, ArrayList<Document>> retDoc,
-                                                                                                                     PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> stemmedPages) {
+    public Pair<PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>, PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>>   ranker(String phrase, HashMap<Integer, ArrayList<Document>> retDoc) {
         PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> rankedPages = new PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>(urlPriority);
         //                       url         paragraph   header          flags         pagerank      priority   tokenCount
 
 
-        stemmedPages = new PriorityQueue<>(urlPriority);
+        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> stemmedPages = new PriorityQueue<>(urlPriority);
 
         HashMap<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> url_priority = new HashMap<>();
         //         url          flags            pagerank     priority  tokenCount
@@ -159,7 +158,8 @@ public class Ranker {
             Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), stemmed, false).getSecond();
             stemmedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), Pair.of(entry.getValue().getSecond().getSecond().getFirst(),entry.getValue().getSecond().getSecond().getSecond()) ))));
         }
-        return rankedPages;
+
+        return Pair.of(rankedPages, stemmedPages);
     }
 
 
