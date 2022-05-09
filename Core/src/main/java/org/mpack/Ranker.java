@@ -23,21 +23,26 @@ import java.util.function.Consumer;
 public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
     Comparator<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> urlPriority = (url1, url2) -> {
-        //title
         if(url1.getSecond().getSecond().getSecond().getSecond() > url2.getSecond().getSecond().getSecond().getSecond())
             return 1;
         else if(url1.getSecond().getSecond().getSecond().getSecond() < url2.getSecond().getSecond().getSecond().getSecond())
             return -1;
 
+            //title
         else if (url1.getSecond().getFirst().get(0) > url2.getSecond().getFirst().get(0))
             return 1;
+        else if (url1.getSecond().getFirst().get(0) < url2.getSecond().getFirst().get(0))
+            return -1;
+
             //header
         else if (url1.getSecond().getFirst().get(1) > url2.getSecond().getFirst().get(1))
             return 1;
+        else if (url1.getSecond().getFirst().get(1) < url2.getSecond().getFirst().get(1))
+            return -1;
+
             //priority  IDF-TF
         else if (url1.getSecond().getSecond().getSecond().getFirst() > url2.getSecond().getSecond().getSecond().getFirst())
             return 1;
-
         else if (url1.getSecond().getSecond().getSecond().getFirst() < url2.getSecond().getSecond().getSecond().getFirst())
             return -1;
 
@@ -62,6 +67,7 @@ public class Ranker {
         stemmedPages = new PriorityQueue<>(urlPriority);
 
         HashMap<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> url_priority = new HashMap<>();
+        //         url          flags            pagerank     priority  tokenCount
         HashMap<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> url_priority_stem = new HashMap<>();
 
         ArrayList<String> query = new ArrayList<>();
@@ -132,7 +138,7 @@ public class Ranker {
                             if (url_priority_stem.containsKey(d.getString("URL"))) {
                                 //then update the priority
                                 double prePriority = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getFirst();
-                                int preTokenCount = url_priority.get(d.getString("URL")).getSecond().getSecond().getSecond();
+                                int preTokenCount = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getSecond();
                                 //then update the priority
                                 url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1) )));
                             } else {
@@ -146,12 +152,12 @@ public class Ranker {
         }
         for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> entry : url_priority.entrySet()) {
             Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, phrase.isEmpty()).getSecond();
-            rankedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), entry.getValue().getSecond().getSecond()))));
+            rankedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), Pair.of(entry.getValue().getSecond().getSecond().getFirst(),entry.getValue().getSecond().getSecond().getSecond())    ))));
         }
 
         for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> entry : url_priority_stem.entrySet()) {
             Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), stemmed, false).getSecond();
-            stemmedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), entry.getValue().getSecond().getSecond()))));
+            stemmedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), Pair.of(entry.getValue().getSecond().getSecond().getFirst(),entry.getValue().getSecond().getSecond().getSecond()) ))));
         }
         return rankedPages;
     }
