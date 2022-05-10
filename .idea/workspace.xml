@@ -11,9 +11,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="..">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -296,7 +294,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652030286897</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="..">
+      <created>1652210987870</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1652210987870</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

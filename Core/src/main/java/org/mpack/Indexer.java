@@ -10,7 +10,6 @@ import java.util.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
@@ -52,10 +51,10 @@ public class Indexer {
             Pair<String, ArrayList<List<String>>> parsedHTML = obj.parseHTML(set.getValue().getSecond(), title, header);
 
             obj.extractFlags(docFlags, title, header);
-            List<String> tokens = obj.extractWords(parsedHTML.getFirst());
+            Pair<List<String>, List<Integer>> tokens = obj.extractWords(parsedHTML.getFirst());
             mongoDB.storeTextUrl(parsedHTML.getSecond(), set.getKey());
-            obj.removeStopWords(tokens, stopWords);
-            obj.stemWord(tokens);
+            obj.removeStopWords(tokens.getFirst(), stopWords);
+            obj.stemWord(tokens.getFirst());
 
             obj.invertedFile(set.getKey(), tokens, docFlags, set.getValue().getFirst());
 
@@ -98,7 +97,7 @@ public class Indexer {
 
     Pair<String, ArrayList<List<String>>> parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
 
-        String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg"};
+        String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
         String[] toStore = {"header", "p", "div"};
         org.jsoup.nodes.Document parsed;
         parsed = Jsoup.parse(HTMLText);
@@ -126,18 +125,28 @@ public class Indexer {
         return Pair.of(parsed.text(), pText);
     }
 
-    List<String> extractWords(@NotNull String text) {
-        List<String> wordList = new ArrayList<>();
+    Pair<List<String>, List<Integer>> extractWords(@NotNull String text) {
+
+        Pair<List<String>, List<Integer>> wordList;
+        wordList = Pair.of(new ArrayList<>(), new ArrayList<>());
+
         StringBuilder word = new StringBuilder();
+        int position = -1;
         char c;
         for (int i = 0; i < text.length(); i++) {
             c = text.charAt(i);
-            if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0' || c == '+')
+            if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0' || c == '+' || c == '-')
                 word.append(c);
-            else {
+
+            else if(c == ' '){
+
+                position++;
                 if (word.isEmpty()) continue;
-                if (!StringUtils.isNumeric(word.toString()))
-                    wordList.add(word.toString().toLowerCase(Locale.ROOT));
+
+                if (!StringUtils.isNumeric(word.toString()) && !(word.equals('+') || word.equals('-'))) {
+                    wordList.getFirst().add(word.toString().toLowerCase(Locale.ROOT));
+                    wordList.getSecond().add(position);
+                }
                 word = new StringBuilder();
             }
         }
@@ -146,7 +155,7 @@ public class Indexer {
 
 
     //remove them
-    public static void removeStopWords(@NotNull List<String> tokens, HashMap<Character, List<String>> stopWords) {
+    public static void removeStopWords(List<String> tokens, HashMap<Character, List<String>> stopWords) {
         for (int i = 0; i < tokens.size(); i++) {
 
             //if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
@@ -163,7 +172,7 @@ public class Indexer {
     }
 
 
-    private void stemWord(@NotNull List<String> tokens) {
+    private void stemWord(List<String> tokens) {
         PorterStemmer stem = new PorterStemmer();
         for (String token : tokens) {
             String result = stem.stemWord(token);
@@ -178,40 +187,40 @@ public class Indexer {
     }
 
 
-    private void invertedFile(String docURL, List<String> tokens, ArrayList<HashMap<String, Integer>> docFlags, float pageRank) {
-        for (int i = 0; i < tokens.size(); i++) {
+    private void invertedFile(String docURL, Pair<List<String>, List<Integer>> tokens, ArrayList<HashMap<String, Integer>> docFlags, float pageRank) {
+        for (int i = 0; i < tokens.getFirst().size(); i++) {
 
-            if (invertedFile.containsKey(tokens.get(i))) {
+            if (invertedFile.containsKey(tokens.getFirst().get(i))) {
                 //then go and update the positions in for this word in this doc
                 //but first check if the doc exists or not
-                if (invertedFile.get(tokens.get(i)).containsKey(docURL)) {
+                if (invertedFile.get(tokens.getFirst().get(i)).containsKey(docURL)) {
                     //then update
-                    invertedFile.get(tokens.get(i)).get(docURL).addPosition(i);
-                    invertedFile.get(tokens.get(i)).get(docURL).incTF();
+                    invertedFile.get(tokens.getFirst().get(i)).get(docURL).addPosition(tokens.getSecond().get(i));
+                    invertedFile.get(tokens.getFirst().get(i)).get(docURL).incTF();
                 } else {
                     //then create it
                     WordInfo container = new WordInfo();
-                    container.addPosition(i);
+                    container.addPosition(tokens.getSecond().get(i));
                     container.incTF();
                     container.setPageRank(pageRank);
                     for (short k = 0; k < docFlags.size(); k++) {
-                        container.setFlags(k, docFlags.get(k).getOrDefault(tokens.get(i), 0));
+                        container.setFlags(k, docFlags.get(k).getOrDefault(tokens.getFirst().get(i), 0));
                     }
-                    invertedFile.get(tokens.get(i)).put(docURL, container);
+                    invertedFile.get(tokens.getFirst().get(i)).put(docURL, container);
                 }
 
             } else {
                 HashMap<String, WordInfo> docMap = new HashMap<>();
                 WordInfo container = new WordInfo();
-                container.addPosition(i);
+                container.addPosition(tokens.getSecond().get(i));
                 container.incTF();
                 container.setPageRank(pageRank);
                 docMap.put(docURL, container);
 
                 for (short k = 0; k < docFlags.size(); k++) {
-                    container.setFlags(k, docFlags.get(k).getOrDefault(tokens.get(i), 0));
+                    container.setFlags(k, docFlags.get(k).getOrDefault(tokens.getFirst().get(i), 0));
                 }
-                invertedFile.put(tokens.get(i), docMap);
+                invertedFile.put(tokens.getFirst().get(i), docMap);
             }
 
         }
@@ -222,7 +231,7 @@ public class Indexer {
         List<String> temp;
         int k;
         for (String item : title) {
-            temp = extractWords(item);
+            temp = extractWords(item).getFirst();
             for (String s : temp) {
                 k = 0;
                 if (docFlags.get(0).containsKey(s)) {
@@ -234,7 +243,7 @@ public class Indexer {
             }
         }
         for (String s : header) {
-            temp = extractWords(s);
+            temp = extractWords(s).getFirst();
             for (String value : temp) {
                 k = 0;
                 if (docFlags.get(1).containsKey(value)) {
