@@ -49,6 +49,7 @@ public class MongodbIndexer {
         Consumer<Document> getContent = doc -> {
             HTMLmap.put(doc.get("url_link").toString(), Pair.of(Float.parseFloat(doc.get("page_rank").toString()), doc.get("html_body").toString()));
         };
+
         crawledCollection.find().limit(4000).forEach(getContent);
         return HTMLmap;
     }

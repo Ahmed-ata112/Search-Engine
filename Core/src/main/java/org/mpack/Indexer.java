@@ -97,6 +97,8 @@ public class Indexer {
 
     Pair<String, ArrayList<List<String>>> parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
 
+
+
         String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
         String[] toStore = {"header", "p", "div"};
         org.jsoup.nodes.Document parsed;
