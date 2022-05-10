@@ -7,6 +7,7 @@ import io.mola.galimatias.canonicalize.CombinedCanonicalizer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 
@@ -153,7 +154,7 @@ class Crawler implements Runnable {
 
 
             try {
-                Document document = Jsoup.connect(url).get();
+                Document document = Jsoup.connect(url).parser(Parser.xmlParser()).get();
                 if (!document.select("html").attr("lang").contains("en")) {
                     // not an english website
                     continue;

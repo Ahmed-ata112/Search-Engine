@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 
 //TF --> per doc
 
-
 public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
     Comparator<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> urlPriority = (url1, url2) -> {
@@ -132,7 +131,7 @@ public class Ranker {
                             if (url_priority_stem.containsKey(d.getString("URL"))) {
                                 //then update the priority
                                 double prePriority = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getFirst();
-                                int preTokenCount = url_priority.get(d.getString("URL")).getSecond().getSecond().getSecond();
+                                int preTokenCount = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getSecond();
                                 //then update the priority
                                 url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1) )));
                             } else {
@@ -166,9 +165,9 @@ public class Ranker {
         int index = -1;
         int i = -1, j;
 
-        if(ps)
+      /*  if(ps)
         {
-            for (j = 0; j < text.size(); j++) {
+            *//*for (j = 0; j < text.size(); j++) {
                 for (i = 0; i < text.get(j).size(); i++) {
                     index = text.get(j).get(i).indexOf(phrase.get(0));
                     if(index != -1)
@@ -182,9 +181,9 @@ public class Ranker {
                     }
                 }
             }
-            if((index == -1)) return Pair.of(-2, Pair.of("", "")); //url --> remove;
+            if((index == -1)) return Pair.of(-2, Pair.of("", "")); //url --> remove;*//*
         }
-        else {
+        else*/ {
             System.out.println("ps = 0");
             for (j = 1; j < text.get(2).size(); j++) {
                 for (i = 0; i < phrase.size(); i++) {

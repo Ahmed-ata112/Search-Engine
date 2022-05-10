@@ -10,10 +10,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="..">
-      <change beforePath="$PROJECT_DIR$/Core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Core/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/api/ApiMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/api/ApiMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/CrawlerMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/RobotHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/RobotHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,39 +45,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Second_year/Second_semester/CMP 2050/Project/APTProject&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Problems&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propDebugger&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;f41d2085a6ce1233d347c4e812a002ed&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "dart.analysis.tool.window.visible": "false",
+    "io.flutter.reload.alreadyRun": "true",
+    "last_opened_file_path": "D:/Second_year/Second_semester/CMP 2050/Project/APTProject",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Problems",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "project.propDebugger",
+    "show.migrate.to.gradle.popup": "false",
+    "spring.configuration.checksum": "f41d2085a6ce1233d347c4e812a002ed"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mongo&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mongo"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Academic_college\second_year_2nd_term\advanced_programming\Project\APT_Project_Last\Core\src\main\java\org\mpack" />
@@ -93,7 +94,20 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Application.org.mpack.Indexer">
+  <component name="RunManager" selected="Application.Indexer">
+    <configuration name="CrawlerMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mpack.CrawlerMain" />
+      <module name="APTProject2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.mpack.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Indexer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.mpack.Indexer" />
       <module name="APTProject2" />
@@ -169,6 +183,7 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.CrawlerMain" />
       <item itemvalue="Application.org.mpack.Indexer" />
       <item itemvalue="Application.Indexer" />
       <item itemvalue="Flutter.main.dart" />
@@ -176,9 +191,10 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Indexer" />
+        <item itemvalue="Application.CrawlerMain" />
         <item itemvalue="Flutter.main.dart" />
         <item itemvalue="Spring Boot.ApiMain" />
-        <item itemvalue="Application.Indexer" />
         <item itemvalue="Application.org.mpack.Indexer" />
       </list>
     </recent_temporary>

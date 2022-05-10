@@ -132,7 +132,7 @@ public class Indexer {
         char c;
         for (int i = 0; i < text.length(); i++) {
             c = text.charAt(i);
-            if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0')
+            if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0' || c == '+')
                 word.append(c);
             else {
                 if (word.isEmpty()) continue;
