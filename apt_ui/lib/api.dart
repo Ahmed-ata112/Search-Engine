@@ -4,8 +4,8 @@ import 'dart:async';
 
 class DBManager {
   //This stores the url that we'll deal with the restful api through
-  //for web-based applications this will be http://localhost:5000/
-  //for mobile-based applications (emulators) this will be http://10.0.2.2:5000
+  //for web-based applications this will be http://localhost:8080/
+  //for mobile-based applications (emulators) this will be http://10.0.2.2:8080
   //http://localhost:8080
   static const String baseUrl = 'http://localhost:8080';
 

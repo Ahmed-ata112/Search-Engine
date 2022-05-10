@@ -1,6 +1,7 @@
 import 'api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:language_tool/language_tool.dart';
 
 class LoadAfterLogin extends StatefulWidget {
   const LoadAfterLogin({Key? key}) : super(key: key);
@@ -30,8 +31,22 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
       ///////////////////////////////////////////////
 
       if (resultsUrls.isEmpty) {
+        var tool = LanguageTool(language: "en-US");
+        List<WritingMistake> result = await tool.check(searchQ);
+        List<String> replacements = [];
+        for (WritingMistake e in result) {
+          List<String?>? ret = e.replacements;
+          if (ret == null) {
+            break;
+          }
+          for (String? s in ret) {
+            replacements.add(s!);
+          }
+        }
+
         Navigator.popAndPushNamed(context, '/no_results', arguments: {
           '_wordSearched': searchQ,
+          '_replacements': replacements
         });
         return;
       }

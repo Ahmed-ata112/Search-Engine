@@ -79,6 +79,7 @@ public class RobotHandler {
         } else {
             UrlFile = url.getFile();
         }
+
         return (robotrules.isDisallowed(UrlFile));
     }
 }
