@@ -1,11 +1,9 @@
 package org.mpack;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.util.Pair;
 import com.mongodb.client.*;
 import org.bson.Document;
 
-import javax.print.Doc;
 import java.util.*;
 import java.util.function.Consumer;
 import java.text.DecimalFormat;
@@ -140,18 +138,26 @@ public class MongodbIndexer {
 
     }
 
-    public void StoreTextUrl(List<String> text, String url)
+
+    //index                          0          1       2     3
+    //usage                          "title","header", "p", "div"
+    public void storeTextUrl(ArrayList<List<String>> text, String url)
     {
         MongoCollection<Document> textURLCollection;
         textURLCollection = searchEngineDb.getCollection("TextURL");
         Document document = new Document();
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("title", text.get(0));
+        map.put("header", text.get(1));
+        map.put("p", text.get(2));
+        map.put("div", text.get(3));
         document.append("_id", url).append("Text_of_URL", text);
         textURLCollection.insertOne(document);
     }
 
-    ArrayList<String> getTextUrl(String url)
+    ArrayList<ArrayList<String>> getTextUrl(String url)
     {
-        return (ArrayList<String>) searchEngineDb.getCollection("TextURL").find(new Document("_id", url)).first().get("Text_of_URL");
+        return (ArrayList<ArrayList<String>>) searchEngineDb.getCollection("TextURL").find(new Document("_id", url)).first().get("Text_of_URL");
     }
 
 //our principle is first fit --> i.e., first fit
