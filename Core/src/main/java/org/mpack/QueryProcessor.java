@@ -62,7 +62,9 @@ public class QueryProcessor {
 
     void generatePermutations(@NotNull List<List<String>> lists, List<List<Document>> result, int depth, List<Document> current) {
         if (depth == lists.size()) {
-            result.add(current);
+            List<Document> temp = new ArrayList<>();
+            temp.addAll(current);
+            result.add(temp);
             return;
         }
 
@@ -77,9 +79,10 @@ public class QueryProcessor {
                 current.add(null);
             }
             generatePermutations(lists, result, depth + 1, current);
+            current.remove(current.size()-1);
         }
     }
-
+    
     public List<String> GetSearchTokens()
     {
         return SearchTokens;
