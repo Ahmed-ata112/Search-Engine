@@ -184,8 +184,8 @@ public class Ranker {
                         if(j == 2) found = true;
                     }
                     if (found) {
-                        String send = text.get(2).get(j);
-                        send = text(send, phrase.get(i), index);
+                        String send = text.get(j).get(i);
+                        send = text(send, phrase.get(0), index);
                         return Pair.of(i, Pair.of(text.get(0).get(0), send));
                     }
                 }

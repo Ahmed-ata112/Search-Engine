@@ -142,16 +142,11 @@ public class MongodbIndexer {
 
     //index                          0          1       2     3
     //usage                          "title","header", "p", "div"
-    public void storeTextUrl(ArrayList<List<String>> text, String url)
+    public void storeTextUrl(List<String> text, String url)
     {
         MongoCollection<Document> textURLCollection;
         textURLCollection = searchEngineDb.getCollection("TextURL");
         Document document = new Document();
-        Map<String, List<String>> map = new HashMap<>();
-        map.put("title", text.get(0));
-        map.put("header", text.get(1));
-        map.put("p", text.get(2));
-        map.put("div", text.get(3));
         document.append("_id", url).append("Text_of_URL", text);
         textURLCollection.insertOne(document);
     }
