@@ -33,7 +33,7 @@ class Crawler implements Runnable {
     static CountDownLatch latch;
 
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 500;
+    static final int MAX_PAGES = 5000;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -327,7 +327,7 @@ public class CrawlerMain {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
         //initialize Connection with The Database
-        int numThreads = 20;
+        int numThreads = 100;
         Crawler.latch = new CountDownLatch(numThreads);
         System.out.printf("Number of Threads is: %d%n", numThreads);
 

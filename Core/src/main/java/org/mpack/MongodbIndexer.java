@@ -16,7 +16,7 @@ public class MongodbIndexer {
     MongoDatabase searchEngineDb;
     MongoClient mongoClient;
     String pattern = "#.###";
-    DecimalFormat decimalFormat =  new DecimalFormat(pattern);
+    DecimalFormat decimalFormat = new DecimalFormat(pattern);
 
     MongodbIndexer() {
         initConnection();
@@ -37,36 +37,32 @@ public class MongodbIndexer {
         }
     }
 
-    public long getDocCount()
-    {
+    public long getDocCount() {
         return searchEngineDb.getCollection("CrawledURLS").countDocuments();
     }
 
 
-    public HashMap<String, Pair<Float, String>> getHTML()
-    {
+    public HashMap<String, Pair<Float, String>> getHTML() {
         crawledCollection = searchEngineDb.getCollection("CrawledURLS");
         HashMap<String, Pair<Float, String>> HTMLmap = new HashMap<>(5100);
 
         Consumer<Document> getContent = doc -> {
             HTMLmap.put(doc.get("url_link").toString(), Pair.of(Float.parseFloat(doc.get("page_rank").toString()), doc.get("html_body").toString()));
         };
-        crawledCollection.find().limit(4000).forEach(getContent);
+        crawledCollection.find().limit(3000).forEach(getContent);
         return HTMLmap;
     }
 
 
     //--------------------------------------
 
-    public void insertInvertedFile(HashMap<String, HashMap<String, WordInfo>>  invertedFile, long docCount)
-    {
+    public void insertInvertedFile(HashMap<String, HashMap<String, WordInfo>> invertedFile, long docCount) {
         String formattedDouble;
         MongoCollection<Document> invertedFileCollection;
         //drop the collection if exists to create a new one
         boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
                 .into(new ArrayList<String>()).contains("InvertedFile");
-        if(collectionExists)
-        {
+        if (collectionExists) {
             invertedFileCollection = searchEngineDb.getCollection("InvertedFile");
             invertedFileCollection.drop();
 
@@ -78,12 +74,10 @@ public class MongodbIndexer {
 
         int k = 0;
         double idf = docCount;
-        for(Map.Entry<String, HashMap<String, WordInfo>> set1 : invertedFile.entrySet())
-        {
+        for (Map.Entry<String, HashMap<String, WordInfo>> set1 : invertedFile.entrySet()) {
 
             k++;
-            if(k == 1000)
-            {
+            if (k == 1000) {
                 k = 0;
                 invertedFileCollection.insertMany(documents);
                 documents.clear();
@@ -94,16 +88,16 @@ public class MongodbIndexer {
 
             List<Document> doc_per_word = new ArrayList<>();
 
-            for(Map.Entry<String, WordInfo> set2 : set1.getValue().entrySet()) {
+            for (Map.Entry<String, WordInfo> set2 : set1.getValue().entrySet()) {
                 Document d = new Document();
 
-                d.append("URL",set2.getKey()).append("TF", Integer.toString(set2.getValue().getTF())).append("normalizedTF", decimalFormat.format(set2.getValue().getNormalizedTF())).append("pageRank", decimalFormat.format(set2.getValue().getPageRank())).append("Flags", set2.getValue().getFlags())
+                d.append("URL", set2.getKey()).append("TF", Integer.toString(set2.getValue().getTF())).append("normalizedTF", decimalFormat.format(set2.getValue().getNormalizedTF())).append("pageRank", decimalFormat.format(set2.getValue().getPageRank())).append("Flags", set2.getValue().getFlags())
                         .append("Positions", set2.getValue().getPositions());
                 doc_per_word.add(d);
 
             }
             doc.append("DF", Integer.toString(set1.getValue().size()));
-            doc.append("IDF",  decimalFormat.format(Math.round(Math.log((idf) / set1.getValue().size()))));
+            doc.append("IDF", decimalFormat.format(Math.round(Math.log((idf) / set1.getValue().size()))));
             doc.append("documents", doc_per_word);
             documents.add(doc);
 
@@ -114,6 +108,7 @@ public class MongodbIndexer {
 
 
     }
+
     public void StoreStemming(Map<String, Set<String>> equivalentStems) {
         List<Document> documents = new ArrayList<>();
 
@@ -129,8 +124,7 @@ public class MongodbIndexer {
         MongoCollection<Document> StemmingCollection;
         boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
                 .into(new ArrayList<String>()).contains("StemmingCollection");
-        if(collectionExists)
-        {
+        if (collectionExists) {
             StemmingCollection = searchEngineDb.getCollection("StemmingCollection");
             StemmingCollection.drop();
 
@@ -140,8 +134,7 @@ public class MongodbIndexer {
 
     }
 
-    public void StoreTextUrl(List<String> text, String url)
-    {
+    public void StoreTextUrl(List<String> text, String url) {
         MongoCollection<Document> textURLCollection;
         textURLCollection = searchEngineDb.getCollection("TextURL");
         Document document = new Document();
@@ -149,8 +142,7 @@ public class MongodbIndexer {
         textURLCollection.insertOne(document);
     }
 
-    ArrayList<String> getTextUrl(String url)
-    {
+    ArrayList<String> getTextUrl(String url) {
         return (ArrayList<String>) searchEngineDb.getCollection("TextURL").find(new Document("_id", url)).first().get("Text_of_URL");
     }
 
