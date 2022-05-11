@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,8 +62,9 @@ class Api {
         System.out.println(documents);
 
         Ranker R = new Ranker();
-        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Double>>>> P = new PriorityQueue<>();
-        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Double>>>> K = R.ranker("", documents, P);
+        Pair< PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>, PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>> KP = R.ranker("", documents);
+        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> K = KP.getFirst();
+        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> P = KP.getSecond();
         System.out.println("PRIORITY0");
         System.out.println(K);
         System.out.println("PRIORITY1");
@@ -71,6 +74,7 @@ class Api {
             // p (   <url,pair<para,header>>     |                           )
             var f = p.getFirst();
             String url = f.getFirst();
+
             var ss = f.getSecond();
             String header = ss.getFirst();
             String para = ss.getSecond();
@@ -78,6 +82,7 @@ class Api {
             objectsList.add(p1);
         }
         for (var p : P) {
+
             // p (   <url,pair<para,header>>     |                           )
             var f = p.getFirst();
             String url = f.getFirst();

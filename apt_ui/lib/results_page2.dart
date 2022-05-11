@@ -14,7 +14,7 @@ Widget resultCard(ResultTile art, context) {
       },
       textStyle: const TextStyle(
         fontWeight: FontWeight.bold,
-        fontSize: 10,
+        fontSize: 20,
       ),
     );
   }
@@ -38,7 +38,7 @@ Widget resultCard(ResultTile art, context) {
           words: words, // Your dictionary words
           textStyle: const TextStyle(
             // You can set the general style, like a Text()
-            fontSize: 10,
+            fontSize: 14,
             color: Colors.black,
           ),
           textAlign: TextAlign
