@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.mpack.MongoDB;
 import org.mpack.QueryProcessor;
 import org.mpack.Ranker;
+import org.mpack.collections;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.util.Pair;
@@ -57,12 +58,12 @@ class Api {
         mongoDB.addToSuggestionsArray(SearchQ);
 
         QueryProcessor Q = new QueryProcessor();
-        HashMap<Integer, ArrayList<Document>> documents = Q.QueryProcessingFunction(SearchQ);
+        ArrayList<Document> documents = Q.QueryProcessingFunction(SearchQ);
         System.out.println("QUERY");
         System.out.println(documents);
 
         Ranker R = new Ranker();
-        Pair< PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>, PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>> KP = R.ranker("", documents);
+         PriorityQueue<Pair<String, collections>> KP = R.ranker2("", documents);
         PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> K = KP.getFirst();
         PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> P = KP.getSecond();
         System.out.println("PRIORITY0");
