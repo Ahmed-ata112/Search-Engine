@@ -32,7 +32,7 @@ return url1.getSecond().compare(url2.getSecond());
 
 
 
-    public PriorityQueue<Pair<String, collections>>  ranker2(String phrase, ArrayList<Document> retDoc) {
+    public PriorityQueue<Pair<String, collections>>  ranker2(String phrase, List<Document> retDoc) {
 
         PriorityQueue<Pair<String, collections>> rankedPages = new PriorityQueue<Pair<String, collections>>(urlPriority);
         //                       url         paragraph   header          flags         pagerank      priority   tokenCount   positions
@@ -71,6 +71,7 @@ return url1.getSecond().compare(url2.getSecond());
                 priority = TF * IDF;
                 collections url = url_priority.get(d.getString("URL"));
 
+
                 url.flags = _flags;
                 url.pagerank = pagRank;
                 url.positions.add(positions);
@@ -87,6 +88,7 @@ return url1.getSecond().compare(url2.getSecond());
                 } else {
                     url.priority = priority;
                     url.token_count = 1;
+                    url.url = d.getString("URL");
                     url_priority.put(d.getString("URL"), url);
                 }
             }
