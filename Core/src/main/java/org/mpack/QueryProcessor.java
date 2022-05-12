@@ -33,11 +33,13 @@ public class QueryProcessor {
         StemmingCollection = DataBase.getCollection("StemmingCollection");
     }
 
-    private @NotNull void Stem(List<String> Phrase)
+    private @NotNull List<List<Document>> Stem(List<String> Phrase)
     {
-        List<List<String>> Stemmed = new ArrayList<>();
+        //list that contain all equivalent words from data base
+        List<List<String>> EquivalentWords = new ArrayList<>();
         for (int i=0;i< Phrase.size();i++)
         {
+            //get the original word , its stemming , the equivalent words and put all of them in the EquWords List
             String OriginalWord = Phrase.get(i);
             PorterStemmer stem = new PorterStemmer();
             String StemmedWord = stem.stemWord(OriginalWord);
@@ -45,22 +47,81 @@ public class QueryProcessor {
             Document Doc;
             Doc = StemmingCollection.find(new Document("stem_word", StemmedWord)).projection(Document.parse("{Equivalent_words: 1 ,_id: 0}")).first();
             if (Doc != null) {
-                //4-make an array list of stemming words
+                //make an array list of all Equivalent words with original word in the beginning of it
                 ArrayList<String> arr = (ArrayList<String>) Doc.get("Equivalent_words");
                 arr.remove(OriginalWord);
                 arr.add(0,OriginalWord);
-                Stemmed.add(arr);
+                EquivalentWords.add(arr);
             }
             else {
-                Stemmed.add(new ArrayList<String>());
+                EquivalentWords.add(new ArrayList<String>());
             }
         }
-        List<Document> current =  new ArrayList<>();
-        List<List<Document>> result = new ArrayList<>();
-        generatePermutations(Stemmed,result,0,current);
+        
+        //get all combinations of equivalent words of the search query
+        String current = "";
+        List<String> result = new ArrayList<>();
+        generatePermutations(EquivalentWords,result,0,current);
+        
+        //construct a hashmap that contain docs mapped to its word
+        Hashmap <String,Document> NameToDoc = ConstructNameToDocsHashMap(EquivalentWords);
+        
+        //create a list of list document which express the search query
+        List<List<Document>> DocsList = new ArrayList<>();
+        
+        //loop on the result list and fill DocsList with the right documents
+        for (int i=0;i<result.size();i++)
+        {
+            List<Document> temp = new ArrayList<>();
+            for (int j = 0;j<Phrase.size();j++)
+            {
+                temp.add(NameToDoc.get(result[i][j]));
+            }
+            DocsList.add(temp);
+        }
+        
+        return DocsList;
     }
 
-    void generatePermutations(@NotNull List<List<String>> lists, List<List<Document>> result, int depth, List<Document> current) {
+   
+    private void generatePermutations(@NotNull List<List<String>> lists, List<String> result, int depth, String current) {
+        if (depth == lists.size()) {
+            result.add(current);
+            return;
+        }
+        
+        for (int i = 0; i < lists.get(depth).size(); i++) {
+            generatePermutations(lists, result, depth + 1, current+lists.get(depth).get(i));
+        }
+    }
+    
+    private Hashmap<String,Document> ConstructNameToDocsHashMap(List<List<String>> EquivalentWords)
+    {
+        Hashmap<String,Document> NameToDocsHM = new Hashmap<>();
+        for (int i = 0;i<EquivalentWords.size();i++)
+        {
+            for (int j=0;j<EquivalentWords.get(i).size();j++)
+            {
+                Document Doc = InvertedDocs.find(new Document("token_name",  EquivalentWords.get(i).get(j))).first();
+                if (Doc != null) {
+                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i),Doc);
+                }
+                else
+                {
+                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i),null);
+                }
+            }
+        }
+        return NameToDocsHM;
+    }
+    
+    public List<String> GetSearchTokens()
+    {
+        return SearchTokens;
+    }
+
+
+     /*void generatePermutations(@NotNull List<List<String>> lists, List<List<Document>> result, int depth, List<Document> current) {
         if (depth == lists.size()) {
             List<Document> temp = new ArrayList<>();
             temp.addAll(current);
@@ -81,13 +142,9 @@ public class QueryProcessor {
             generatePermutations(lists, result, depth + 1, current);
             current.remove(current.size()-1);
         }
-    }
+    }*/
     
-    public List<String> GetSearchTokens()
-    {
-        return SearchTokens;
-    }
-
+    
    /* public HashMap<Integer,ArrayList<Document>> QueryProcessingFunction (String SearchQuery) throws FileNotFoundException {
         stopWords = Indexer.constructStopWords();
         SearchTokens = List.of(SearchQuery.toLowerCase().split(" "));
