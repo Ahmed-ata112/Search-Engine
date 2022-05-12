@@ -250,9 +250,9 @@ public class Ranker {
         int index = -1;
         int i = -1, j;
 
-      /*  if(ps)
+        if(ps)
         {
-            *//*for (j = 0; j < text.size(); j++) {
+            for (j = 0; j < text.size(); j++) {
                 for (i = 0; i < text.get(j).size(); i++) {
                     index = text.get(j).get(i).indexOf(phrase.get(0));
                     if(index != -1)
@@ -260,23 +260,21 @@ public class Ranker {
                         if(j == 2) found = true;
                     }
                     if (found) {
-                        String send = text.get(2).get(j);
-                        send = text(send, phrase.get(i), index);
+                        String send = text.get(j).get(i);
+                        send = text(send, phrase.get(0), index);
                         return Pair.of(i, Pair.of(text.get(0).get(0), send));
                     }
                 }
             }
-            if((index == -1)) return Pair.of(-2, Pair.of("", "")); //url --> remove;*//*
+            if((index == -1)) return Pair.of(-2, Pair.of("", "")); //url --> remove;
         }
-        else*/ {
-            System.out.println("ps = 0");
+        else {
             for (j = 1; j < text.get(2).size(); j++) {
                 for (i = 0; i < phrase.size(); i++) {
                     if(phrase.get(i).isEmpty()) continue;
                     index = text.get(2).get(j).indexOf(phrase.get(i));
                     if(index != -1)
                     {
-                        System.out.println("index != -1");
                         char b = ' ';
                         if(index != 0) b = text.get(2).get(j).charAt(index - 1);
                         char a = ' ';
@@ -298,7 +296,7 @@ public class Ranker {
     }
 
 
-    String text(String paragragh, String word, int index)
+    static String text(String paragragh, String word, int index)
     {
         StringBuilder text = new StringBuilder();
         int counter = 0, i = index - 1;
