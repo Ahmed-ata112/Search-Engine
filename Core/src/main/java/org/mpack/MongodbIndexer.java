@@ -50,7 +50,7 @@ public class MongodbIndexer {
             HTMLmap.put(doc.get("url_link").toString(), Pair.of(Float.parseFloat(doc.get("page_rank").toString()), doc.get("html_body").toString()));
         };
 
-        crawledCollection.find().limit(4000).forEach(getContent);
+        crawledCollection.find().forEach(getContent);
         return HTMLmap;
     }
 
@@ -151,9 +151,9 @@ public class MongodbIndexer {
         textURLCollection.insertOne(document);
     }
 
-    ArrayList<ArrayList<String>> getTextUrl(String url)
+    ArrayList<String> getTextUrl(String url)
     {
-        return (ArrayList<ArrayList<String>>) searchEngineDb.getCollection("TextURL").find(new Document("_id", url)).first().get("Text_of_URL");
+        return (ArrayList<String>) searchEngineDb.getCollection("TextURL").find(new Document("_id", url)).first().get("Text_of_URL");
     }
 
 //our principle is first fit --> i.e., first fit

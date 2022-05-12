@@ -152,7 +152,7 @@ public class Ranker {
 
             }
         }
-        for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> entry : url_priority.entrySet()) {
+       /* for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> entry : url_priority.entrySet()) {
             Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, phrase.isEmpty()).getSecond();
             rankedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), Pair.of(entry.getValue().getSecond().getSecond().getFirst(),entry.getValue().getSecond().getSecond().getSecond())    ))));
         }
@@ -160,21 +160,25 @@ public class Ranker {
         for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> entry : url_priority_stem.entrySet()) {
             Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), stemmed, false).getSecond();
             stemmedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), Pair.of(entry.getValue().getSecond().getSecond().getFirst(),entry.getValue().getSecond().getSecond().getSecond()) ))));
-        }
+        }*/
 
         return Pair.of(rankedPages, stemmedPages);
     }
 
 
     //phrase is array of query words without stop words, the whole phrase is at index 0.
-    Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, boolean ps) {
-        ArrayList<ArrayList<String>> text = mongoDB.getTextUrl(url);
+    Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, boolean ps, ArrayList<List<Integer>> positions) {
+        ArrayList<String> text = mongoDB.getTextUrl(url);
 
         boolean found = false;
         int index = -1;
         int i = -1, j;
+        int start, end;
+        StringBuilder parag = new StringBuilder();
 
-        if(ps)
+
+
+       /* if(ps)
         {
             for (j = 0; j < text.size(); j++) {
                 for (i = 0; i < text.get(j).size(); i++) {
@@ -192,10 +196,20 @@ public class Ranker {
             }
             if((index == -1)) return Pair.of(-2, Pair.of("", "")); //url --> remove;
         }
-        else {
-            for (j = 1; j < text.get(2).size(); j++) {
-                for (i = 0; i < phrase.size(); i++) {
-                    if(phrase.get(i).isEmpty()) continue;
+        else {*/
+            for (j = 0; j < phrase.size(); j++) {
+                for (i = 0; i < positions.get(j).size(); i++) {
+
+                    start = Math.max(0, positions.get(j).get(i) - 10);
+                    end = Math.min(text.size(), positions.get(j).get(i) + 10);
+
+                    for (int k = start; k < end; k++) {
+                        parag.append(text.get(k));
+                    }
+                    return Pair.of(-1, Pair.of(text.get(0), parag.toString()));
+                }
+            }
+/*
                     index = text.get(2).get(j).indexOf(phrase.get(i));
                     if(index != -1)
                     {
@@ -213,10 +227,10 @@ public class Ranker {
                         return Pair.of(i, Pair.of(text.get(0).get(0), send));
                     }
                 }
-            }
-        }
+            }*/
+
             //not found --> return description
-            return Pair.of(-1, Pair.of(text.get(0).get(0), "text.get(2).get(0)"));
+            return Pair.of(-1, Pair.of(text.get(0), "text.get(2).get(0)"));
     }
 
 

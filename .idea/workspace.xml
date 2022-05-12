@@ -10,7 +10,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="..">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
@@ -236,7 +235,8 @@
       <workItem from="1652111071124" duration="687000" />
       <workItem from="1652216566853" duration="3781000" />
       <workItem from="1652220713467" duration="139000" />
-      <workItem from="1652220868508" duration="5568000" />
+      <workItem from="1652220868508" duration="5607000" />
+      <workItem from="1652360009769" duration="4346000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
@@ -322,7 +322,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652224302578</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="..">
+      <created>1652227478724</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1652227478724</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -367,5 +374,10 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/APTProject$Indexer.ic" NAME="Indexer Coverage Results" MODIFIED="1652362497996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>org.mpack.*</FILTER>
+    </SUITE>
   </component>
 </project>
