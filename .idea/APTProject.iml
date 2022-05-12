@@ -11,9 +11,9 @@
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/build" />
-      <excludeFolder url="file://$MODULE_DIR$/apt_ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/build" />
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/apt_ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/build" />
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/apt_ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/.pub" />

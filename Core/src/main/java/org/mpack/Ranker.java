@@ -4,6 +4,7 @@ import org.bson.Document;
 import org.springframework.data.util.Pair;
 
 
+import java.lang.reflect.Array;
 import java.util.*;
 //import javafx.util.Pair;
 
@@ -44,6 +45,7 @@ return url1.getSecond().compare(url2.getSecond());
         ArrayList<String> query = new ArrayList<>();
         ArrayList<String> stemmed = new ArrayList<>();
 
+
         query.add(phrase);
 
 
@@ -69,24 +71,26 @@ return url1.getSecond().compare(url2.getSecond());
 
                 pagRank = Double.parseDouble(d.get("pageRank").toString());
                 priority = TF * IDF;
-                collections url = url_priority.get(d.getString("URL"));
 
 
-                url.flags = _flags;
-                url.pagerank = pagRank;
-                url.positions.add(positions);
                 //search in the hashmap for this url or insert it if not found
                 if (url_priority.containsKey(d.getString("URL"))) {
                     //then update the priority
+                    collections url = url_priority.get(d.getString("URL"));
+                    url.pagerank = pagRank;
+                    url.positions.add(positions);
                     double prePriority = url_priority.get(d.getString("URL")).priority;
                     int preTokenCount = url_priority.get(d.getString("URL")).token_count;
                     //then update the priority
-
                     url.token_count =  preTokenCount + 1;
                     url.priority = prePriority + priority;
                     url_priority.put(d.getString("URL"), url);
                 } else {
+                    collections url = new collections();
+                    url.flags = _flags;
                     url.priority = priority;
+                    url.positions = new ArrayList<>();
+                    url.positions.add(positions);
                     url.token_count = 1;
                     url.url = d.getString("URL");
                     url_priority.put(d.getString("URL"), url);
@@ -112,52 +116,31 @@ return url1.getSecond().compare(url2.getSecond());
 
 
 
-
-
-
-
-
     //phrase is array of query words without stop words, the whole phrase is at index 0.
     Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, collections collection) {
-        ArrayList<ArrayList<String>> text = mongoDB.getTextUrl(url);
-
+        ArrayList<String> text = mongoDB.getTextUrl(url);
         boolean found = false;
         int index = -1;
         int i = -1, j;
+        int start, end;
+        StringBuilder parag = new StringBuilder();
 
-        if(ps)
-        {
-            for (j = 0; j < text.size(); j++) {
-                for (i = 0; i < text.get(j).size(); i++) {
-                    index = text.get(j).get(i).indexOf(phrase.get(0));
-                    if(index != -1)
-                    {
-                        if(j == 2) found = true;
-                    }
-                    if (found) {
-                        String send = text.get(j).get(i);
-                        send = text(send, phrase.get(0), index);
-                        return Pair.of(i, Pair.of(text.get(0).get(0), send));
-                    }
+        collection.wordNear = 0;
+
+
+        for (j = 0; j < phrase.size(); j++) {
+            for (i = 0; i < collection.positions.get(j).size(); i++) {
+
+                start = Math.max(0, collection.positions.get(j).get(i) - 10);
+                end = Math.min(text.size() - 1, collection.positions.get(j).get(i) + 10);
+
+                for (int k = start; k < end; k++) {
+                    parag.append(text.get(k + 1) + " ");
                 }
+                return Pair.of(0, Pair.of(text.get(0), parag.toString()));
             }
-            if((index == -1)) return Pair.of(-2, Pair.of("", "")); //url --> remove;
         }
-        else {
-            for (j = 1; j < text.get(2).size(); j++) {
-                for (i = 0; i < phrase.size(); i++) {
-                    if(phrase.get(i).isEmpty()) continue;
-                    index = text.get(2).get(j).indexOf(phrase.get(i));
-                    if(index != -1)
-                    {
-                        char b = ' ';
-                        if(index != 0) b = text.get(2).get(j).charAt(index - 1);
-                        char a = ' ';
-                        if(text.get(2).get(j).length() != index + phrase.get(i).length()) a = text.get(2).get(j).charAt(index + phrase.get(i).length());
-
-
-        //not found --> return description
-        return Pair.of(-1, Pair.of(text.get(0).get(0), "text.get(2).get(0)"));
+        return Pair.of(-1, Pair.of("", ""));
     }
 
 
