@@ -1,15 +1,9 @@
 package org.mpack;
 
-import com.thedeanda.lorem.Lorem;
-import com.thedeanda.lorem.LoremIpsum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
-import org.mpack.MongoDB;
-import org.mpack.QueryProcessor;
-import org.mpack.Ranker;
-import org.mpack.collections;
+import crawler.MongoDB;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.util.Pair;
@@ -17,9 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.awt.*;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.util.*;
 import java.util.List;
 

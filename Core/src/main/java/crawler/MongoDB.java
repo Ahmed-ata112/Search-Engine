@@ -1,7 +1,8 @@
-package org.mpack;
+package crawler;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.UpdateOptions;
+import crawler.Crawler;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -211,13 +212,12 @@ public class MongoDB {
 
         List<Document> r = getRelations();
         Crawler.pagesEdges.clear();
-        
+
         for (Document d : r) {
             String root = (String) d.get("_id");
             List<String> others = d.getList("relations", String.class);
             Crawler.pagesEdges.put(root, new HashSet<String>(others));
         }
-        System.out.println(Crawler.pagesEdges);
     }
 
 

@@ -1,5 +1,7 @@
 package org.mpack;
 
+import crawler.MongoDB;
+
 import java.util.*;
 
 class PageNode {
