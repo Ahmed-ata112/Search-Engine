@@ -7,6 +7,7 @@ import io.mola.galimatias.canonicalize.CombinedCanonicalizer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 
@@ -153,7 +154,7 @@ class Crawler implements Runnable {
 
 
             try {
-                Document document = Jsoup.connect(url).get();
+                Document document = Jsoup.connect(url).parser(Parser.xmlParser()).get();
                 if (!document.select("html").attr("lang").contains("en")) {
                     // not an english website
                     continue;
@@ -375,7 +376,7 @@ public class CrawlerMain {
     private static void readAndProcess(int numThreads) throws FileNotFoundException {
         mainMongo.setState(0); // start crawling
 
-        File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
+        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Project_delete_except\\Core\\attaches\\seed.txt");    //creates a new file instance
         FileReader fr = new FileReader(file);   //reads the file
         ArrayList<String> seedsArray;
         try (BufferedReader br = new BufferedReader(fr)) {

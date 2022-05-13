@@ -1,12 +1,11 @@
 package org.mpack;
 
 import org.bson.Document;
-import org.jsoup.Jsoup;
 import org.springframework.data.util.Pair;
 
 
+import java.lang.reflect.Array;
 import java.util.*;
-import java.util.function.Consumer;
 //import javafx.util.Pair;
 
 
@@ -22,58 +21,26 @@ import java.util.function.Consumer;
 
 public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
-    Comparator<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> urlPriority = (url2, url1) -> {
-        if(url1.getSecond().getSecond().getSecond().getSecond() > url2.getSecond().getSecond().getSecond().getSecond())
 
-            return 1;
-        else if (url1.getSecond().getSecond().getSecond().getSecond() < url2.getSecond().getSecond().getSecond().getSecond())
-            return -1;
 
-            //title
-        else if (url1.getSecond().getFirst().get(0) > url2.getSecond().getFirst().get(0))
-            return 1;
-        else if (url1.getSecond().getFirst().get(0) < url2.getSecond().getFirst().get(0))
-            return -1;
+    Comparator<Pair<String, collections>> urlPriority = (url2, url1) -> {
+        return url1.getSecond().compare(url2.getSecond());
 
-            //header
-        else if (url1.getSecond().getFirst().get(1) > url2.getSecond().getFirst().get(1))
-            return 1;
-        else if (url1.getSecond().getFirst().get(1) < url2.getSecond().getFirst().get(1))
-            return -1;
-
-            //priority  IDF-TF
-        else if (url1.getSecond().getSecond().getSecond().getFirst() > url2.getSecond().getSecond().getSecond().getFirst())
-            return 1;
-        else if (url1.getSecond().getSecond().getSecond().getFirst() < url2.getSecond().getSecond().getSecond().getFirst())
-            return -1;
-
-            //pageRank
-        else if (url1.getSecond().getSecond().getFirst() > url2.getSecond().getSecond().getFirst())
-            return 1;
-
-        else if (url1.getSecond().getSecond().getFirst() < url2.getSecond().getSecond().getFirst())
-            return -1;
-
-        else
-            return 0;
     };
 
 
+    public PriorityQueue<Pair<String, collections>> ranker2(String phrase, List<Document> retDoc) {
 
-    public Pair<PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>, PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>>   ranker(String phrase, HashMap<Integer, ArrayList<Document>> retDoc) {
-
-        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> rankedPages = new PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>>(urlPriority);
-        //                       url         paragraph   header          flags         pagerank      priority   tokenCount
+        PriorityQueue<Pair<String, collections>> rankedPages = new PriorityQueue<Pair<String, collections>>(urlPriority);
+        //                       url         paragraph   header          flags         pagerank      priority   tokenCount   positions
 
 
-        PriorityQueue<Pair<Pair<String, Pair<String, String>>, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>>> stemmedPages = new PriorityQueue<>(urlPriority);
-
-        HashMap<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> url_priority = new HashMap<>();
+        HashMap<String, collections> url_priority = new HashMap<>();
         //         url          flags            pagerank     priority  tokenCount
-        HashMap<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> url_priority_stem = new HashMap<>();
 
         ArrayList<String> query = new ArrayList<>();
         ArrayList<String> stemmed = new ArrayList<>();
+
 
         query.add(phrase);
 
@@ -82,221 +49,133 @@ public class Ranker {
         double TF = 0;
         double priority = 0;
         double pagRank;
-        for (int i = 0; i < 2; i++) {
-            //actual words
-            if (i == 0) {
-                for (int j = 0; j < retDoc.get(i).size(); j++) {
-                    query.add(retDoc.get(i).get(j).get("token_name").toString());
-                    //mongoDB.CalcTF_IDF(retDoc.get(i).get(j), url_priority);
-                    IDF = Double.parseDouble(retDoc.get(i).get(j).get("IDF").toString());
-                    List<Document> webPages = (List<Document>) retDoc.get(i).get(j).get("documents");
-                    //I think there is a more efficient way to get the url of the word rather than this
-                    for (Document d : webPages) {
-                        List<Integer> _flags = new ArrayList<>();
-                        /*_flags.set(0, 0);
-                        _flags.set(1, 0);*/
-                        TF = Double.parseDouble(d.get("normalizedTF").toString());  // to make sure -48 ?
-                        _flags = (ArrayList<Integer>) (d.get("Flags"));
 
-                        /*if(flags[0] - 48 > 0) // to convert from char to int --> to make sure ??????
-                            _flags.set(0, flags[0] - 48);
 
-                        if(flags[1] - 48 > 0)
-                            _flags.set(1, flags[1] - 48);
-*/
-                        pagRank = Double.parseDouble(d.get("pageRank").toString());
-                        priority = TF * IDF;
-                        //search in the hashmap for this url or insert it if not found
-                        if (url_priority.containsKey(d.getString("URL"))) {
-                            //then update the priority
-                            double prePriority = url_priority.get(d.getString("URL")).getSecond().getSecond().getFirst();
-                            int preTokenCount = url_priority.get(d.getString("URL")).getSecond().getSecond().getSecond();
-                            //then update the priority
-                            url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1))));
-                        } else {
-                            url_priority.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(priority, 1))));
-                        }
-                    }
+        for (int i = 0; i < retDoc.size(); i++) {
+            query.add(retDoc.get(i).get("token_name").toString());
+            IDF = Double.parseDouble(retDoc.get(i).get("IDF").toString());
+            List<Document> webPages = (List<Document>) retDoc.get(i).get("documents");
+            //I think there is a more efficient way to get the url of the word rather than this
+            for (Document d : webPages) {
+                List<Integer> _flags;
+                /*_flags.set(0, 0);
+                _flags.set(1, 0);*/
+                TF = Double.parseDouble(d.get("normalizedTF").toString());  // to make sure -48 ?
+                _flags = (ArrayList<Integer>) (d.get("Flags"));
+                List<Integer> positions = new ArrayList<>();
+                positions = (ArrayList<Integer>) (d.get("Positions"));
+
+                pagRank = Double.parseDouble(d.get("pageRank").toString());
+                priority = TF * IDF;
+
+
+                //search in the hashmap for this url or insert it if not found
+                if (url_priority.containsKey(d.getString("URL"))) {
+                    //then update the priority
+                    collections url = url_priority.get(d.getString("URL"));
+                    url.pagerank = pagRank;
+                    url.positions.add(positions);
+                    double prePriority = url_priority.get(d.getString("URL")).priority;
+                    int preTokenCount = url_priority.get(d.getString("URL")).token_count;
+                    //then update the priority
+                    url.token_count = preTokenCount + 1;
+                    url.priority = prePriority + priority;
+                    url_priority.put(d.getString("URL"), url);
+                } else {
+                    collections url = new collections();
+                    url.flags = _flags;
+                    url.priority = priority;
+                    url.positions = new ArrayList<>();
+                    url.positions.add(positions);
+                    url.token_count = 1;
+                    url.url = d.getString("URL");
+                    url_priority.put(d.getString("URL"), url);
                 }
             }
-            //stemming words
-            else {
-                for (int j = 0; j < retDoc.get(i).size(); j++) {
-                    stemmed.add(retDoc.get(i).get(j).get("token_name").toString());
-                    //mongoDB.CalcTF_IDF(retDoc.get(i).get(j), url_priority);
-                    IDF = Double.parseDouble(retDoc.get(i).get(j).get("IDF").toString());
-                    List<Document> webPages = (List<Document>) retDoc.get(i).get(j).get("documents");
-                    //I think there is a more efficient way to get the url of the word rather than this
-                    for (Document d : webPages) {
-                        List<Integer> _flags;
-
-                        TF = Double.parseDouble(d.get("normalizedTF").toString());  // to make sure -48 ?
-                        _flags = (ArrayList<Integer>) (d.get("Flags"));
-
-                        pagRank = Double.parseDouble(d.get("pageRank").toString());
-                        priority = TF * IDF;
-                        //search in the hashmap for this url or insert it if not found
-                        if (!url_priority.containsKey(d.getString("URL"))) {
-                            if (url_priority_stem.containsKey(d.getString("URL"))) {
-                                //then update the priority
-                                double prePriority = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getFirst();
-                                int preTokenCount = url_priority_stem.get(d.getString("URL")).getSecond().getSecond().getSecond();
-                                //then update the priority
-                                url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(prePriority + priority, preTokenCount + 1))));
-                            } else {
-                                url_priority_stem.put(d.getString("URL"), Pair.of(_flags, Pair.of(pagRank, Pair.of(priority, 1))));
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-        for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> entry : url_priority.entrySet()) {
-            Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, phrase.isEmpty()).getSecond();
-            rankedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), Pair.of(entry.getValue().getSecond().getSecond().getFirst(),entry.getValue().getSecond().getSecond().getSecond())    ))));
         }
 
-        for (Map.Entry<String, Pair<List<Integer>, Pair<Double, Pair<Double, Integer>>>> entry : url_priority_stem.entrySet()) {
-            Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), stemmed, false).getSecond();
-            stemmedPages.add(Pair.of(Pair.of(entry.getKey(), paragraphTitle), Pair.of(entry.getValue().getFirst(), Pair.of(entry.getValue().getSecond().getFirst(), Pair.of(entry.getValue().getSecond().getSecond().getFirst(),entry.getValue().getSecond().getSecond().getSecond()) ))));
+
+        int ifFound = 0;
+        for (Map.Entry<String, collections> entry : url_priority.entrySet()) {
+            Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, entry.getValue()).getSecond();
+            entry.getValue().title = paragraphTitle.getFirst();
+            entry.getValue().paragraph = paragraphTitle.getSecond();
+            rankedPages.add(Pair.of(entry.getKey(), entry.getValue()));
         }
 
-        return Pair.of(rankedPages, stemmedPages);
+
+        return rankedPages;
     }
 
 
     //phrase is array of query words without stop words, the whole phrase is at index 0.
-    Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, boolean ps) {
+    Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, collections collection) {
         ArrayList<String> text = mongoDB.getTextUrl(url);
         boolean found = false;
+        int index = -1;
         int i = -1, j;
-        for (j = 2; j < text.size(); j++) {
-            for (i = 0; i < phrase.size(); i++) {
-                found = text.contains(phrase.get(i));
-                if (found)
-                    return Pair.of(i, Pair.of(text.get(0), text.get(j)));
+        int start, end;
+        StringBuilder parag = new StringBuilder();
+
+        collection.wordNear = 0;
+
+
+        for (j = 0; j < phrase.size(); j++) {
+            for (i = 0; i < collection.positions.get(j).size(); i++) {
+
+                start = Math.max(0, collection.positions.get(j).get(i) - 10);
+                end = Math.min(text.size() - 1, collection.positions.get(j).get(i) + 10);
+
+                for (int k = start; k < end; k++) {
+                    parag.append(text.get(k + 1) + " ");
+                }
+                return Pair.of(0, Pair.of(text.get(0), parag.toString()));
             }
         }
-        //not found --> return description
-        return Pair.of(-1, Pair.of(text.get(0), text.get(1)));
+        return Pair.of(-1, Pair.of("", ""));
     }
 
-    // --> the whole phrase is at index 0.
-    //phrase array is sorted according to importance of the word.
-/*    Pair<ArrayList<String>, String> getParagraph(String url, ArrayList<String> phrase, boolean ps)
-    {
-       String text = mongoDB.getTextUrl(url);
-       ArrayList<ArrayList<Integer>> indecies = new ArrayList<ArrayList<Integer>>();
-       int index;
-    *//*   if(ps) {
-           ArrayList<Integer> list = new ArrayList<>();
-           list.add(0, text.indexOf(phrase.get(0)));
-           indecies.add(0, list);
-           return new String(text.substring(indecies.get(0).get(0) - 50, indecies.get(0).get(0) + 50)); //TODO: change limits
-       }
-       else
-       {*//*
-        for (String s : phrase) {
-            index = 0;
-            ArrayList<Integer> list = new ArrayList<>();
-            do {
-                index = text.indexOf(s, index);
-                list.add(index);
-            } while (index != -1);
-            indecies.add(list);
+
+    static String text(String paragragh, String word, int index) {
+        StringBuilder text = new StringBuilder();
+        int counter = 0, i = index - 1;
+        char c, t = 'a';
+        int maxA = 10, maxB = 10;
+        if (index == 0) {
+            maxA = 20;
+            maxB = 0;
         }
-       *//*}*//*
-
-        for(int i = 0; i < indecies.size(); i++)
-        {
-
+        if (index + word.length() == paragragh.length()) {
+            maxA = 0;
+            if (maxB == 10) maxB = 20;
         }
-       return text;
-    }*/
+        while (i > -1 && counter < maxB) {
+            c = paragragh.charAt(i);
+            if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0') ;
+            else if (t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
+            i--;
+            t = c;
+        }
+        i++;
+        text.append(paragragh.substring(i, index + word.length()));
 
+        counter = 0;
 
+        i = index + word.length();
+        t = 'a';
 
-/*
-    PriorityQueue<Pair<String, Double>> ranker(HashMap<Integer, ArrayList<String>> retDoc)
-    {
-        PriorityQueue<Pair<String, Double>> rankedPages = new PriorityQueue<>(urlPriority);
-        HashMap<String, Double> url_priority = new HashMap<>();
-        for(int i = 0; i < 2; i++)
-        {
-            for(int j = 0; j < retDoc.get(i).size(); j++)
-            {
-                mongoDB.CalcTF_IDF(retDoc.get(i).get(j), url_priority);
-            }
+        while (i < paragragh.length() && counter < maxA) {
+
+            c = paragragh.charAt(i);
+            if ((c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0')) ;
+            else if (t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
+            i++;
+            t = c;
         }
 
-        for(Map.Entry<String, Double> entry : url_priority.entrySet()) {
-            rankedPages.add(Pair.of(entry.getKey(), entry.getValue()));
-        }
-        return rankedPages;
+        text.append(paragragh.substring(index + word.length(), i));
+
+        return text.toString();
     }
-*/
-
-/*
-
-    PriorityQueue<Pair<String, Float>> ranker(HashMap<Integer, ArrayList<Pair<String, ArrayList<String>>>> retDoc)
-    {
-        PriorityQueue<Pair<String, Float>> rankedPages = new PriorityQueue<>(urlPriority);
-        HashMap<String, Float> url_priority = new HashMap<>();
-        for(int i = 0; i < 2; i++)
-        {
-            for(int j = 0; j < retDoc.get(i).size(); j++)
-            {
-                mongoDB.CalcTF_IDF(retDoc.get(i).get(j).getFirst(), url_priority);
-            }
-        }
-
-        for(Map.Entry<String, Float> entry : url_priority.entrySet()) {
-            rankedPages.add(Pair.of(entry.getKey(), entry.getValue()));
-        }
-        return rankedPages;
-    }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    PriorityQueue<Pair<String, Float>> ranker2(List<String> query, List<String> urls)
-    {
-        PriorityQueue<Pair<String, Float>> rankedPages = new PriorityQueue<>(urlPriority);
-                        // url     priority
-        float priority;
-        for(int i = 0; i < urls.size(); i++)
-        {
-            priority = 0;
-            for(int j = 0; j < query.size(); j++)
-            {
-                //get the TF*IDF of this word in this url and add them to the priority
-                priority += mongoDB.getTF_IDF(query.get(j), urls.get(j));
-
-                //todo:  get the flags of this word in this url and the positions --> in the previous call
-
-
-            }
-            //make the pair of the url and the priority
-            //Pair<String, Float> entry = new Pair<>(urls.get(i), priority);  //gives an error
-
-            //now push enqueue this url in the queue
-            rankedPages.add(Pair.of(urls.get(i), priority));
-
-        }
-        return rankedPages;
-    }
-*/
 
 }
