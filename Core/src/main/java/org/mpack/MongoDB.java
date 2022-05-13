@@ -16,6 +16,7 @@ import java.util.Set;
 public class MongoDB {
     MongoCollection<org.bson.Document> urlsCollection;
 
+
     MongoCollection<org.bson.Document> stateCollection;
     MongoCollection<org.bson.Document> stateUrlsCollection;
 
@@ -36,7 +37,8 @@ public class MongoDB {
             mongoClient = MongoClients.create(CONNECTION_STRING);
             searchEngineDb = mongoClient.getDatabase("SearchEngine");
 
-            urlsCollection = searchEngineDb.getCollection("CrawledURLS");
+            //urlsCollection = searchEngineDb.getCollection("CrawledURLS");
+            urlsCollection = searchEngineDb.getCollection("CrawledURLStest");
             stateCollection = searchEngineDb.getCollection("State");
             stateUrlsCollection = searchEngineDb.getCollection("StateURLS");
             stateUrlsCollection.createIndex(new Document(new org.bson.Document("url_link", -1)));
@@ -52,6 +54,16 @@ public class MongoDB {
                 .append("page_rank", 0.0)
                 .append("html_body", html);
         urlsCollection.insertOne(urlEntry);
+    }
+
+    public void updateUrl(String url, String html) {
+        org.bson.Document urlEntry = new org.bson.Document("url_link", url);
+        org.bson.Document updateEntry = new org.bson.Document("$set", new org.bson.Document("url_link", url)
+                .append("page_rank", 0.0)
+                .append("html_body", html));
+        UpdateOptions options = new UpdateOptions().upsert(true);
+
+        urlsCollection.updateOne(urlEntry, updateEntry, options);
     }
 
     public void setPageRank(String url, double rank) {

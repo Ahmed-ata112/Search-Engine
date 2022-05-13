@@ -3,6 +3,7 @@ package org.mpack;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,8 +28,8 @@ public class RobotHandler {
         try {
             Robothtml = Jsoup.connect(RobotUrl).get();
         } catch (IOException e) {
-            e.printStackTrace();
-            preVisitedUrls.putIfAbsent(url.getHost(),null);
+            System.out.printf("-URL with no ROBOTS--\n");
+            preVisitedUrls.putIfAbsent(url.getHost(), null);
             return false;
         }
         String Robottxt = Robothtml.body().text();
@@ -85,8 +86,8 @@ public class RobotHandler {
 }
 
 class RobotRules {
-    HashSet <Pattern> disallowed = new HashSet<>();
-    HashSet <Pattern> Allowed = new HashSet<>();
+    HashSet<Pattern> disallowed = new HashSet<>();
+    HashSet<Pattern> Allowed = new HashSet<>();
 
 
     public boolean addDisallowed(@NotNull String path) {

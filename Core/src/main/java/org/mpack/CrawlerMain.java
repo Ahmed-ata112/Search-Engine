@@ -34,7 +34,7 @@ class Crawler implements Runnable {
     static CountDownLatch latch;
 
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 5000;
+    static final int MAX_PAGES = 50;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -69,15 +69,17 @@ class Crawler implements Runnable {
         this(initialStrings, 0);
     }
 
+    public static void resetDatabase() {
+        mongoDB.resetStateForReCrawling();
+
+    }
+
     @Override
     public void run() {
 
         if (isReCrawling) {
             reCrawl(reCrawlingList);
         } else {
-            if (!isContinuing)
-                mongoDB.resetStateForReCrawling();
-
             crawl(initialStrings);
         }
     }
@@ -111,6 +113,48 @@ class Crawler implements Runnable {
         atomicCount.set(oldCount);
     }
 
+    /**
+     * @param url url passed
+     * @return empty string if unsuccessful
+     * normalized url if all well
+     */
+    private String urlIsValid(String url) {
+        try {
+            url = canonicalized.canonicalize(URL.parse(url)).toString();
+
+        } catch (Exception e) {
+            //not a valid url
+            System.out.println("Error in Canon");
+            return "";
+        }
+
+        synchronized (visitedLinks) {
+            if (visitedLinks.contains(url) || RobotHandler.isDisallowed(url))
+                return "";
+            else {
+                visitedLinks.add(url);
+            }
+        }
+        return url;
+    }
+
+    private Document parseDocument(String url) throws IOException {
+        Document document = Jsoup.connect(url).parser(Parser.xmlParser()).get();
+        if (!document.select("html").attr("lang").contains("en")) {
+            // not an english website
+            return null;
+        }
+
+        String hashed = encryptThisString(document.html());
+        synchronized (websites_hashes) {
+            if (websites_hashes.contains(hashed)) {
+                return null;
+
+            } else
+                websites_hashes.add(hashed);
+        }
+        return document;
+    }
 
     public void crawl(List<String> seedUrls) {
 
@@ -118,53 +162,18 @@ class Crawler implements Runnable {
 
         while (!unprocessedUrlsStack.isEmpty()) {
             if (atomicCount.get() > MAX_PAGES) {
-                //set state to 1 as we finished all the Pages
-                finishState();
-                return;
+                break; //exit
             }
-            String url;
             //To make sure The Queue is large enough not to make it idle here
-            if (neededThreads > 0 && unprocessedUrlsStack.size() > 10) {
-                url = unprocessedUrlsStack.pop();
-                ArrayList<String> toSend = new ArrayList<>();
-                toSend.add(url);
-                new Thread(new Crawler(toSend)).start();
-                neededThreads--;
-            }
-            url = unprocessedUrlsStack.pop();
-            //delete from the unprocessed array
-            mongoDB.removeFromStateUrls(url);
+            String url = getNextUrl(unprocessedUrlsStack);
 
+            url = urlIsValid(url);
+            if (url.equals(""))
+                continue; // wasn't successful
             try {
-                url = canonicalized.canonicalize(URL.parse(url)).toString();
-
-            } catch (Exception e) {
-                //not a valid url
-                System.out.println("Error in Canon");
-                continue;
-            }
-
-            synchronized (visitedLinks) {
-                if (visitedLinks.contains(url) || RobotHandler.isDisallowed(url))
-                    continue;
-                else {
-                    visitedLinks.add(url);
-                }
-            }
-
-
-            try {
-                Document document = Jsoup.connect(url).parser(Parser.xmlParser()).get();
-                if (!document.select("html").attr("lang").contains("en")) {
-                    // not an english website
-                    continue;
-                }
-                String hashed = encryptThisString(document.html());
-                synchronized (websites_hashes) {
-                    if (websites_hashes.contains(hashed)) {
-                        continue;
-                    } else
-                        websites_hashes.add(hashed);
+                Document document = parseDocument(url);
+                if (document == null) {
+                    continue; // wasn't successful
                 }
                 Elements linksOnPage = document.select("a[href]");
                 ArrayList<String> neis = new ArrayList<>();
@@ -177,9 +186,7 @@ class Crawler implements Runnable {
                 //now we really processed a link
                 atomicCount.incrementAndGet();
                 pagesEdges.put(url, neis);
-                mongoDB.insertUrl(url, document.html());
-
-
+                mongoDB.insertUrl(url, document.html().trim());
             } catch (Exception e) {
                 System.err.println("For '" + url + "': " + e.getMessage());
                 System.out.println(e.getMessage());
@@ -188,7 +195,15 @@ class Crawler implements Runnable {
         }
         // Out but with links less than Count
         //state should Remain 0
+        System.out.printf("thread finished remained %d and count = %d%n", neededThreads, latch.getCount());
+
+
         latch.countDown();
+        //if its responsible for creating any threads - make them finish too
+        while (neededThreads > 0) {
+            latch.countDown();
+            neededThreads--;
+        }
 
     }
 
@@ -196,20 +211,10 @@ class Crawler implements Runnable {
     public void reCrawl(List<String> seedUrls) {
 
         Deque<String> unprocessedUrlsStack = new ArrayDeque<>(seedUrls);
-
+        String url;
         while (!unprocessedUrlsStack.isEmpty()) {
-
-            String url;
             //To make sure The Queue is large enough not to make it idle here
-            if (neededThreads > 0 && unprocessedUrlsStack.size() > 10) {
-                url = unprocessedUrlsStack.pop();
-                ArrayList<String> toSend = new ArrayList<>();
-                toSend.add(url);
-                new Thread(new Crawler(toSend)).start();
-                neededThreads--;
-            }
-            url = unprocessedUrlsStack.pop();
-            mongoDB.removeFromStateUrls(url);
+            url = getNextUrl(unprocessedUrlsStack);
 
             try {
                 url = canonicalized.canonicalize(URL.parse(url)).toString();
@@ -221,10 +226,10 @@ class Crawler implements Runnable {
             }
             //delete from the unprocessed array
             synchronized (visitedLinks) {
-
-                if (!reCrawlingList.contains(url) && visitedLinks.contains(url)) {
+                if (RobotHandler.isDisallowed(url))
                     continue;
-                }
+
+                visitedLinks.add(url);
             }
             try {
                 Document document = Jsoup.connect(url).get();
@@ -249,7 +254,7 @@ class Crawler implements Runnable {
                 }
                 synchronized (visitedLinks) {
                     if (!visitedLinks.contains(url)) {
-                        mongoDB.insertUrl(url, document.html());
+                        mongoDB.updateUrl(url, document.html());
                         visitedLinks.add(url);
                     }//now we really processed a link
                 }
@@ -260,15 +265,35 @@ class Crawler implements Runnable {
 
         }
         latch.countDown();
-
+        //if its responsible for creating any threads - make them finish too
+        while (neededThreads > 0) {
+            latch.countDown();
+            neededThreads--;
+        }
     }
 
-    private void finishState() {
+    private String getNextUrl(Deque<String> unprocessedUrlsStack) {
+        String url;
+        if (neededThreads > 0 && unprocessedUrlsStack.size() > 10) {
+            url = unprocessedUrlsStack.pop();
+            ArrayList<String> toSend = new ArrayList<>();
+            toSend.add(url);
+            new Thread(new Crawler(toSend)).start();
+            neededThreads--;
+        }
+
+        url = unprocessedUrlsStack.pop();
+        mongoDB.removeFromStateUrls(url);
+        return url;
+    }
+
+    public static void finishState() {
         //send isDone=1 to the state
         mongoDB.setState(1);
-        latch.countDown();
 
     }
+
+
 }
 
 
@@ -309,12 +334,13 @@ public class CrawlerMain {
                     ss = new ArrayList<>();
                     ss.add(seedsArray.get(i));
                     System.out.println(ss);
-                    new Thread(new Crawler(ss)).start();
                     neededThreads--;
+                    new Thread(new Crawler(ss)).start();
                 } else {
                     //The last threads takes all the remaining
                     ss = new ArrayList<>();
                     ss.add(seedsArray.get(i));
+                    neededThreads--;
                     new Thread(new Crawler(ss, neededThreads)).start();
                     System.out.println(ss);
                 }
@@ -324,61 +350,14 @@ public class CrawlerMain {
 
     }
 
-    @SuppressWarnings("InfiniteLoopStatement")
-    public static void main(String[] args) throws FileNotFoundException, InterruptedException {
-
-        //initialize Connection with The Database
-        int numThreads = 100;
-        Crawler.latch = new CountDownLatch(numThreads);
-        System.out.printf("Number of Threads is: %d%n", numThreads);
-
-        /*
-         * state is -1 |0 | 1
-         * -1 : never worked before
-         * 0  : worked before but didn't finish
-         * 1  : worked and finished
-         * */
-
-        int state = mainMongo.getState();
-        System.out.printf("state is: %d%n", state);
-        if (state == -1) {
-            // never worked
-            System.out.println("here");
-            readAndProcess(numThreads);
-
-        } else if (state == 0) {
-            //continue what it started
-            continueAndProcess(numThreads);
-        }
-        Crawler.latch.await();      // wait for all The Threads to finish
-        System.out.println("Finished Waiting");
-        PageRank p = new PageRank();
-        p.initRankMatrix(Crawler.visitedLinks, Crawler.pagesEdges);
-        p.run();
-
-        //Re crawl
-        while (true) {
-            try {
-                sleep(100);
-                Crawler.latch = new CountDownLatch(numThreads); // puts a Countdown for threads
-                reCrawl(numThreads);
-                Crawler.latch.await();      // wait for all The Threads to finish
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // testMongo();
-    }
-
     // take your seeds from the unprocessed Stack
     private static void readAndProcess(int numThreads) throws FileNotFoundException {
-        mainMongo.setState(0); // start crawling
 
-        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Project_delete_except\\Core\\attaches\\seed.txt");    //creates a new file instance
+        File file = new File(".\\attaches\\seed.txt");    //creates a new file instance
         FileReader fr = new FileReader(file);   //reads the file
         ArrayList<String> seedsArray;
+        mainMongo.setState(0); // start crawling
+        Crawler.resetDatabase();
         try (BufferedReader br = new BufferedReader(fr)) {
             String line;
             seedsArray = new ArrayList<>();
@@ -421,4 +400,65 @@ public class CrawlerMain {
             System.out.println("ERROR");
         }
     }
+
+    private static void pagerankInit() {
+        PageRank p = new PageRank();
+        p.initRankMatrix(Crawler.visitedLinks, Crawler.pagesEdges);
+        p.run();
+
+    }
+
+
+    @SuppressWarnings("InfiniteLoopStatement")
+    public static void main(String[] args) throws FileNotFoundException, InterruptedException {
+
+        //initialize Connection with The Database
+        int numThreads = 100;
+        Crawler.latch = new CountDownLatch(numThreads);
+        System.out.printf("Number of Threads is: %d%n", numThreads);
+
+        /*
+         * state is -1 |0 | 1
+         * -1 : never worked before
+         * 0  : worked before but didn't finish
+         * 1  : worked and finished
+         * */
+
+        int state = mainMongo.getState();
+        System.out.printf("state is: %d%n", state);
+        if (state == -1) {
+            // never worked
+            System.out.println("here");
+            readAndProcess(numThreads);
+            Crawler.latch.await();      // wait for all The Threads to finish
+            pagerankInit();
+        } else if (state == 0) {
+            //continue what it started
+            continueAndProcess(numThreads);
+            Crawler.latch.await();      // wait for all The Threads to finish
+            pagerankInit();
+        }
+        Crawler.finishState(); //all is done
+        System.out.println("Finished Waiting");
+
+
+        System.out.println("RE_CRAWLING");
+        //Re crawl
+        while (true) {
+
+            try {
+                sleep(100);
+                Crawler.latch = new CountDownLatch(numThreads); // puts a Countdown for threads
+                reCrawl(numThreads);
+                Crawler.latch.await();      // wait for all The Threads to finish
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // testMongo();
+    }
+
+
 }

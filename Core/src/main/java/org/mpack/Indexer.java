@@ -46,8 +46,7 @@ public class Indexer {
         ArrayList<String> header;
         HashMap<Character, List<String>> stopWords = obj.constructStopWords();
 
-        int count = 20000;
-        while (count == 0) count--;
+       
         for (Map.Entry<String, Pair<Float, String>> set : htmlDocs.entrySet()) {
             docFlags = new ArrayList<>(2);
             for (int i = 0; i < 2; i++)
