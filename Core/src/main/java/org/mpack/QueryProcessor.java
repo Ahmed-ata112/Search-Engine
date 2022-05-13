@@ -1,3 +1,4 @@
+
 package org.mpack;
 import ca.rmen.porterstemmer.PorterStemmer;
 import com.mongodb.client.MongoClient;
@@ -6,10 +7,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.FileNotFoundException;
 import java.lang.reflect.Array;
 import java.util.*;
+
 
 public class QueryProcessor {
     HashMap<Integer,ArrayList<Document>> result = new HashMap<>();
@@ -57,71 +58,75 @@ public class QueryProcessor {
                 EquivalentWords.add(new ArrayList<String>());
             }
         }
-        
+
         //get all combinations of equivalent words of the search query
         String current = "";
         List<String> result = new ArrayList<>();
         generatePermutations(EquivalentWords,result,0,current);
-        
+
         //construct a hashmap that contain docs mapped to its word
-        Hashmap <String,Document> NameToDoc = ConstructNameToDocsHashMap(EquivalentWords);
-        
+        HashMap<String,Document> NameToDoc = ConstructNameToDocsHashMap(EquivalentWords);
+
         //create a list of list document which express the search query
         List<List<Document>> DocsList = new ArrayList<>();
-        
+
         //loop on the result list and fill DocsList with the right documents
         for (int i=0;i<result.size();i++)
         {
+            String[] splitedString = result.get(i).trim().split(" ");
             List<Document> temp = new ArrayList<>();
             for (int j = 0;j<Phrase.size();j++)
             {
-                temp.add(NameToDoc.get(result[i][j]));
+                temp.add(NameToDoc.get(splitedString[j]));
             }
             DocsList.add(temp);
         }
-        
+
         return DocsList;
     }
 
-   
+
     private void generatePermutations(@NotNull List<List<String>> lists, List<String> result, int depth, String current) {
         if (depth == lists.size()) {
+            System.out.println(current);
             result.add(current);
             return;
         }
-        
+
         for (int i = 0; i < lists.get(depth).size(); i++) {
-            generatePermutations(lists, result, depth + 1, current+lists.get(depth).get(i));
+            generatePermutations(lists, result, depth + 1, current+" "+lists.get(depth).get(i));
         }
     }
-    
-    private Hashmap<String,Document> ConstructNameToDocsHashMap(List<List<String>> EquivalentWords)
+
+    private HashMap<String,Document> ConstructNameToDocsHashMap(List<List<String>> EquivalentWords)
     {
-        Hashmap<String,Document> NameToDocsHM = new Hashmap<>();
+
+        HashMap<String,Document> NameToDocsHM = new HashMap<>();
         for (int i = 0;i<EquivalentWords.size();i++)
         {
             for (int j=0;j<EquivalentWords.get(i).size();j++)
             {
                 Document Doc = InvertedDocs.find(new Document("token_name",  EquivalentWords.get(i).get(j))).first();
                 if (Doc != null) {
-                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i),Doc);
+                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i).get(j),Doc);
                 }
                 else
                 {
-                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i),null);
+                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i).get(j),null);
                 }
             }
         }
         return NameToDocsHM;
     }
-    
+
     public List<String> GetSearchTokens()
     {
         return SearchTokens;
     }
 
 
-     /*void generatePermutations(@NotNull List<List<String>> lists, List<List<Document>> result, int depth, List<Document> current) {
+
+/*void generatePermutations(@NotNull List<List<String>> lists, List<List<Document>> result, int depth, List<Document> current) {
         if (depth == lists.size()) {
             List<Document> temp = new ArrayList<>();
             temp.addAll(current);
@@ -142,10 +147,12 @@ public class QueryProcessor {
             generatePermutations(lists, result, depth + 1, current);
             current.remove(current.size()-1);
         }
-    }*/
-    
-    
-   /* public HashMap<Integer,ArrayList<Document>> QueryProcessingFunction (String SearchQuery) throws FileNotFoundException {
+    }*//*
+
+
+
+   */
+/* public HashMap<Integer,ArrayList<Document>> QueryProcessingFunction (String SearchQuery) throws FileNotFoundException {
         stopWords = Indexer.constructStopWords();
         SearchTokens = List.of(SearchQuery.toLowerCase().split(" "));
         Indexer.removeStopWords(SearchTokens,stopWords);
@@ -176,6 +183,7 @@ public class QueryProcessor {
         return result;
     }*/
 
+
     public HashMap<Integer,ArrayList<Document>> PhraseProcessing (String SearchQuery) {
         //1-construct and remove stop words
         //2-split the phrase into array of words
@@ -190,7 +198,8 @@ public class QueryProcessor {
         QueryProcessor q = new QueryProcessor();
         List<String> temp = new ArrayList<>();
         temp.add("cancelled");
-        temp.add("mathematical");
+        temp.add("tree");
         q.Stem(temp);
+
     }
 }
