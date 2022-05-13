@@ -9,7 +9,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
-import org.mpack.RobotHandler;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
