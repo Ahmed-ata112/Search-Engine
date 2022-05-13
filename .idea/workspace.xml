@@ -12,9 +12,6 @@
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="..">
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/MongodbIndexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/MongodbIndexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +65,7 @@
     "WebServerToolWindowFactoryState": "false",
     "dart.analysis.tool.window.visible": "false",
     "io.flutter.reload.alreadyRun": "true",
-    "last_opened_file_path": "D:/Second_year/Second_semester/CMP 2050/Project/APTProject/Core",
+    "last_opened_file_path": "D:/Second_year/Second_semester/CMP 2050/Project/APTProject/apt_ui",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -239,6 +236,7 @@
       <workItem from="1652220713467" duration="139000" />
       <workItem from="1652220868508" duration="5607000" />
       <workItem from="1652360009769" duration="4346000" />
+      <workItem from="1652466174148" duration="658000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
