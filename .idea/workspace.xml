@@ -10,18 +10,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="..">
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/MongodbIndexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/MongodbIndexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="Rufaida" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -58,7 +68,7 @@
     "WebServerToolWindowFactoryState": "false",
     "dart.analysis.tool.window.visible": "false",
     "io.flutter.reload.alreadyRun": "true",
-    "last_opened_file_path": "D:/Second_year/Second_semester/CMP 2050/Project/APTProject",
+    "last_opened_file_path": "D:/Second_year/Second_semester/CMP 2050/Project/APTProject/Core",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -67,7 +77,7 @@
     "project.structure.last.edited": "Problems",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "project.propDebugger",
+    "settings.editor.selected.configurable": "project.propCompiler",
     "show.migrate.to.gradle.popup": "false",
     "spring.configuration.checksum": "f41d2085a6ce1233d347c4e812a002ed"
   },
@@ -92,20 +102,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Indexer">
-    <configuration name="CrawlerMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.mpack.CrawlerMain" />
-      <module name="APTProject2" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.mpack.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Application.org.mpack.QueryProcessor">
     <configuration name="Indexer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.mpack.Indexer" />
       <module name="APTProject2" />
@@ -145,9 +142,24 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="org.mpack.Indexer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.mpack.Indexer" />
-      <module name="demo1" />
+    <configuration name="Try" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mpack.Try" />
+      <module name="APTProject2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.mpack.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="org.mpack.QueryProcessor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="17" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="org.mpack.QueryProcessor" />
+      <module name="APTProject2" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="org.mpack.*" />
@@ -181,19 +193,19 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.CrawlerMain" />
-      <item itemvalue="Application.org.mpack.Indexer" />
+      <item itemvalue="Application.org.mpack.QueryProcessor" />
+      <item itemvalue="Application.Try" />
       <item itemvalue="Application.Indexer" />
       <item itemvalue="Flutter.main.dart" />
       <item itemvalue="Spring Boot.ApiMain" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.org.mpack.QueryProcessor" />
         <item itemvalue="Application.Indexer" />
-        <item itemvalue="Application.CrawlerMain" />
-        <item itemvalue="Flutter.main.dart" />
         <item itemvalue="Spring Boot.ApiMain" />
-        <item itemvalue="Application.org.mpack.Indexer" />
+        <item itemvalue="Flutter.main.dart" />
+        <item itemvalue="Application.Try" />
       </list>
     </recent_temporary>
   </component>
@@ -223,6 +235,10 @@
       <workItem from="1652008995479" duration="511000" />
       <workItem from="1652009538553" duration="18741000" />
       <workItem from="1652111071124" duration="687000" />
+      <workItem from="1652216566853" duration="3781000" />
+      <workItem from="1652220713467" duration="139000" />
+      <workItem from="1652220868508" duration="5607000" />
+      <workItem from="1652360009769" duration="4346000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
@@ -301,7 +317,21 @@
       <option name="project" value="LOCAL" />
       <updated>1652210987870</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="..">
+      <created>1652224302578</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1652224302578</updated>
+    </task>
+    <task id="LOCAL-00013" summary="..">
+      <created>1652227478724</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1652227478724</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -346,5 +376,10 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/APTProject$Indexer.ic" NAME="Indexer Coverage Results" MODIFIED="1652362497996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>org.mpack.*</FILTER>
+    </SUITE>
   </component>
 </project>
