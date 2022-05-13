@@ -1,0 +1,12 @@
+
+_
+java:S1192*"IDefine a constant instead of duplicating this literal "url_link" 7 times.(ğÒ ¡
+S	java:S106-"9Replace this use of System.out or System.err by a logger.(©şêÜúÿÿÿÿ
+V	java:S125="<This block of commented-out lines of code should be removed.(ŞÓù¢ÿÿÿÿÿ
+Q	java:S125h"<This block of commented-out lines of code should be removed.(€¢¯
+R	java:S125ˆ"<This block of commented-out lines of code should be removed.(™ÉĞÉ
+R	java:S125"<This block of commented-out lines of code should be removed.(Éãñ¦
+I
+java:S1135Ÿ"2Complete the task associated to this TODO comment.(ä‡‚æ
+E
+java:S1128"*Remove this unused import 'java.util.Set'.(ö²„¤şÿÿÿÿ

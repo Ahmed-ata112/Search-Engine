@@ -1,0 +1,42 @@
+
+t	java:S135w"YReduce the total number of break and continue statements in this loop to use at most one.(ô¤øJ8¹–ğÅ‹0
+u	java:S135È"YReduce the total number of break and continue statements in this loop to use at most one.(ô¤øJ8¹–ğÅ‹0
+†
+java:S1319"iThe type of "visitedLinks" should be an interface such as "Set" rather than the implementation "HashSet".(¾Óßğ8º–ğÅ‹0
+‰
+java:S1319"lThe type of "websites_hashes" should be an interface such as "Set" rather than the implementation "HashSet".(İá¶œ8»–ğÅ‹0
+E
+java:S2189è""Add an end condition to this loop.(˜ïˆÿÿÿÿÿ8¯ ğÅ‹0
+:
+java:S2386"Make this member "protected".(¾Óßğ8³ ğÅ‹0
+:
+java:S2386"Make this member "protected".(İá¶œ8³ ğÅ‹0
+^
+java:S32528"AUse static access with "org.slf4j.Logger" for "ROOT_LOGGER_NAME".(±ŠÆ8¿ ğÅ‹0
+U	java:S106i"9Replace this use of System.out or System.err by a logger.(öğ¢ç8Æ ğÅ‹0
+n
+java:S3776s"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(“ûé8É ğÅ‹0
+V	java:S106"9Replace this use of System.out or System.err by a logger.(ÊØú±8Ó ğÅ‹0
+U	java:S106¸"9Replace this use of System.out or System.err by a logger.(¨¥Ÿe8Ú ğÅ‹0
+[	java:S106¹"9Replace this use of System.out or System.err by a logger.(©şêÜúÿÿÿÿ8Û ğÅ‹0
+p
+java:S3776Ä"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(ïøÛ³8Ü ğÅ‹0
+V	java:S106Û"9Replace this use of System.out or System.err by a logger.(ÊØú±8â ğÅ‹0
+U	java:S106"9Replace this use of System.out or System.err by a logger.(¨¥Ÿe8è ğÅ‹0
+[	java:S106‚"9Replace this use of System.out or System.err by a logger.(©şêÜúÿÿÿÿ8é ğÅ‹0
+[	java:S106·"9Replace this use of System.out or System.err by a logger.(³²ó¹ûÿÿÿÿ8ò ğÅ‹0
+[	java:S106¿"9Replace this use of System.out or System.err by a logger.(³²ó¹ûÿÿÿÿ8ô ğÅ‹0
+V	java:S106Í"9Replace this use of System.out or System.err by a logger.(Ğµ é8÷ ğÅ‹0
+V	java:S106×"9Replace this use of System.out or System.err by a logger.(ÆŞÚ¬8ø ğÅ‹0
+V	java:S106Ú"9Replace this use of System.out or System.err by a logger.(ˆİ’Ô8ø ğÅ‹0
+V	java:S106â"9Replace this use of System.out or System.err by a logger.(÷ÂçÓ8ú ğÅ‹0
+|
+java:S2142ï"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(ä ¹€8ú ğÅ‹0
+X	java:S125ô"<This block of commented-out lines of code should be removed.(†ÔÇi8ü ğÅ‹0
+d
+java:S1075û"ARefactor your code to get this URI from a customizable parameter.(ÆÿÑ™üÿÿÿÿ8ÿ ğÅ‹0
+V	java:S106‘"9Replace this use of System.out or System.err by a logger.(äí8„¡ğÅ‹0
+U	java:S106¢"9Replace this use of System.out or System.err by a logger.(íÙÆ8ˆ¡ğÅ‹0
+V	java:S106¥"9Replace this use of System.out or System.err by a logger.(ÿƒ®ë8‰¡ğÅ‹0
+K
+java:S1144".Remove this unused private "testMongo" method.(·ÚÊ8Š¡ğÅ‹0

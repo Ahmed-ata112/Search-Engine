@@ -1,0 +1,35 @@
+
+n
+java:S2293:"YReplace the type specification in this constructor call with the diamond operator ("<>").(›Ô(
+„
+java:S1319»"mThe return type of this method should be an interface such as "Map" rather than the implementation "HashMap".(ªãµ
+k	java:S117%"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Åúé¾şÿÿÿÿ
+f	java:S117("QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ñğ—Ü
+k	java:S117,"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ô‹ë¥üÿÿÿÿ
+k	java:S117."QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(íæ—•øÿÿÿÿ
+k	java:S1170"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÿº©Íúÿÿÿÿ
+f	java:S117D"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÃÄ÷ù
+f	java:S117G"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“à©
+f	java:S117e"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‹ì³ı
+f	java:S117h"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ã©Õ°
+e	java:S117m"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(×ÃQ
+g	java:S117»"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ªãµ
+k	java:S116"QRename this field "Phrase" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è¢ß£ûÿÿÿÿ
+q	java:S116"WRename this field "SearchTokens" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“¶ûÀûÿÿÿÿ
+m	java:S116"SRename this field "DataBase" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ü»œıÿÿÿÿ
+l	java:S116"WRename this field "InvertedDocs" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰ƒ¢Ø
+r	java:S116"]Rename this field "StemmingCollection" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ĞñÌ
+h	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(„ÏÁüÿÿÿÿ
+h	java:S100%"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Åúé¾şÿÿÿÿ
+U
+java:S1117@":Rename "result" which hides the field declared at line 16.(»Ğõ¨ùÿÿÿÿ
+U	java:S106["9Replace this use of System.out or System.err by a logger.(´Ó”†8€õ†Æ‹0
+c	java:S100e"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‹ì³ı
+c	java:S100z"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(µÃŞ
+d	java:S100»"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ªãµ
+I
+java:S1172»"2Remove this unused method parameter "SearchQuery".(ªãµ
+R	java:S125"<This block of commented-out lines of code should be removed.(èô¸Â
+R	java:S125›"<This block of commented-out lines of code should be removed.(Èü¿ğ
+’
+java:S1130Å"vRemove the declaration of thrown exception 'java.io.FileNotFoundException', as it cannot be thrown from method's body.(ıŞâçúÿÿÿÿ

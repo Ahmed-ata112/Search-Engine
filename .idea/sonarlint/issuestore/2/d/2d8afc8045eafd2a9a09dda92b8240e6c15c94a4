@@ -1,0 +1,24 @@
+
+j
+java:S1192B"MDefine a constant instead of duplicating this literal "InvertedFile" 3 times.(íÈ»Ê8­ƒêÅ‹0
+j
+java:S1192 "MDefine a constant instead of duplicating this literal "SearchEngine" 3 times.(Å’õ8­ƒêÅ‹0
+q
+java:S1192‚"SDefine a constant instead of duplicating this literal "StemmingCollection" 3 times.(Éùÿ´8­ƒêÅ‹0
+
+java:S1319,"mThe return type of this method should be an interface such as "Map" rather than the implementation "HashMap".(Ì¥Ü™şÿÿÿÿ8®ƒêÅ‹0
+‹
+java:S1319<"iThe type of "invertedFile" should be an interface such as "Map" rather than the implementation "HashMap".(ÑŞÄûÿÿÿÿ8¯ƒêÅ‹0
+m	java:S117/"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Îè‰Ò8°ƒêÅ‹0
+m	java:S117^"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(€ôúË8°ƒêÅ‹0
+n	java:S117€"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(—ı›8°ƒêÅ‹0
+]	java:S125"<This block of commented-out lines of code should be removed.(×¶Ã×úÿÿÿÿ8Ë†êÅ‹0
+Z	java:S106""9Replace this use of System.out or System.err by a logger.(©şêÜúÿÿÿÿ8Ì†êÅ‹0
+I
+java:S16021",Remove useless curly braces around statement(ÍÙ›¸8Ğ†êÅ‹0
+V
+java:S1481>"4Remove this unused "formattedDouble" local variable.(­ÀËåúÿÿÿÿ8Ö†êÅ‹0
+o	java:S100t"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(÷“÷ùùÿÿÿÿ8æ†êÅ‹0
+^	java:S125¢"<This block of commented-out lines of code should be removed.(ÒÌâ–øÿÿÿÿ8ø†êÅ‹0
+^	java:S125å"<This block of commented-out lines of code should be removed.(ÒÌâ–øÿÿÿÿ8ø†êÅ‹0
+^	java:S125’"<This block of commented-out lines of code should be removed.(ÒÌâ–øÿÿÿÿ8ù†êÅ‹0

@@ -1,0 +1,52 @@
+
+v
+java:S2293A"YReplace the type specification in this constructor call with the diamond operator ("<>").(ï‹ââ8ºƒïÅ‹0
+€
+java:S1319?"cThe type of "retDoc" should be an interface such as "Map" rather than the implementation "HashMap".( é–Ÿ8ÉƒïÅ‹0
+m	java:S117G"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(™Ò×Õ8ËƒïÅ‹0
+r	java:S117I"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(—ŸøÍýÿÿÿÿ8ËƒïÅ‹0
+r	java:S117Q"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Úå”¶üÿÿÿÿ8ËƒïÅ‹0
+m	java:S117R"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ß„æ†8ÌƒïÅ‹0
+r	java:S117_"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ú÷¡Èüÿÿÿÿ8ÌƒïÅ‹0
+n	java:S117ƒ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ú˜èº8ÌƒïÅ‹0
+]	java:S125
+"<This block of commented-out lines of code should be removed.(Ð©¿ûÿÿÿÿ8ïïÅ‹0
+o
+java:S3776?"RRefactor this method to reduce its Cognitive Complexity from 36 to the 15 allowed.( é–Ÿ8£‘ïÅ‹0
+\
+java:S1854_":Remove this useless assignment to local variable "_flags".(Ú÷¡Èüÿÿÿÿ8¥‘ïÅ‹0
+X	java:S125Z"<This block of commented-out lines of code should be removed.(¿¡þ«8³‘ïÅ‹0
+]	java:S125`"<This block of commented-out lines of code should be removed.(·˜ˆïüÿÿÿÿ8¹‘ïÅ‹0
+X	java:S125e"<This block of commented-out lines of code should be removed.(ÒÏéÃ8¼‘ïÅ‹0
+X	java:S125~"<This block of commented-out lines of code should be removed.(¿¡þ«8Ê‘ïÅ‹0
+^	java:S125›"<This block of commented-out lines of code should be removed.(ú›¶Çýÿÿÿÿ8Þ‘ïÅ‹0
+G
+java:S1172ª")Remove this unused method parameter "ps".(Íç¦å8â‘ïÅ‹0
+=
+java:S1659¯"Declare "j" on a separate line.(žƒŸŽ8å‘ïÅ‹0
+D
+java:S1659°"!Declare "end" on a separate line.(ÍôÁÑýÿÿÿÿ8æ‘ïÅ‹0
+M
+java:S1481­"*Remove this unused "found" local variable.(Íªäúÿÿÿÿ8ç‘ïÅ‹0
+H
+java:S1481®"*Remove this unused "index" local variable.(ÜÞøæ8è‘ïÅ‹0
+Y	java:S125µ"<This block of commented-out lines of code should be removed.(™Ü©ø8ë‘ïÅ‹0
+T
+java:S1751Ñ"6Remove this "return" statement or make it conditional.(Úç ‘8ò‘ïÅ‹0
+^	java:S125Õ"<This block of commented-out lines of code should be removed.(‰ß¹Çúÿÿÿÿ8õ‘ïÅ‹0
+p
+java:S3776í"RRefactor this method to reduce its Cognitive Complexity from 34 to the 15 allowed.(ô›¡‹8ø‘ïÅ‹0
+<
+java:S1659ð"Declare "i" on a separate line.(¡Íç8ü‘ïÅ‹0
+<
+java:S1659ñ"Declare "t" on a separate line.(œðÕ`8ý‘ïÅ‹0
+E
+java:S1659ò""Declare "maxB" on a separate line.(³±ðýÿÿÿÿ8ý‘ïÅ‹0
+:
+java:S1116€"Remove this empty statement.(›»ä²8’ïÅ‹0
+?
+java:S1116’"Remove this empty statement.(ÃÁÂüÿÿÿÿ8†’ïÅ‹0
+N
+java:S1128",Remove this unused import 'org.jsoup.Jsoup'.(Ù±šªûÿÿÿÿ8‹’ïÅ‹0
+Z
+java:S1128	"8Remove this unused import 'java.util.function.Consumer'.(Ì†ƒÔùÿÿÿÿ8‹’ïÅ‹0

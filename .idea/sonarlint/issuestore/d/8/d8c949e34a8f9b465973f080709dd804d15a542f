@@ -1,0 +1,33 @@
+
+v
+java:S2293_"YReplace the type specification in this constructor call with the diamond operator ("<>").(£Å¸‰8ŒéÅ‹0
+v	java:S135’"YReduce the total number of break and continue statements in this loop to use at most one.(„½„8éÅ‹0
+t	java:S127º"XRefactor the code in order to not assign to this loop counter from within the loop body.(¨…ÄK8éÅ‹0
+
+java:S1319P"mThe return type of this method should be an interface such as "Map" rather than the implementation "HashMap".(Ä˜èøÿÿÿÿ8’éÅ‹0
+„
+java:S1319¯"fThe type of "stopWords" should be an interface such as "Map" rather than the implementation "HashMap".(±ß¤Á8’éÅ‹0
+m	java:S117h"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÈÒ—Š8“éÅ‹0
+g
+java:S2095T"EUse try-with-resources or close this "Scanner" in a "finally" clause.(ÔˆÕÂûÿÿÿÿ8Ø™éÅ‹0
+a
+java:S25830"DChange this condition so that it does not always evaluate to "false"(î“ó“8Ø™éÅ‹0
+^
+java:S3252"AUse static access with "org.slf4j.Logger" for "ROOT_LOGGER_NAME".(±ŠÆ8ü™éÅ‹0
+Q
+java:S2209-"5Change this instance-reference to a static reference.(¨Èì8ƒšéÅ‹0
+I
+java:S1905=",Remove this unnecessary cast to "ArrayList".(’ğÍ8¼‡¤õ‹0
+R
+java:S2209>"5Change this instance-reference to a static reference.(´øÁÙ8šéÅ‹0
+^
+java:S1075R"ARefactor your code to get this URI from a customizable parameter.(Âò°¶8šéÅ‹0
+X	java:S125X"<This block of commented-out lines of code should be removed.(ßù€…8¤šéÅ‹0
+u
+java:S3776‡"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(×­†øÿÿÿÿ8»šéÅ‹0
+t
+java:S2159¡"VRemove this call to "equals"; comparisons between unrelated types always return false.(›—®ı8ÊšéÅ‹0
+t
+java:S2159¡"VRemove this call to "equals"; comparisons between unrelated types always return false.(›—®ı8ÊšéÅ‹0
+Y	java:S125²"<This block of commented-out lines of code should be removed.(ü­¦ä8ÕšéÅ‹0
+Y	java:S125¶"<This block of commented-out lines of code should be removed.(Ô¤ó¾8ÜšéÅ‹0
