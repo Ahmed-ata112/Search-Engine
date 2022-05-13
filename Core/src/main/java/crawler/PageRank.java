@@ -1,6 +1,4 @@
-package org.mpack;
-
-import crawler.MongoDB;
+package crawler;
 
 import java.util.*;
 

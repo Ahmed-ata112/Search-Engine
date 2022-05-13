@@ -1,7 +1,5 @@
 package crawler;
 
-import org.mpack.PageRank;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
