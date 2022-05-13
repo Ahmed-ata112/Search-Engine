@@ -19,21 +19,17 @@ import java.util.*;
 //TF --> per doc
 
 
-
-
-
 public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
 
 
     Comparator<Pair<String, collections>> urlPriority = (url2, url1) -> {
-return url1.getSecond().compare(url2.getSecond());
+        return url1.getSecond().compare(url2.getSecond());
 
     };
 
 
-
-    public PriorityQueue<Pair<String, collections>>  ranker2(String phrase, List<Document> retDoc) {
+    public PriorityQueue<Pair<String, collections>> ranker2(String phrase, List<Document> retDoc) {
 
         PriorityQueue<Pair<String, collections>> rankedPages = new PriorityQueue<Pair<String, collections>>(urlPriority);
         //                       url         paragraph   header          flags         pagerank      priority   tokenCount   positions
@@ -61,12 +57,12 @@ return url1.getSecond().compare(url2.getSecond());
             List<Document> webPages = (List<Document>) retDoc.get(i).get("documents");
             //I think there is a more efficient way to get the url of the word rather than this
             for (Document d : webPages) {
-                List<Integer> _flags = new ArrayList<>();
+                List<Integer> _flags;
                 /*_flags.set(0, 0);
                 _flags.set(1, 0);*/
                 TF = Double.parseDouble(d.get("normalizedTF").toString());  // to make sure -48 ?
                 _flags = (ArrayList<Integer>) (d.get("Flags"));
-                List<Integer> positions = new  ArrayList<>();
+                List<Integer> positions = new ArrayList<>();
                 positions = (ArrayList<Integer>) (d.get("Positions"));
 
                 pagRank = Double.parseDouble(d.get("pageRank").toString());
@@ -82,7 +78,7 @@ return url1.getSecond().compare(url2.getSecond());
                     double prePriority = url_priority.get(d.getString("URL")).priority;
                     int preTokenCount = url_priority.get(d.getString("URL")).token_count;
                     //then update the priority
-                    url.token_count =  preTokenCount + 1;
+                    url.token_count = preTokenCount + 1;
                     url.priority = prePriority + priority;
                     url_priority.put(d.getString("URL"), url);
                 } else {
@@ -108,12 +104,8 @@ return url1.getSecond().compare(url2.getSecond());
         }
 
 
-
         return rankedPages;
     }
-
-
-
 
 
     //phrase is array of query words without stop words, the whole phrase is at index 0.
@@ -144,27 +136,23 @@ return url1.getSecond().compare(url2.getSecond());
     }
 
 
-    static String text(String paragragh, String word, int index)
-    {
+    static String text(String paragragh, String word, int index) {
         StringBuilder text = new StringBuilder();
         int counter = 0, i = index - 1;
         char c, t = 'a';
         int maxA = 10, maxB = 10;
-        if(index == 0)
-        {
+        if (index == 0) {
             maxA = 20;
             maxB = 0;
         }
-        if(index + word.length() == paragragh.length())
-        {
+        if (index + word.length() == paragragh.length()) {
             maxA = 0;
-            if(maxB == 10) maxB = 20;
+            if (maxB == 10) maxB = 20;
         }
-        while(i > -1 && counter < maxB)
-        {
+        while (i > -1 && counter < maxB) {
             c = paragragh.charAt(i);
-            if(c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0');
-            else if(t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
+            if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0') ;
+            else if (t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
             i--;
             t = c;
         }
@@ -176,13 +164,11 @@ return url1.getSecond().compare(url2.getSecond());
         i = index + word.length();
         t = 'a';
 
-        while(i < paragragh.length()  && counter < maxA)
-
-        {
+        while (i < paragragh.length() && counter < maxA) {
 
             c = paragragh.charAt(i);
-            if((c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0'));
-            else if(t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
+            if ((c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0')) ;
+            else if (t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
             i++;
             t = c;
         }

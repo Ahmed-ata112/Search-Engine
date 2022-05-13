@@ -28,9 +28,11 @@ public class Indexer {
 
     long documentsCount;
     static Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+
     static {
         root.setLevel(Level.OFF);
     }
+
     public static void main(String[] arg) throws FileNotFoundException {
 
         Indexer obj = new Indexer();
@@ -45,7 +47,7 @@ public class Indexer {
         HashMap<Character, List<String>> stopWords = obj.constructStopWords();
 
         int count = 20000;
-        while(count == 0) count--;
+        while (count == 0) count--;
         for (Map.Entry<String, Pair<Float, String>> set : htmlDocs.entrySet()) {
             docFlags = new ArrayList<>(2);
             for (int i = 0; i < 2; i++)
@@ -72,6 +74,7 @@ public class Indexer {
 
 
     }
+
     public Indexer() {
 
         invertedFile = new HashMap<>();
@@ -80,7 +83,7 @@ public class Indexer {
     //read the stop words
     public static @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Project_delete_except\\Core\\attaches\\stopwords.txt");
+        File file = new File("C:\\Users\\aatta\\eclipse-workspace\\APTProject\\Core\\attaches\\stopwords.txt");
 
         Scanner scan = new Scanner(file);
 
@@ -105,7 +108,6 @@ public class Indexer {
     String parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
 
 
-
         String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
 
         org.jsoup.nodes.Document parsed;
@@ -116,7 +118,7 @@ public class Indexer {
         if (!parsed.getElementsByTag("main").isEmpty())
             parsed = Jsoup.parse(Objects.requireNonNull(parsed.getElementsByTag("main").first()).toString());
 
-        for(String s : toRemove)
+        for (String s : toRemove)
             parsed.select(s).remove();
 
         header.addAll(parsed.getElementsByTag("header").eachText());
@@ -142,10 +144,8 @@ public class Indexer {
             if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0' || c == '+' || c == '-') {
                 word.append(c);
                 original.append(c);
-            }
-
-            else if(c == ' '){
-                if(original.isEmpty()) continue;
+            } else if (c == ' ') {
+                if (original.isEmpty()) continue;
                 position++;
 
                 wordList.getFirst().get(1).add(original.toString());
@@ -158,8 +158,7 @@ public class Indexer {
 
                 word = new StringBuilder();
                 original = new StringBuilder();
-            }
-            else original.append(c);
+            } else original.append(c);
         }
         return wordList;
     }
@@ -170,7 +169,7 @@ public class Indexer {
         for (int i = 0; i < tokens.size(); i++) {
 
             //if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
-            if(stopWords.get(tokens.get(i).charAt(0)) == null)
+            if (stopWords.get(tokens.get(i).charAt(0)) == null)
                 continue;
             if (stopWords.get(tokens.get(i).charAt(0)).contains(tokens.get(i).toLowerCase(Locale.ROOT)))
             //if (stopWords.contains(tokens.get(i).toLowerCase(Locale.ROOT)))

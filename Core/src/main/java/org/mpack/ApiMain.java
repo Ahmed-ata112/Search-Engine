@@ -58,7 +58,7 @@ class Api {
 
         QueryProcessor Q = new QueryProcessor();
 
-        List<List<Document>> documents = Q.Stem(List.of(SearchQ.trim().split(" ")));
+        List<List<Document>> documents = Q.Stem(List.of(SearchQ.toLowerCase().trim().split(" ")));
 
         System.out.println("QUERY");
         System.out.println(documents);
@@ -67,6 +67,10 @@ class Api {
         LinkedHashSet<collections> finalResults = new LinkedHashSet<>();
         for (List<Document> v :
                 documents) {
+            if (v == null || v.isEmpty() || v.get(0) == null) {
+                continue;
+            }
+
             PriorityQueue<Pair<String, collections>> ret = R.ranker2("", v);
             for (var a :
                     ret) {
@@ -85,7 +89,7 @@ class Api {
             Pojo p1 = new Pojo(p.url, p.title, ts, p.paragraph);
             objectsList.add(p1);
         }
-
+        System.out.println("Sending with size: " + objectsList.size());
         return objectsList;
     }
 
