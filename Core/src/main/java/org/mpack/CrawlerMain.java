@@ -29,7 +29,7 @@ class Crawler implements Runnable {
     //Links That were already crawled -- So That You don't put one twice
     // a way to define blocked sites (Robot.txt) is just to put it in the links set without crawling it
 
-    static final Map<String, List<String>> pagesEdges = new HashMap<>();
+    static final Map<String, Set<String>> pagesEdges = new HashMap<>();
     static AtomicInteger atomicCount = new AtomicInteger(0);
     static CountDownLatch latch;
 
@@ -176,16 +176,17 @@ class Crawler implements Runnable {
                     continue; // wasn't successful
                 }
                 Elements linksOnPage = document.select("a[href]");
-                ArrayList<String> neis = new ArrayList<>();
+                Set<String> neighbors = new LinkedHashSet<>();
                 for (Element page : linksOnPage) {
                     String uu = page.attr("abs:href");
-                    neis.add(uu);
+                    neighbors.add(uu);
                     unprocessedUrlsStack.add(uu);
                     mongoDB.addToStateUrls(uu);
                 }
                 //now we really processed a link
                 atomicCount.incrementAndGet();
-                pagesEdges.put(url, neis);
+                pagesEdges.put(url, neighbors);
+                mongoDB.addToRelationsDB(url, neighbors);
                 mongoDB.insertUrl(url, document.html().trim());
             } catch (Exception e) {
                 System.err.println("For '" + url + "': " + e.getMessage());
@@ -374,7 +375,7 @@ public class CrawlerMain {
     }
 
     private static void continueAndProcess(int numThreads) {
-        mainMongo.getVisitedLinks();
+        mainMongo.getAllArraysBAck();
         Crawler.setCount(Crawler.visitedLinks.size());
         Crawler.setIsContinuing(true);
         System.out.printf("will continue my work with count %d", Crawler.atomicCount.get());
@@ -383,7 +384,7 @@ public class CrawlerMain {
     }
 
     private static void reCrawl(int numThreads) {
-        mainMongo.getVisitedLinks();
+        mainMongo.getAllArraysBAck();
         Crawler.setCount((int) mainMongo.getUrlCount());
         Crawler.setIsReCrawling(true);
         initCrawling(numThreads, new ArrayList<>());
@@ -394,7 +395,7 @@ public class CrawlerMain {
         String url = "https://www.google.com/doodles";
 
         MongoDB mm = new MongoDB();
-        mm.updateUrl(url, "fgdddddd");
+        System.out.println(mm.getRelations());
     }
 
     private static void pagerankInit() {
@@ -408,52 +409,50 @@ public class CrawlerMain {
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
-//        //initialize Connection with The Database
-//        int numThreads = 100;
-//        Crawler.latch = new CountDownLatch(numThreads);
-//        System.out.printf("Number of Threads is: %d%n", numThreads);
-//
-//        /*
-//         * state is -1 |0 | 1
-//         * -1 : never worked before
-//         * 0  : worked before but didn't finish
-//         * 1  : worked and finished
-//         * */
-//
-//        int state = mainMongo.getState();
-//        System.out.printf("state is: %d%n", state);
-//        if (state == -1) {
-//            // never worked
-//            System.out.println("here");
-//            readAndProcess(numThreads);
-//            Crawler.latch.await();      // wait for all The Threads to finish
-//            pagerankInit();
-//        } else if (state == 0) {
-//            //continue what it started
-//            continueAndProcess(numThreads);
-//            Crawler.latch.await();      // wait for all The Threads to finish
-//            pagerankInit();
-//        }
-//        Crawler.finishState(); //all is done
-//        System.out.println("Finished Waiting");
-//
-//
-//        System.out.println("RE_CRAWLING");
-//        //Re crawl
-//        while (true) {
-//
-//            try {
-//                sleep(100);
-//                Crawler.latch = new CountDownLatch(numThreads); // puts a Countdown for threads
-//                reCrawl(numThreads);
-//                Crawler.latch.await();      // wait for all The Threads to finish
-//
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        //initialize Connection with The Database
+        int numThreads = 20;
+        Crawler.latch = new CountDownLatch(numThreads);
+        System.out.printf("Number of Threads is: %d%n", numThreads);
 
-        testMongo();
+        /*
+         * state is -1 |0 | 1
+         * -1 : never worked before
+         * 0  : worked before but didn't finish
+         * 1  : worked and finished
+         * */
+
+        int state = mainMongo.getState();
+        System.out.printf("state is: %d%n", state);
+        if (state == -1) {
+            // never worked
+            System.out.println("here");
+            readAndProcess(numThreads);
+            Crawler.latch.await();      // wait for all The Threads to finish
+            pagerankInit();
+        } else if (state == 0) {
+            //continue what it started
+            continueAndProcess(numThreads);
+            Crawler.latch.await();      // wait for all The Threads to finish
+            pagerankInit();
+        }
+        Crawler.finishState(); //all is done
+        System.out.println("Finished Waiting");
+        System.out.println("RE_CRAWLING");
+        //Re crawl
+        while (true) {
+
+            try {
+                sleep(100);
+                Crawler.latch = new CountDownLatch(numThreads); // puts a Countdown for threads
+                reCrawl(numThreads);
+                Crawler.latch.await();      // wait for all The Threads to finish
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //testMongo();
     }
 
 

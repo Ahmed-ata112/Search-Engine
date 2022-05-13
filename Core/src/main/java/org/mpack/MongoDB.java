@@ -1,17 +1,11 @@
 package org.mpack;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class MongoDB {
     MongoCollection<org.bson.Document> urlsCollection;
@@ -19,6 +13,7 @@ public class MongoDB {
 
     MongoCollection<org.bson.Document> stateCollection;
     MongoCollection<org.bson.Document> stateUrlsCollection;
+    MongoCollection<org.bson.Document> relationsCollection;
 
     static final String CONNECTION_STRING = "mongodb://localhost:27017";
     MongoDatabase searchEngineDb;
@@ -39,6 +34,7 @@ public class MongoDB {
 
             //urlsCollection = searchEngineDb.getCollection("CrawledURLS");
             urlsCollection = searchEngineDb.getCollection("CrawledURLStest");
+            relationsCollection = searchEngineDb.getCollection("PagesRelations");
             stateCollection = searchEngineDb.getCollection("State");
             stateUrlsCollection = searchEngineDb.getCollection("StateURLS");
             stateUrlsCollection.createIndex(new Document(new org.bson.Document("url_link", -1)));
@@ -104,6 +100,7 @@ public class MongoDB {
     public void resetStateForReCrawling() {
         stateUrlsCollection.drop();
         urlsCollection.drop();
+        relationsCollection.drop();
     }
 
     public long getUrlCount() {
@@ -165,6 +162,23 @@ public class MongoDB {
 
     }*/
 
+    public void addToRelationsDB(String root, Set<String> related) {
+        org.bson.Document urlEntry = new org.bson.Document("_id", root);
+        urlEntry.append("relations", related);
+
+        relationsCollection.insertOne(urlEntry);
+    }
+
+    public List<Document> getRelations() {
+        List<Document> items = new ArrayList<>();
+        try (MongoCursor<Document> cursor = relationsCollection.find().iterator()) {
+            while (cursor.hasNext()) {
+                items.add(cursor.next());
+            }
+        }
+        return items;
+    }
+
     public void addToSuggestionsArray(String query) {
         org.bson.Document urlEntry = new org.bson.Document("Name", "suggestions");
         // TODO: ensure addToSet  is working
@@ -188,12 +202,22 @@ public class MongoDB {
     }
 
 
-    public void getVisitedLinks() {
+    public void getAllArraysBAck() {
         Crawler.visitedLinks.clear();
         for (String s : urlsCollection.distinct("url_link", String.class)) {
             Crawler.visitedLinks.add(s);
             Crawler.websites_hashes.add(Crawler.encryptThisString(s));
         }
+
+        List<Document> r = getRelations();
+        Crawler.pagesEdges.clear();
+        
+        for (Document d : r) {
+            String root = (String) d.get("_id");
+            List<String> others = d.getList("relations", String.class);
+            Crawler.pagesEdges.put(root, new HashSet<String>(others));
+        }
+        System.out.println(Crawler.pagesEdges);
     }
 
 
