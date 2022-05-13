@@ -328,7 +328,7 @@ public class CrawlerMain {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
         //initialize Connection with The Database
-        int numThreads = 300;
+        int numThreads = 20;
         Crawler.latch = new CountDownLatch(numThreads);
         System.out.printf("Number of Threads is: %d%n", numThreads);
 
@@ -376,7 +376,7 @@ public class CrawlerMain {
     private static void readAndProcess(int numThreads) throws FileNotFoundException {
         mainMongo.setState(0); // start crawling
 
-        File file = new File("D:\\Second_year\\Second_semester\\CMP 2050\\Project\\APTProject\\Core\\attaches\\seed.txt");    //creates a new file instance
+        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Project_delete_except\\Core\\attaches\\seed.txt");    //creates a new file instance
         FileReader fr = new FileReader(file);   //reads the file
         ArrayList<String> seedsArray;
         try (BufferedReader br = new BufferedReader(fr)) {

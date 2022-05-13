@@ -34,7 +34,7 @@ public class QueryProcessor {
         StemmingCollection = DataBase.getCollection("StemmingCollection");
     }
 
-    private @NotNull List<List<Document>> Stem(List<String> Phrase)
+    public @NotNull List<List<Document>> Stem(List<String> Phrase)
     {
         //list that contain all equivalent words from data base
         List<List<String>> EquivalentWords = new ArrayList<>();

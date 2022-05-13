@@ -54,10 +54,11 @@ public class Indexer {
             title = new ArrayList<>();
             header = new ArrayList<>();
 
-            Pair<String, ArrayList<List<String>>> parsedHTML = obj.parseHTML(set.getValue().getSecond(), title, header);
+            String parsedHTML = obj.parseHTML(set.getValue().getSecond(), title, header);
 
             obj.extractFlags(docFlags, title, header);
-            Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML.getFirst());
+            Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML);
+            tokens.getFirst().get(1).add(0, title.get(0));
             mongoDB.storeTextUrl((ArrayList<String>) tokens.getFirst().get(1), set.getKey());
             obj.removeStopWords(tokens.getFirst().get(0), stopWords);
             obj.stemWord(tokens.getFirst().get(0));
@@ -79,7 +80,7 @@ public class Indexer {
     //read the stop words
     public static @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File("D:\\Second_year\\Second_semester\\CMP 2050\\Project\\APTProject\\Core\\attaches\\stopwords.txt");
+        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Project_delete_except\\Core\\attaches\\stopwords.txt");
 
         Scanner scan = new Scanner(file);
 
@@ -101,12 +102,12 @@ public class Indexer {
         return stopWords;
     }
 
-    Pair<String, ArrayList<List<String>>> parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
+    String parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
 
 
 
         String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
-        String[] toStore = {"header", "p", "div"};
+
         org.jsoup.nodes.Document parsed;
         parsed = Jsoup.parse(HTMLText);
 
@@ -117,19 +118,12 @@ public class Indexer {
 
         for(String s : toRemove)
             parsed.select(s).remove();
-        ArrayList<List<String>> pText = new ArrayList<>();
-        pText.add(title);
-        List<String> list;
-        for(String s : toStore) {
-            list = parsed.getElementsByTag(s).eachText();
-            pText.add(list);
-        }
 
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 
 
-        return Pair.of(parsed.text(), pText);
+        return parsed.text();
     }
 
     Pair<List<List<String>>, List<Integer>> extractWords(@NotNull String text) {
