@@ -1,3 +1,4 @@
+import 'package:apt_ui/suggestions_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -179,32 +180,5 @@ class _SearchHomeState extends State<SearchHome> {
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
     );
-  }
-}
-
-class BackendService {
-  static final Set<String> allWords = {};
-
-  static Future<void> initWords() async {
-    List result = await DBManager.getSuggestionsList();
-
-    for (String word in result) {
-      allWords.add(word);
-    }
-  }
-
-  static addToSuggestions(String word) {
-    allWords.add(word);
-  }
-
-  static getSuggestions(String pattern) {
-    Set<String> subToReturn = {};
-
-    for (String ele in allWords) {
-      if (ele.startsWith(pattern) && pattern.isNotEmpty) {
-        subToReturn.add(ele);
-      }
-    }
-    return subToReturn;
   }
 }

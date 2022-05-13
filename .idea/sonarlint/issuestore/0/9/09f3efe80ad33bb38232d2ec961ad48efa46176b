@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 _
 java:S1192*"IDefine a constant instead of duplicating this literal "url_link" 7 times.(ðÒ ¡
 S	java:S106-"9Replace this use of System.out or System.err by a logger.(©þêÜúÿÿÿÿ
@@ -10,3 +11,16 @@ I
 java:S1135Ÿ"2Complete the task associated to this TODO comment.(ä‡‚æ
 E
 java:S1128"*Remove this unused import 'java.util.Set'.(ö²„¤þÿÿÿÿ
+=======
+f
+java:S1192*"IDefine a constant instead of duplicating this literal "url_link" 7 times.(ðÒ ¡8¾–®üŠ0
+Z	java:S106-"9Replace this use of System.out or System.err by a logger.(©þêÜúÿÿÿÿ8¼—®üŠ0
+]	java:S125="<This block of commented-out lines of code should be removed.(ÞÓù¢ÿÿÿÿÿ8Í—®üŠ0
+X	java:S125h"<This block of commented-out lines of code should be removed.(ž€¢¯8Š˜®üŠ0
+Y	java:S125ˆ"<This block of commented-out lines of code should be removed.(™ÉÐÉ8™˜®üŠ0
+Y	java:S125"<This block of commented-out lines of code should be removed.(Éãñ¦8š˜®üŠ0
+P
+java:S1135Ÿ"2Complete the task associated to this TODO comment.(ä‡‚æ8›˜®üŠ0
+L
+java:S1128"*Remove this unused import 'java.util.Set'.(ö²„¤þÿÿÿÿ8¢˜®üŠ0
+>>>>>>> 7067c436985c68826b364c1ab0b73fbc1a0e8f24

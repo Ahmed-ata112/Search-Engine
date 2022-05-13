@@ -1,4 +1,4 @@
-package org.mpack;
+package crawler;
 
 import java.util.*;
 
@@ -37,7 +37,7 @@ public class PageRank {
     private static final HashMap<PageNode, List<PageNode>> pagesMatrix = new HashMap<PageNode, List<PageNode>>();
 
     // Parse file and initialize graph represented by member variables.
-    public void initRankMatrix(HashSet<String> urlsArray, Map<String, List<String>> pagesEdges) {
+    public void initRankMatrix(HashSet<String> urlsArray, Map<String, Set<String>> pagesEdges) {
 
         // Create name_to_node.
         for (String name : urlsArray) {
