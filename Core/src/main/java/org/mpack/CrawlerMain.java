@@ -145,7 +145,7 @@ class Crawler implements Runnable {
             return null;
         }
 
-        String hashed = encryptThisString(document.html());
+        String hashed = encryptThisString(document.html().trim());
         synchronized (websites_hashes) {
             if (websites_hashes.contains(hashed)) {
                 return null;
@@ -391,14 +391,10 @@ public class CrawlerMain {
 
 
     private static void testMongo() {
-        String url = "https://time.com/";
-        try {
-            Document document = Jsoup.connect(url).get();
-            System.out.println(document.select("html").attr("lang").contains("en"));
+        String url = "https://www.google.com/doodles";
 
-        } catch (Exception e) {
-            System.out.println("ERROR");
-        }
+        MongoDB mm = new MongoDB();
+        mm.updateUrl(url, "fgdddddd");
     }
 
     private static void pagerankInit() {
@@ -412,52 +408,52 @@ public class CrawlerMain {
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
-        //initialize Connection with The Database
-        int numThreads = 100;
-        Crawler.latch = new CountDownLatch(numThreads);
-        System.out.printf("Number of Threads is: %d%n", numThreads);
+//        //initialize Connection with The Database
+//        int numThreads = 100;
+//        Crawler.latch = new CountDownLatch(numThreads);
+//        System.out.printf("Number of Threads is: %d%n", numThreads);
+//
+//        /*
+//         * state is -1 |0 | 1
+//         * -1 : never worked before
+//         * 0  : worked before but didn't finish
+//         * 1  : worked and finished
+//         * */
+//
+//        int state = mainMongo.getState();
+//        System.out.printf("state is: %d%n", state);
+//        if (state == -1) {
+//            // never worked
+//            System.out.println("here");
+//            readAndProcess(numThreads);
+//            Crawler.latch.await();      // wait for all The Threads to finish
+//            pagerankInit();
+//        } else if (state == 0) {
+//            //continue what it started
+//            continueAndProcess(numThreads);
+//            Crawler.latch.await();      // wait for all The Threads to finish
+//            pagerankInit();
+//        }
+//        Crawler.finishState(); //all is done
+//        System.out.println("Finished Waiting");
+//
+//
+//        System.out.println("RE_CRAWLING");
+//        //Re crawl
+//        while (true) {
+//
+//            try {
+//                sleep(100);
+//                Crawler.latch = new CountDownLatch(numThreads); // puts a Countdown for threads
+//                reCrawl(numThreads);
+//                Crawler.latch.await();      // wait for all The Threads to finish
+//
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
-        /*
-         * state is -1 |0 | 1
-         * -1 : never worked before
-         * 0  : worked before but didn't finish
-         * 1  : worked and finished
-         * */
-
-        int state = mainMongo.getState();
-        System.out.printf("state is: %d%n", state);
-        if (state == -1) {
-            // never worked
-            System.out.println("here");
-            readAndProcess(numThreads);
-            Crawler.latch.await();      // wait for all The Threads to finish
-            pagerankInit();
-        } else if (state == 0) {
-            //continue what it started
-            continueAndProcess(numThreads);
-            Crawler.latch.await();      // wait for all The Threads to finish
-            pagerankInit();
-        }
-        Crawler.finishState(); //all is done
-        System.out.println("Finished Waiting");
-
-
-        System.out.println("RE_CRAWLING");
-        //Re crawl
-        while (true) {
-
-            try {
-                sleep(100);
-                Crawler.latch = new CountDownLatch(numThreads); // puts a Countdown for threads
-                reCrawl(numThreads);
-                Crawler.latch.await();      // wait for all The Threads to finish
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // testMongo();
+        testMongo();
     }
 
 

@@ -59,7 +59,6 @@ public class MongoDB {
     public void updateUrl(String url, String html) {
         org.bson.Document urlEntry = new org.bson.Document("url_link", url);
         org.bson.Document updateEntry = new org.bson.Document("$set", new org.bson.Document("url_link", url)
-                .append("page_rank", 0.0)
                 .append("html_body", html));
         UpdateOptions options = new UpdateOptions().upsert(true);
 
