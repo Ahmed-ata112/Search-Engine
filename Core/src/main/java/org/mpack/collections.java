@@ -43,7 +43,12 @@ class collections
         else if (flags.get(1) < url2.flags.get(1))
             return -1;
 
-            //priority  IDF-TF
+            //priority  IDF-TF -- pagerank
+        else if (TF_IDF + ((1/3) * pagerank) > url2.TF_IDF + ((1/3) * url2.pagerank))
+            return 1;
+        else if (TF_IDF + ((1/3) * pagerank) < url2.TF_IDF + ((1/3) * url2.pagerank))
+            return -1;
+
         else if (TF_IDF > url2.TF_IDF)
             return 1;
         else if (TF_IDF < url2.TF_IDF)
@@ -52,7 +57,6 @@ class collections
             //pageRank
         else if (pagerank > url2.pagerank)
             return 1;
-
         else if (pagerank < url2.pagerank)
             return -1;
 
