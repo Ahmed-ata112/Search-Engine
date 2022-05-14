@@ -141,7 +141,7 @@ public class Crawler implements Runnable {
             return null;
         }
 
-        String hashed = encryptThisString(document.html().trim());
+        String hashed = encryptThisString(document.body().text().trim());
         synchronized (websites_hashes) {
             if (websites_hashes.contains(hashed)) {
                 return null;
