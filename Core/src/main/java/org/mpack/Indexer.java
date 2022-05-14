@@ -35,6 +35,7 @@ public class Indexer {
 
     public static void main(String[] arg) throws FileNotFoundException {
 
+
         Indexer obj = new Indexer();
         obj.documentsCount = mongoDB.getDocCount();
         //get crawled docs
@@ -46,7 +47,9 @@ public class Indexer {
         ArrayList<String> header;
         HashMap<Character, List<String>> stopWords = obj.constructStopWords();
 
-       
+        //drop this database at the beginning of each run
+        mongoDB.removeTextUrl();
+
         for (Map.Entry<String, Pair<Float, String>> set : htmlDocs.entrySet()) {
             docFlags = new ArrayList<>(2);
             for (int i = 0; i < 2; i++)
@@ -82,7 +85,7 @@ public class Indexer {
     //read the stop words
     public static @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File("C:\\Users\\aatta\\eclipse-workspace\\APTProject\\Core\\attaches\\stopwords.txt");
+        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_Project_delete_except\\Core\\attaches\\stopwords.txt");
 
         Scanner scan = new Scanner(file);
 
