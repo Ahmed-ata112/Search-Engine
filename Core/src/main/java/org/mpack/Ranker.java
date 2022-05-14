@@ -51,6 +51,8 @@ class paragraphGetter implements Runnable
 
         collection.title = text.get(0);
 
+        collection.paragraph = "paragragh";
+/*
         for (j = 0; j < phrase.size(); j++) {
             for (i = 0; i < collection.positions.get(j).size(); i++) {
 
@@ -63,7 +65,7 @@ class paragraphGetter implements Runnable
                 collection.paragraph = parag.toString();
                 return;
             }
-        }
+        }*/
     }
 
 }
@@ -97,7 +99,7 @@ public class Ranker {
         double priority = 0;
         double pagRank;
 
-
+        collections url;
         for (Document document : retDoc) {
             query.add(document.get("token_name").toString());
             IDF = Double.parseDouble(document.get("IDF").toString());
@@ -114,27 +116,36 @@ public class Ranker {
                 priority = TF * IDF;
 
 
+
                 //search in the hashmap for this url or insert it if not found
                 if (urlPosition.containsKey(d.getString("URL"))) {
                     //then update the priority
-                    collections url = urlPriority.get(urlPosition.get(d.getString("URL")));
+                    url = urlPriority.get(urlPosition.get(d.getString("URL")));
                     url.pagerank = pagRank;
-                    url.positions.add(positions);
 
                     //then update the priority
                     url.token_count++;
                     url.priority += priority;
 
+
                 } else {
-                    collections url = new collections();
+                    url = new collections();
                     url.flags = _flags;
                     url.priority = priority;
+
                     url.positions = new ArrayList<>();
-                    url.positions.add(positions);
+
                     url.token_count = 1;
                     url.url = d.getString("URL");
                     urlPriority.add(url);
                     urlPosition.put(url.url, urlPriority.size() - 1);
+                }
+
+
+                //rufaida: make sure var in list is updated also
+                for (int pos:
+                        positions) {              //starts from 1 as 0 is the phrase ==> we may remove it
+                    url.positions.add(Pair.of(pos, query.size() - 1));
                 }
             }
         }
