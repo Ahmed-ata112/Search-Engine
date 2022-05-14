@@ -17,7 +17,7 @@ public class Interval {
         HashMap<Integer, Integer> counts = new HashMap<>();
         int i = positionsToWords.get(0).getFirst(); //position of starting window
         int j = i;
-        Pair<Integer, Integer> retPair = Pair.of(i, i); // return the position of the first word if didn't find all
+        Pair<Integer, Integer> retPair = null; // return the position of the first word if didn't find all
 
         while (j < positionsToWords.size()) {
             Pair<Integer, Integer> current = positionsToWords.get(j);
@@ -38,8 +38,9 @@ public class Interval {
                 }
 
                 //System.out.println(firstInSeq.getFirst() + " to " + current.getFirst()); // found a min
+                if (retPair == null || current.getFirst() - firstInSeq.getFirst() < retPair.getSecond() - retPair.getFirst())
+                    retPair = Pair.of(firstInSeq.getFirst(), current.getFirst());
 
-                retPair = Pair.of(firstInSeq.getFirst(), current.getFirst());
                 counts.remove(firstWord); // remove the first to try to find a one better
                 i++;
             }
@@ -64,6 +65,7 @@ public class Interval {
         positionsToWords.add(Pair.of(80, 2));
         positionsToWords.add(Pair.of(91, 1));
 
-        findSmallestWindow(positionsToWords, no_words);
+        var a = findSmallestWindow(positionsToWords, no_words);
+        System.out.println(a);
     }
 }
