@@ -49,14 +49,15 @@ class Api {
         mongoDB.addToSuggestionsArray(SearchQ);
 
         QueryProcessor Q = new QueryProcessor();
-
-        List<List<Document>> documents = Q.Stem(List.of(SearchQ.toLowerCase().trim().split(" ")));
-
+        var ts = new ArrayList<>(List.of(SearchQ.toLowerCase().trim().split(" ")));
+        List<List<Document>> documents = Q.Stem(ts);
+        HashSet<String> resultsUrls = new HashSet<>();
         System.out.println("QUERY");
         System.out.println(documents);
 
         Ranker R = new Ranker();
-        LinkedHashSet<collections> finalResults = new LinkedHashSet<>();
+
+        ts.addAll(List.of(SearchQ.trim().split(" ")));
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {
@@ -64,24 +65,17 @@ class Api {
             }
 
             List<Pair<String, collections>> ret = R.ranker2("", v);
-            for (var a :
-                    ret) {
-                finalResults.add(a.getSecond());
+            for (var a : ret) {
+                if (resultsUrls.add(a.getFirst())) {
+                    var p = a.getSecond();
+                    Pojo p1 = new Pojo(p.url, p.title, ts, p.paragraph);
+                    objectsList.add(p1);
+                }
             }
+
         }
 
-        System.out.println("PRIORITY0");
-        System.out.println(finalResults);
-
-        var ts = List.of(SearchQ.trim().split(" "));
-        for (var p : finalResults) {
-
-            // p (   <url,pair<para,header>>     |                           )
-
-            Pojo p1 = new Pojo(p.url, p.title, ts, p.paragraph);
-            objectsList.add(p1);
-        }
-        System.out.println("Sending with size: " + objectsList.size());
+        System.out.println("Sending  size: " + objectsList.size());
         return objectsList;
     }
 
