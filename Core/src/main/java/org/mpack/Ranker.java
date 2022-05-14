@@ -11,7 +11,7 @@ class paragraphGetter implements Runnable
 {
     ArrayList<String> phrase;
     ArrayList<collections> collectionsList;
-    PriorityQueue<Pair<String, collections>> rankedPages;
+    PriorityQueue<collections> rankedPages;
 
     int count;
     MongodbIndexer mongoDB;
@@ -33,7 +33,7 @@ class paragraphGetter implements Runnable
             getParagraph(current);
             synchronized (this)
             {
-                rankedPages.add(Pair.of(current.url, current));
+                rankedPages.add(current);
             }
         }
 
@@ -72,15 +72,14 @@ public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
 
 
-    Comparator<Pair<String, collections>> urlPriority = (url2, url1) -> {
-        return url1.getSecond().compare(url2.getSecond());
-
+    Comparator<collections> urlPriority = (url2, url1) -> {
+        return url1.compare(url2);
     };
 
 
-    public PriorityQueue<Pair<String, collections>> ranker2(String phrase, List<Document> retDoc) {
+    public PriorityQueue<collections> ranker2(String phrase, List<Document> retDoc) {
 
-        PriorityQueue<Pair<String, collections>> rankedPages = new PriorityQueue<Pair<String, collections>>(urlPriority);
+        PriorityQueue<collections> rankedPages = new PriorityQueue<>(urlPriority);
         //                       url         paragraph   header          flags         pagerank      priority   tokenCount   positions
 
 

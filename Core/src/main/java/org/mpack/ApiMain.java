@@ -63,11 +63,8 @@ class Api {
                 continue;
             }
 
-            PriorityQueue<Pair<String, collections>> ret = R.ranker2("", v);
-            for (var a :
-                    ret) {
-                finalResults.add(a.getSecond());
-            }
+            PriorityQueue<collections> ret = R.ranker2("", v);
+            finalResults.addAll(ret);
         }
 
         System.out.println("PRIORITY0");
