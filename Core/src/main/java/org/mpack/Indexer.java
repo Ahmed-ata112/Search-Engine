@@ -12,6 +12,8 @@ import java.util.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 
@@ -61,7 +63,7 @@ public class Indexer {
             Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML);
             tokens.getFirst().get(1).add(0, title.get(0));
             mongoDB.storeTextUrl((ArrayList<String>) tokens.getFirst().get(1), set.getKey());
-            obj.removeStopWords(tokens.getFirst().get(0), stopWords);
+            obj.removeStopWords(tokens.getFirst().get(0), stopWords, tokens.getSecond());
             obj.stemWord(tokens.getFirst().get(0));
 
             obj.invertedFile(set.getKey(), tokens, docFlags, set.getValue().getFirst());
@@ -108,7 +110,7 @@ public class Indexer {
     String parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
 
 
-        String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
+        String[] toRemove = {"img", "meta", "iframe", "button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
 
         org.jsoup.nodes.Document parsed;
         parsed = Jsoup.parse(HTMLText);
@@ -124,8 +126,8 @@ public class Indexer {
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 
-
-        return parsed.text();
+        //System.out.println(Jsoup.clean(parsed.text(), Safelist.none()));
+        return Jsoup.clean(parsed.text(), Safelist.none());
     }
 
     Pair<List<List<String>>, List<Integer>> extractWords(@NotNull String text) {
@@ -149,23 +151,28 @@ public class Indexer {
                 position++;
 
                 wordList.getFirst().get(1).add(original.toString());
-                wordList.getSecond().add(position);
 
-                if (word.isEmpty()) continue;
-                if (!StringUtils.isNumeric(word.toString()) && !(word.equals('+') || word.equals('-'))) {
+
+                if (!StringUtils.isNumeric(word.toString()) && !(word.equals('+') || word.equals('-')) && !word.isEmpty()) {
                     wordList.getFirst().get(0).add(word.toString().toLowerCase(Locale.ROOT));
+                    wordList.getSecond().add(position);
                 }
-
-                word = new StringBuilder();
                 original = new StringBuilder();
+                if (!word.isEmpty())
+                    word = new StringBuilder();
             } else original.append(c);
         }
+        /*System.out.println(position);
+        System.out.println(wordList.getFirst().size());
+        System.out.println(wordList.getFirst().get(0).size());
+        System.out.println(wordList.getFirst().get(1).size());
+        System.out.println("-----------------------------------------------------------------------------");*/
         return wordList;
     }
 
 
     //remove them
-    public static void removeStopWords(List<String> tokens, HashMap<Character, List<String>> stopWords) {
+    public static void removeStopWords(List<String> tokens, HashMap<Character, List<String>> stopWords, List<Integer> positions) {
         for (int i = 0; i < tokens.size(); i++) {
 
             //if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
@@ -176,6 +183,7 @@ public class Indexer {
             {
                 //then remove it
                 tokens.remove(i);
+                positions.remove(i);
                 i--;
             }
         }
