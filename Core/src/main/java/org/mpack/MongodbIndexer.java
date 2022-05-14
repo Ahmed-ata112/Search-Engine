@@ -18,9 +18,7 @@ public class MongodbIndexer {
 
     MongodbIndexer() {
         initConnection();
-        /*MongoCollection<Document> textURLCollection;
-        textURLCollection = searchEngineDb.getCollection("TextURL");
-        textURLCollection.drop();*/
+
     }
 
     public void initConnection() {
@@ -142,6 +140,20 @@ public class MongodbIndexer {
         Document document = new Document();
         document.append("_id", url).append("Text_of_URL", text);
         textURLCollection.insertOne(document);
+    }
+
+
+    public void removeTextUrl()
+    {
+        MongoCollection<Document> textURLCollection;
+
+        boolean collectionExists = mongoClient.getDatabase("SearchEngine").listCollectionNames()
+                .into(new ArrayList<String>()).contains("TextURL");
+        if (collectionExists) {
+            textURLCollection = searchEngineDb.getCollection("TextURL");
+            textURLCollection.drop();
+
+        }
     }
 
     ArrayList<String> getTextUrl(String url) {
