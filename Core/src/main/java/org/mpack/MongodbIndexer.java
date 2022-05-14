@@ -41,14 +41,14 @@ public class MongodbIndexer {
 
 
     public HashMap<String, Pair<Float, String>> getHTML() {
-        crawledCollection = searchEngineDb.getCollection("CrawledURLS");
+        crawledCollection = searchEngineDb.getCollection("CrawledURLStest");
         HashMap<String, Pair<Float, String>> HTMLmap = new HashMap<>(5100);
 
         Consumer<Document> getContent = doc -> {
             HTMLmap.put(doc.get("url_link").toString(), Pair.of(Float.parseFloat(doc.get("page_rank").toString()), doc.get("html_body").toString()));
         };
 
-        crawledCollection.find().limit(5000).forEach(getContent);
+        crawledCollection.find().limit(4000).forEach(getContent);
         return HTMLmap;
     }
 
@@ -139,6 +139,11 @@ public class MongodbIndexer {
     public void storeTextUrl(List<String> text, String url) {
         MongoCollection<Document> textURLCollection;
         textURLCollection = searchEngineDb.getCollection("TextURL");
+        if(url.equals("https://www.insider.com/"))
+        for (int i = 0; i < text.size(); i++) {
+            System.out.println(i + " " + text.get(i));
+        }
+
         Document document = new Document();
         document.append("_id", url).append("Text_of_URL", text);
         textURLCollection.insertOne(document);

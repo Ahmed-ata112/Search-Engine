@@ -62,7 +62,7 @@ public class Indexer {
             obj.extractFlags(docFlags, title, header);
             Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML);
             tokens.getFirst().get(1).add(0, title.get(0));
-            mongoDB.storeTextUrl((ArrayList<String>) tokens.getFirst().get(1), set.getKey());
+            mongoDB.storeTextUrl(tokens.getFirst().get(1), set.getKey());
             obj.removeStopWords(tokens.getFirst().get(0), stopWords, tokens.getSecond());
             obj.stemWord(tokens.getFirst().get(0));
 
