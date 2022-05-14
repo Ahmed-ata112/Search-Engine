@@ -29,7 +29,9 @@ public class CrawlerMain {
                     //The last threads takes all the remaining
                     ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
                 }
+                System.out.println("Created Thread num: " + i);
                 new Thread(new Crawler(ss)).start();
+
             }
 
 
@@ -54,6 +56,7 @@ public class CrawlerMain {
                     System.out.println(ss);
                 }
             }
+
 
         }
 
@@ -86,7 +89,7 @@ public class CrawlerMain {
         mainMongo.getAllArraysBAck();
         Crawler.setCount(Crawler.visitedLinks.size());
         Crawler.setIsContinuing(true);
-        System.out.printf("will continue my work with count %d", Crawler.atomicCount.get());
+        System.out.printf("will continue my work with count %d%n", Crawler.atomicCount.get());
         ArrayList<String> seedsArray = (ArrayList<String>) mainMongo.getStateURLs();
         initCrawling(numThreads, seedsArray);
     }
@@ -140,11 +143,12 @@ public class CrawlerMain {
             //continue what it started
             continueAndProcess(numThreads);
             Crawler.latch.await();      // wait for all The Threads to finish
+            System.out.println("Finished Waiting and started Ranking");
             pagerankInit();
         }
         Crawler.finishState(); //all is done
-        System.out.println("Finished Waiting");
         //Re crawl
+
         while (true) {
 
             try {
