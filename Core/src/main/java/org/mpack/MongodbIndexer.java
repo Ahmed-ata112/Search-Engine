@@ -139,10 +139,6 @@ public class MongodbIndexer {
     public void storeTextUrl(List<String> text, String url) {
         MongoCollection<Document> textURLCollection;
         textURLCollection = searchEngineDb.getCollection("TextURL");
-        if(url.equals("https://www.insider.com/"))
-        for (int i = 0; i < text.size(); i++) {
-            System.out.println(i + " " + text.get(i));
-        }
 
         Document document = new Document();
         document.append("_id", url).append("Text_of_URL", text);

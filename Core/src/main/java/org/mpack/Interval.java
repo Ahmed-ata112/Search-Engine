@@ -15,7 +15,7 @@ public class Interval {
         }
         // 4 1   5 2     6 1    7 3
         HashMap<Integer, Integer> counts = new HashMap<>();
-        int i = positionsToWords.get(0).getFirst(); //position of starting window
+        int i = 0; //position of starting window
         int j = i;
         Pair<Integer, Integer> retPair = null; // return the position of the first word if didn't find all
 

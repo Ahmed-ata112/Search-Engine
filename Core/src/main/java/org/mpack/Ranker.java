@@ -41,31 +41,34 @@ class paragraphGetter implements Runnable
 
     void getParagraph(collections collection) {
         ArrayList<String> text = mongoDB.getTextUrl(collection.url);
-        boolean found = false;
-        int index = -1;
-        int i = -1, j;
+
         int start, end;
         StringBuilder parag = new StringBuilder();
 
         collection.wordNear = 0;
 
         collection.title = text.get(0);
+        Pair<Integer, Integer> window = Interval.findSmallestWindow(collection.positions, collection.token_count);
+        int count = window.getSecond() - window.getFirst() + 1;
+        if(count < 20)
+        {
+            count = (int) Math.ceil((float)(20 - count - 1) / 2);
+            start = Math.max(0, window.getFirst() - count);
+            end = Math.min(text.size() - 1, window.getSecond() + count);
+        }
+        else
+        {
+            start = window.getFirst();
+        end = window.getSecond() + 1;
+        }
+        System.out.println(window);
 
-        collection.paragraph = "paragragh";
-/*
-        for (j = 0; j < phrase.size(); j++) {
-            for (i = 0; i < collection.positions.get(j).size(); i++) {
 
-                start = Math.max(0, collection.positions.get(j).get(i) - 10);
-                end = Math.min(text.size() - 1, collection.positions.get(j).get(i) + 10);
-
-                for (int k = start; k < end; k++) {
+        for (int k = start; k <= end; k++) {
                     parag.append(text.get(k + 1) + " ");
                 }
                 collection.paragraph = parag.toString();
                 return;
-            }
-        }*/
     }
 
 }
@@ -147,6 +150,8 @@ public class Ranker {
                         positions) {              //starts from 1 as 0 is the phrase ==> we may remove it
                     url.positions.add(Pair.of(pos, query.size() - 1));
                 }
+                System.out.println(url.positions.size());
+                System.out.println(urlPriority.get(urlPosition.get(d.getString("URL"))).positions.size());
             }
         }
 

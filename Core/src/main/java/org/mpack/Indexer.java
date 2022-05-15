@@ -113,6 +113,8 @@ public class Indexer {
         String[] toRemove = {"img", "meta", "iframe", "button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
 
         org.jsoup.nodes.Document parsed;
+        HTMLText = HTMLText.replaceAll("<[^>]*script[^>]*>.*?</script>", "").replaceAll("<[^>]*span[^>]*>.*?</span>", "").replaceAll("<[^>]*style[^>]*>.*?</style>", "");
+
         parsed = Jsoup.parse(HTMLText);
 
         title.add(parsed.title());
@@ -126,8 +128,8 @@ public class Indexer {
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 
-        //System.out.println(Jsoup.clean(parsed.text(), Safelist.none()));
-        return Jsoup.clean(parsed.text(), Safelist.none());
+        return parsed.text().replaceAll("<[^>]*>", "");
+
     }
 
     Pair<List<List<String>>, List<Integer>> extractWords(@NotNull String text) {
@@ -162,11 +164,6 @@ public class Indexer {
                     word = new StringBuilder();
             } else original.append(c);
         }
-        /*System.out.println(position);
-        System.out.println(wordList.getFirst().size());
-        System.out.println(wordList.getFirst().get(0).size());
-        System.out.println(wordList.getFirst().get(1).size());
-        System.out.println("-----------------------------------------------------------------------------");*/
         return wordList;
     }
 
@@ -217,23 +214,26 @@ public class Indexer {
                     invertedFile.get(tokens.getFirst().get(0).get(i)).get(docURL).incTF();
                 } else {
                     //then create it
-                    WordInfo container = new WordInfo();
+                    WordInfo container = new WordInfo(tokens.getFirst().get(1).size());
                     container.addPosition(tokens.getSecond().get(i));
                     container.incTF();
                     container.setPageRank(pageRank);
+
                     for (short k = 0; k < docFlags.size(); k++) {
                         container.setFlags(k, docFlags.get(k).getOrDefault(tokens.getFirst().get(0).get(i), 0));
                     }
                     invertedFile.get(tokens.getFirst().get(0).get(i)).put(docURL, container);
                 }
 
+
             } else {
                 HashMap<String, WordInfo> docMap = new HashMap<>();
-                WordInfo container = new WordInfo();
+                WordInfo container = new WordInfo(tokens.getFirst().get(1).size());
                 container.addPosition(tokens.getSecond().get(i));
                 container.incTF();
                 container.setPageRank(pageRank);
                 docMap.put(docURL, container);
+
 
                 for (short k = 0; k < docFlags.size(); k++) {
                     container.setFlags(k, docFlags.get(k).getOrDefault(tokens.getFirst().get(0).get(i), 0));
