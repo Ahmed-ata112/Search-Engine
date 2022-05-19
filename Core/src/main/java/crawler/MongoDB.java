@@ -5,6 +5,7 @@ import com.mongodb.client.model.UpdateOptions;
 import crawler.Crawler;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.jsoup.Jsoup;
 
 import java.util.*;
 
@@ -33,8 +34,8 @@ public class MongoDB {
             mongoClient = MongoClients.create(CONNECTION_STRING);
             searchEngineDb = mongoClient.getDatabase("SearchEngine");
 
-            urlsCollection = searchEngineDb.getCollection("CrawledURLS");
-            //urlsCollection = searchEngineDb.getCollection("CrawledURLStest");
+            //urlsCollection = searchEngineDb.getCollection("CrawledURLS");
+            urlsCollection = searchEngineDb.getCollection("CrawledURLStest");
             relationsCollection = searchEngineDb.getCollection("PagesRelations");
             stateCollection = searchEngineDb.getCollection("State");
             stateUrlsCollection = searchEngineDb.getCollection("StateURLS");
@@ -207,7 +208,8 @@ public class MongoDB {
         Crawler.visitedLinks.clear();
         for (String s : urlsCollection.distinct("url_link", String.class)) {
             Crawler.visitedLinks.add(s);
-            Crawler.websites_hashes.add(Crawler.encryptThisString(s));
+            org.jsoup.nodes.Document doc = Jsoup.parse(s);
+            Crawler.websites_hashes.add(Crawler.encryptThisString(doc.body().text().trim()));
         }
 
         List<Document> r = getRelations();

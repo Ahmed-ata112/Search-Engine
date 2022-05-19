@@ -4,7 +4,6 @@ import org.bson.Document;
 import org.springframework.data.util.Pair;
 
 
-import java.lang.reflect.Array;
 import java.util.*;
 //import javafx.util.Pair;
 
@@ -29,17 +28,17 @@ public class Ranker {
     };
 
 
-    public PriorityQueue<Pair<String, collections>> ranker2(String phrase, List<Document> retDoc) {
+    public List<Pair<String, collections>> ranker2(String phrase, List<Document> retDoc) {
 
-        PriorityQueue<Pair<String, collections>> rankedPages = new PriorityQueue<Pair<String, collections>>(urlPriority);
-        //                       url         paragraph   header          flags         pagerank      priority   tokenCount   positions
+        //PriorityQueue<Pair<String, collections>> rankedPages = new PriorityQueue<Pair<String, collections>>(urlPriority);
+        List<Pair<String, collections>> rankedPages = new ArrayList<Pair<String, collections>>();
 
 
         HashMap<String, collections> url_priority = new HashMap<>();
         //         url          flags            pagerank     priority  tokenCount
 
         ArrayList<String> query = new ArrayList<>();
-        ArrayList<String> stemmed = new ArrayList<>();
+        //ArrayList<String> stemmed = new ArrayList<>();
 
 
         query.add(phrase);
@@ -73,7 +72,10 @@ public class Ranker {
                 if (url_priority.containsKey(d.getString("URL"))) {
                     //then update the priority
                     collections url = url_priority.get(d.getString("URL"));
-                    url.pagerank = pagRank;
+                    List<Integer> tempFlags = new ArrayList<>(2);
+                    url.flags.add(url.flags.get(0) + _flags.get(0));
+                    url.flags.add(url.flags.get(1) + _flags.get(1));
+                    //url.pagerank = pagRank; //no need - already done at the first insertion
                     url.positions.add(positions);
                     double prePriority = url_priority.get(d.getString("URL")).priority;
                     int preTokenCount = url_priority.get(d.getString("URL")).token_count;
@@ -84,6 +86,7 @@ public class Ranker {
                 } else {
                     collections url = new collections();
                     url.flags = _flags;
+                    url.pagerank = pagRank;
                     url.priority = priority;
                     url.positions = new ArrayList<>();
                     url.positions.add(positions);
@@ -96,13 +99,14 @@ public class Ranker {
 
 
         int ifFound = 0;
+
         for (Map.Entry<String, collections> entry : url_priority.entrySet()) {
             Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, entry.getValue()).getSecond();
             entry.getValue().title = paragraphTitle.getFirst();
             entry.getValue().paragraph = paragraphTitle.getSecond();
             rankedPages.add(Pair.of(entry.getKey(), entry.getValue()));
         }
-
+        rankedPages.sort(urlPriority);
 
         return rankedPages;
     }

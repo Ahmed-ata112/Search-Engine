@@ -1,9 +1,14 @@
 package crawler;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.parser.Parser;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
+import static crawler.Crawler.encryptThisString;
 import static java.lang.Thread.sleep;
 
 public class CrawlerMain {
@@ -29,7 +34,9 @@ public class CrawlerMain {
                     //The last threads takes all the remaining
                     ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
                 }
+                System.out.println("Created Thread num: " + i);
                 new Thread(new Crawler(ss)).start();
+
             }
 
 
@@ -54,6 +61,7 @@ public class CrawlerMain {
                     System.out.println(ss);
                 }
             }
+
 
         }
 
@@ -86,7 +94,7 @@ public class CrawlerMain {
         mainMongo.getAllArraysBAck();
         Crawler.setCount(Crawler.visitedLinks.size());
         Crawler.setIsContinuing(true);
-        System.out.printf("will continue my work with count %d", Crawler.atomicCount.get());
+        System.out.printf("will continue my work with count %d%n", Crawler.atomicCount.get());
         ArrayList<String> seedsArray = (ArrayList<String>) mainMongo.getStateURLs();
         initCrawling(numThreads, seedsArray);
     }
@@ -99,13 +107,6 @@ public class CrawlerMain {
     }
 
 
-    private static void testMongo() {
-        String url = "https://www.google.com/doodles";
-
-        MongoDB mm = new MongoDB();
-        System.out.println(mm.getRelations());
-    }
-
     private static void pagerankInit() {
         PageRank p = new PageRank();
         p.initRankMatrix(Crawler.visitedLinks, Crawler.pagesEdges);
@@ -113,6 +114,15 @@ public class CrawlerMain {
 
     }
 
+    private static void testMongo() throws IOException {
+
+        Document document = Jsoup.connect("https://time.com/newsletters/?source=SI+hp+link+mid+&newsletter_name=climate").parser(Parser.xmlParser()).get();
+        String hashed = encryptThisString(document.body().text().trim());
+        document = Jsoup.connect("https://time.com/newsletters/?source=SI+hp+mod+mid+&newsletter_name=the_brief").parser(Parser.xmlParser()).get();
+        System.out.println(Objects.equals(encryptThisString(document.body().text().trim()), hashed));
+
+
+    }
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
@@ -140,11 +150,12 @@ public class CrawlerMain {
             //continue what it started
             continueAndProcess(numThreads);
             Crawler.latch.await();      // wait for all The Threads to finish
+            System.out.println("Finished Waiting and started Ranking");
             pagerankInit();
         }
         Crawler.finishState(); //all is done
-        System.out.println("Finished Waiting");
         //Re crawl
+
         while (true) {
 
             try {
@@ -158,7 +169,11 @@ public class CrawlerMain {
             }
         }
 
-        //testMongo();
+//        try {
+//            testMongo();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
 

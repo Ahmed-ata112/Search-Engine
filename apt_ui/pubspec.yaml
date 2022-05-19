@@ -48,6 +48,7 @@ dependencies:
   highlight_text: ^1.3.0
   number_paginator: ^0.0.2
   language_tool: ^2.0.0
+  substring_highlight: ^1.0.33
 
 dev_dependencies:
   flutter_test:
