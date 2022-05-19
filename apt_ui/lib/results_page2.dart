@@ -1,23 +1,14 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:substring_highlight/substring_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:number_paginator/number_paginator.dart';
 
 Widget resultCard(ResultTile art, context) {
   Map<String, HighlightedWord> words = <String, HighlightedWord>{};
-  for (String word in art.tokens) {
-    words[word] = HighlightedWord(
-      onTap: () {
-        print("highlight");
-      },
-      textStyle: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 20,
-      ),
-    );
-  }
+
   return GFCard(
     boxFit: BoxFit.cover,
     titlePosition: GFPosition.start,
@@ -33,17 +24,19 @@ Widget resultCard(ResultTile art, context) {
         const SizedBox(
           height: 15,
         ),
-        TextHighlight(
-          text: art.para, // You need to pass the string you want the highlights
-          words: words, // Your dictionary words
-          textStyle: const TextStyle(
-            // You can set the general style, like a Text()
-            fontSize: 14,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign
-              .justify, // You can use any attribute of the RichText widget
-        ),
+        SubstringHighlight(
+            caseSensitive: false,
+            maxLines: 6,
+            overflow: TextOverflow.ellipsis,
+            terms: art.tokens,
+            text: art.para,
+            // text: 'ee e!',
+            textAlign: TextAlign.right,
+            textStyle: const TextStyle(
+              // non-highlight style
+              color: Colors.grey,
+            ),
+            words: true),
       ],
     ),
     buttonBar: GFButtonBar(
@@ -76,7 +69,7 @@ class ResultTile {
   final String url;
   final String para;
   final String header;
-  final List<dynamic> tokens;
+  final List<String> tokens;
   ResultTile(this.url, this.para, this.header, this.tokens);
 }
 
@@ -102,13 +95,12 @@ class _ResultsPageState extends State<ResultsPage> {
     List<String> _urls = data!['_urls'];
     List<String> _paragraphs = data!['_paragraphs'];
     List<String> _headers = data!['_headers'];
-    List<List<dynamic>> _tokens = data!['_tokens'];
+    List<String> _tokens = data!['_tokens'];
     int _numPages = (_urls.length / 10.0).ceil();
     List<ResultTile> allTiles = [];
 
     for (int i = 0; i < _urls.length; i++) {
-      allTiles
-          .add(ResultTile(_urls[i], _paragraphs[i], _headers[i], _tokens[i]));
+      allTiles.add(ResultTile(_urls[i], _paragraphs[i], _headers[i], _tokens));
     }
     var pages = List.generate(
       _numPages,
