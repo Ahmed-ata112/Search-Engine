@@ -3,12 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:substring_highlight/substring_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:highlight_text/highlight_text.dart';
 import 'package:number_paginator/number_paginator.dart';
 
 Widget resultCard(ResultTile art, context) {
-  Map<String, HighlightedWord> words = <String, HighlightedWord>{};
-
   return GFCard(
     boxFit: BoxFit.cover,
     titlePosition: GFPosition.start,
@@ -32,6 +29,8 @@ Widget resultCard(ResultTile art, context) {
             text: art.para,
             // text: 'ee e!',
             textAlign: TextAlign.right,
+            textStyleHighlight: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold),
             textStyle: const TextStyle(
               // non-highlight style
               color: Colors.grey,
