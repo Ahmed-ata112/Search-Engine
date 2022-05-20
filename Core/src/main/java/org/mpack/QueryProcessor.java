@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 
 public class QueryProcessor {
-    String morethanOneIndicator;
-    List<String> SearchTokens;
+    String moreThanOneIndicator;
+    List<String> searchTokens;
     static HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
@@ -36,21 +36,21 @@ public class QueryProcessor {
 
     public @NotNull List<List<Document>> ProcessQuery(List<String> Phrase, boolean isPhraseSearching) throws FileNotFoundException {
         //initialize data member variables
-        SearchTokens = Phrase;
+        searchTokens = Phrase;
         if (Phrase.size() == 1)
-            morethanOneIndicator = "";
+            moreThanOneIndicator = "";
         else
-            morethanOneIndicator = Phrase.stream().map(String::valueOf).collect(Collectors.joining(" "));
+            moreThanOneIndicator = Phrase.stream().map(String::valueOf).collect(Collectors.joining(" "));
         //remove stop words
         if (stopWords.isEmpty())
             stopWords = Indexer.constructStopWords();
 
-        Indexer.removeStopWords(SearchTokens, stopWords);
+        Indexer.removeStopWords(searchTokens, stopWords);
         //list that contain all equivalent words from database
         List<List<String>> EquivalentWords = new ArrayList<>();
 
         PorterStemmer stem = new PorterStemmer();
-        for (String currentWord : SearchTokens) {
+        for (String currentWord : searchTokens) {
             //get the original word , its stemming , the equivalent words and put all of them in the EquWords List
 
 
@@ -125,12 +125,12 @@ public class QueryProcessor {
     }
 
     public List<String> GetSearchTokens() {
-        return SearchTokens;
+        return searchTokens;
     }
 
     //if the search query is one word return en ampty string otherwise it return the search query as is is
     public String GetQueryPhraseIndicator() {
-        return morethanOneIndicator;
+        return moreThanOneIndicator;
     }
 
     public static void main(String[] arg) throws FileNotFoundException {

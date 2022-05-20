@@ -12,7 +12,8 @@ class DBManager {
   static Future<dynamic> executeQuery(String searchQ) async {
     var response = await http.get(Uri.parse('$baseUrl/Query/$searchQ'));
     if (response.statusCode == 200) {
-      List ret = json.decode(response.body); // list<list<dynamic>>
+      List ret =
+          json.decode(utf8.decode(response.bodyBytes)); // list<list<dynamic>>
       return ret; // List of JsonMaps
 
     } else {
@@ -24,7 +25,8 @@ class DBManager {
   static Future<List> getSuggestionsList() async {
     var response = await http.get(Uri.parse('$baseUrl/suggests'));
     if (response.statusCode == 200) {
-      List ret = json.decode(response.body); // list<list<dynamic>>
+      List ret =
+          json.decode(utf8.decode(response.bodyBytes)); // list<list<dynamic>>
       print(ret);
       return ret; // List of JsonMaps
     } else {
