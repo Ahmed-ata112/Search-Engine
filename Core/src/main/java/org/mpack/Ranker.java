@@ -19,7 +19,7 @@ import java.util.*;
 
 
 public class Ranker {
-    final MongodbIndexer mongoDB = new MongodbIndexer();
+    static final MongodbIndexer mongoDB = new MongodbIndexer();
 
 
     Comparator<Pair<String, collections>> urlPriority = (url2, url1) -> {
