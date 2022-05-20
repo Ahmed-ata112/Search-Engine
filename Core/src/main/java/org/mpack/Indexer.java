@@ -1,22 +1,17 @@
 package org.mpack;
 
 import ca.rmen.porterstemmer.PorterStemmer;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.*;
-
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class Indexer {
 
@@ -45,7 +40,7 @@ public class Indexer {
         ArrayList<HashMap<String, Integer>> docFlags;
         ArrayList<String> title;
         ArrayList<String> header;
-        HashMap<Character, List<String>> stopWords = obj.constructStopWords();
+        HashMap<Character, List<String>> stopWords = constructStopWords();
 
         //drop this database at the beginning of each run
         mongoDB.removeTextUrl();
@@ -63,8 +58,8 @@ public class Indexer {
             obj.extractFlags(docFlags, title, header);
             Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML);
             tokens.getFirst().get(1).add(0, title.get(0));
-            mongoDB.storeTextUrl((ArrayList<String>) tokens.getFirst().get(1), set.getKey());
-            obj.removeStopWords(tokens.getFirst().get(0), stopWords, tokens.getSecond());
+            mongoDB.storeTextUrl(tokens.getFirst().get(1), set.getKey());
+            removeStopWords(tokens.getFirst().get(0), stopWords, tokens.getSecond());
             obj.stemWord(tokens.getFirst().get(0));
 
             obj.invertedFile(set.getKey(), tokens, docFlags, set.getValue().getFirst());
@@ -183,7 +178,7 @@ public class Indexer {
             {
                 //then remove it
                 tokens.remove(i);
-                if(positions != null)
+                if (positions != null)
                     positions.remove(i);
                 i--;
             }

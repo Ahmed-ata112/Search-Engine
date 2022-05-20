@@ -42,9 +42,7 @@ class paragraphGetter implements Runnable {
         for (int i = start; i < end; i++) {
             current = collectionsList.get(i);
             getParagraph(current);
-            synchronized (this) {
-                collectionsList.add(current);
-            }
+
         }
 
     }
@@ -63,7 +61,7 @@ class paragraphGetter implements Runnable {
 
         collection.positions.sort(sortPositions);
         //System.out.println(collection.positions);
-        Pair<Integer, Integer> window = Interval.findSmallestWindow(collection.positions, collection.token_count);
+        Pair<Integer, Integer> window = Interval.findSmallestWindow((ArrayList<Pair<Integer, Integer>>) collection.positions, collection.token_count);
         if (window == null) {
             collection.paragraph = "";
             return;
@@ -92,13 +90,16 @@ class paragraphGetter implements Runnable {
 }
 
 public class Ranker {
-    final MongodbIndexer mongoDB = new MongodbIndexer();
-
+    static final MongodbIndexer mongoDB = new MongodbIndexer();
+    static HashSet<String> allUrls = new HashSet<>();
+    static public void clearAllUrls(){
+        allUrls = new HashSet<>();
+    }
 
     Comparator<collections> urlPriority = (url2, url1) -> url1.compare(url2);
 
 
-    public List<collections> ranker2(String phrase, List<Document> retDoc) {
+    public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> oroginalTokens, boolean isPhraseSearching) {
 
 
         HashMap<String, Integer> urlPosition = new HashMap<>();
@@ -119,12 +120,15 @@ public class Ranker {
 
         for (Document document : retDoc) {
 
+
             collections url;
             query.add(document.get("token_name").toString());
             IDF = Double.parseDouble(document.get("IDF").toString());
             List<Document> webPages = (List<Document>) document.get("documents");
             //I think there is a more efficient way to get the url of the word rather than this
             for (Document d : webPages) {
+                if(allUrls.contains(d.getString("URL"))) continue;
+                allUrls.add(d.getString("URL"));
                 List<Integer> _flags;
                 /*_flags.set(0, 0);
                 _flags.set(1, 0);*/
@@ -180,10 +184,10 @@ public class Ranker {
         pGet.collectionsList = rankedPages;
         pGet.mongoDB = mongoDB;
         pGet.phrase = query;
-        pGet.count = Math.max(1, rankedPages.size() / 50);
+        pGet.count = Math.max(1, rankedPages.size() / 100);
 
         ArrayList<Thread> threads = new ArrayList<>(pGet.count);
-        System.out.println(rankedPages.size());
+
 
 
         try {
@@ -198,10 +202,12 @@ public class Ranker {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
+        //System.out.println(rankedPages.size());
 
         rankedPages.sort(urlPriority);
 
         return rankedPages;
     }
+
 
 }
