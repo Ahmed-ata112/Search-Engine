@@ -18,8 +18,7 @@ import java.util.*;
 //TF --> per doc
 
 
-class paragraphGetter implements Runnable
-{
+class paragraphGetter implements Runnable {
     ArrayList<String> phrase;
     ArrayList<collections> collectionsList;
 
@@ -36,15 +35,14 @@ class paragraphGetter implements Runnable
         collections current;
 
         start = (collectionsList.size() / count) * id;
-        if(id == count - 1)
+        if (id == count - 1)
             end = collectionsList.size();
         else
             end = start + collectionsList.size() / count;
         for (int i = start; i < end; i++) {
             current = collectionsList.get(i);
             getParagraph(current);
-            synchronized (this)
-            {
+            synchronized (this) {
                 collectionsList.add(current);
             }
         }
@@ -54,34 +52,42 @@ class paragraphGetter implements Runnable
     void getParagraph(collections collection) {
         ArrayList<String> text = mongoDB.getTextUrl(collection.url);
 
-        int start, end;
+        int start;
+        int end;
         StringBuilder parag = new StringBuilder();
 
         collection.wordNear = 0;
 
         collection.title = text.get(0);
+        if (collection.url.equals("https://time.com/6156587/time-studios-to-create-childrens-series-based-on-the-littles-nft/"))
+            System.out.println(collection.title);
         collection.positions.sort(sortPositions);
+        //System.out.println(collection.positions);
         Pair<Integer, Integer> window = Interval.findSmallestWindow(collection.positions, collection.token_count);
-        int count = window.getSecond() - window.getFirst() + 1;
-        if(count < 20)
-        {
-            count = (int) Math.ceil((float)(20 - count - 1) / 2);
-            start = Math.max(0, window.getFirst() - count);
-            end = Math.min(text.size() - 1, window.getSecond() + count);
+        if (window == null) {
+            collection.paragraph = "";
+            return;
         }
+        int windowLen = window.getSecond() - window.getFirst() + 1;
+        if (windowLen == collection.token_count) collection.wordNear = 100;
+       /* if(windowLen < 20)
+        {*/
+        //windowLen = (int) Math.ceil((float)(20 - windowLen - 1) / 2);
+        start = Math.max(1, window.getFirst() - 4);
+        end = Math.min(text.size() - 1, window.getSecond() + 4);
+      /*  }
         else
         {
             start = window.getFirst();
             end = window.getSecond();
-        }
+        }*/
         System.out.println(window);
 
 
-        for (int k = start; k <= end; k++) {
-            parag.append(text.get(k) + " ");
+        for (int k = start - 1; k < end; k++) {
+            parag.append(text.get(k + 1)).append(" ");
         }
         collection.paragraph = parag.toString();
-        return;
     }
 
 }
@@ -98,7 +104,6 @@ public class Ranker {
 
         HashMap<String, Integer> urlPosition = new HashMap<>();
         ArrayList<collections> rankedPages = new ArrayList<>();
-
 
 
         ArrayList<String> query = new ArrayList<>();
@@ -147,7 +152,7 @@ public class Ranker {
                     //url.pagerank = pagRank; //no need - already done at the first insertion
 
 
-                }  else {
+                } else {
                     url = new collections();
                     url.flags = _flags;
                     url.priority = priority;
@@ -169,35 +174,35 @@ public class Ranker {
         }
 
 
-    int ifFound = 0;
+        int ifFound = 0;
 
-    paragraphGetter pGet = null;
+        paragraphGetter pGet = null;
         pGet = new paragraphGetter();
-                pGet.collectionsList = rankedPages;
-                pGet.mongoDB = mongoDB;
-                pGet.phrase = query;
-                pGet.count = Math.max(1, rankedPages.size() / 50);
+        pGet.collectionsList = rankedPages;
+        pGet.mongoDB = mongoDB;
+        pGet.phrase = query;
+        pGet.count = Math.max(1, rankedPages.size() / 50);
 
-                ArrayList<Thread> threads = new ArrayList<>(pGet.count);
-                System.out.println(rankedPages.size());
+        ArrayList<Thread> threads = new ArrayList<>(pGet.count);
+        System.out.println(rankedPages.size());
 
 
         try {
-        for (int i = 0; i < pGet.count; i++) {
-        threads.add(new Thread(pGet));
-        threads.get(i).setName(Integer.toString(i));
-        threads.get(i).start();
-        }
-        for (Thread thread : threads) {
-        thread.join();
-        }
+            for (int i = 0; i < pGet.count; i++) {
+                threads.add(new Thread(pGet));
+                threads.get(i).setName(Integer.toString(i));
+                threads.get(i).start();
+            }
+            for (Thread thread : threads) {
+                thread.join();
+            }
         } catch (InterruptedException e) {
-        System.out.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
 
         rankedPages.sort(urlPriority);
 
         return rankedPages;
-        }
+    }
 
-        }
+}
