@@ -37,34 +37,39 @@ class Pojo {
 
 @RestController
 class Api {
-    final static MongoDB mongoDB = new MongoDB();
+    static final MongoDB mongoDB = new MongoDB();
+    static final Ranker ranker = new Ranker();
+    static final QueryProcessor queryProcessor = new QueryProcessor();
 
     @GetMapping(value = "/Query/{Qword}")
-    public List<Pojo> queryProcessor(@PathVariable(value = "Qword") String SearchQ) throws FileNotFoundException {
+    public List<Pojo> queryProcessor(@PathVariable(value = "Qword") String searchQ) throws FileNotFoundException {
         List<Pojo> objectsList = new ArrayList<>();
-        //TODO: Remember to add The Word to The future Suggestions List
 
+        mongoDB.addToSuggestionsArray(searchQ);
+        boolean isPhraseSearching = false;
 
-        System.out.println(SearchQ);
-        mongoDB.addToSuggestionsArray(SearchQ);
+        searchQ = searchQ.toLowerCase().trim();
 
-        QueryProcessor Q = new QueryProcessor();
-        var ts = new ArrayList<>(List.of(SearchQ.toLowerCase().trim().split(" ")));
-        List<List<Document>> documents = Q.Stem(ts);
+        if (searchQ.charAt(0) == '"' && searchQ.charAt(searchQ.length() - 1) == '"') {
+            isPhraseSearching = true;
+            searchQ = searchQ.substring(1, searchQ.length() - 1);
+        }
+
+        System.out.println("query is " + searchQ);
+        var ts = new ArrayList<>(List.of(searchQ.split("\\s+")));
+        List<List<Document>> documents = queryProcessor.ProcessQuery(ts, isPhraseSearching);
         HashSet<String> resultsUrls = new HashSet<>();
-        System.out.println("QUERY");
-        System.out.println(documents);
+        //System.out.println("QUERY");
+        //System.out.println(documents);
 
-        Ranker R = new Ranker();
 
-        ts.addAll(List.of(SearchQ.trim().split(" ")));
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {
                 continue;
             }
 
-            List<Pair<String, collections>> ret = R.ranker2("", v);
+            List<Pair<String, collections>> ret = ranker.ranker2("", v);
             for (var a : ret) {
                 if (resultsUrls.add(a.getFirst())) {
                     var p = a.getSecond();
@@ -81,7 +86,6 @@ class Api {
 
     @GetMapping(value = "/suggests")
     public List<String> getSuggestion() {
-        System.out.println("in sugg");
         return mongoDB.getSuggestionsArray();
     }
 
