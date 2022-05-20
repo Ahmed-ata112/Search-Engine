@@ -18,27 +18,90 @@ import java.util.*;
 //TF --> per doc
 
 
+class paragraphGetter implements Runnable
+{
+    ArrayList<String> phrase;
+    ArrayList<collections> collectionsList;
+
+    int count;
+    MongodbIndexer mongoDB;
+
+    Comparator<Pair<Integer, Integer>> sortPositions = Comparator.comparingInt(Pair::getFirst);
+
+    @Override
+    public void run() {
+        int id = Integer.parseInt(Thread.currentThread().getName());
+        int start;
+        int end;
+        collections current;
+
+        start = (collectionsList.size() / count) * id;
+        if(id == count - 1)
+            end = collectionsList.size();
+        else
+            end = start + collectionsList.size() / count;
+        for (int i = start; i < end; i++) {
+            current = collectionsList.get(i);
+            getParagraph(current);
+            synchronized (this)
+            {
+                collectionsList.add(current);
+            }
+        }
+
+    }
+
+    void getParagraph(collections collection) {
+        ArrayList<String> text = mongoDB.getTextUrl(collection.url);
+
+        int start, end;
+        StringBuilder parag = new StringBuilder();
+
+        collection.wordNear = 0;
+
+        collection.title = text.get(0);
+        collection.positions.sort(sortPositions);
+        Pair<Integer, Integer> window = Interval.findSmallestWindow(collection.positions, collection.token_count);
+        int count = window.getSecond() - window.getFirst() + 1;
+        if(count < 20)
+        {
+            count = (int) Math.ceil((float)(20 - count - 1) / 2);
+            start = Math.max(0, window.getFirst() - count);
+            end = Math.min(text.size() - 1, window.getSecond() + count);
+        }
+        else
+        {
+            start = window.getFirst();
+            end = window.getSecond();
+        }
+        System.out.println(window);
+
+
+        for (int k = start; k <= end; k++) {
+            parag.append(text.get(k) + " ");
+        }
+        collection.paragraph = parag.toString();
+        return;
+    }
+
+}
+
 public class Ranker {
     final MongodbIndexer mongoDB = new MongodbIndexer();
 
 
-    Comparator<Pair<String, collections>> urlPriority = (url2, url1) -> {
-        return url1.getSecond().compare(url2.getSecond());
-
-    };
+    Comparator<collections> urlPriority = (url2, url1) -> url1.compare(url2);
 
 
-    public List<Pair<String, collections>> ranker2(String phrase, List<Document> retDoc) {
-
-        //PriorityQueue<Pair<String, collections>> rankedPages = new PriorityQueue<Pair<String, collections>>(urlPriority);
-        List<Pair<String, collections>> rankedPages = new ArrayList<Pair<String, collections>>();
+    public List<collections> ranker2(String phrase, List<Document> retDoc) {
 
 
-        HashMap<String, collections> url_priority = new HashMap<>();
-        //         url          flags            pagerank     priority  tokenCount
+        HashMap<String, Integer> urlPosition = new HashMap<>();
+        ArrayList<collections> rankedPages = new ArrayList<>();
+
+
 
         ArrayList<String> query = new ArrayList<>();
-        //ArrayList<String> stemmed = new ArrayList<>();
 
 
         query.add(phrase);
@@ -50,10 +113,12 @@ public class Ranker {
         double pagRank;
 
 
-        for (int i = 0; i < retDoc.size(); i++) {
-            query.add(retDoc.get(i).get("token_name").toString());
-            IDF = Double.parseDouble(retDoc.get(i).get("IDF").toString());
-            List<Document> webPages = (List<Document>) retDoc.get(i).get("documents");
+        for (Document document : retDoc) {
+
+            collections url;
+            query.add(document.get("token_name").toString());
+            IDF = Double.parseDouble(document.get("IDF").toString());
+            List<Document> webPages = (List<Document>) document.get("documents");
             //I think there is a more efficient way to get the url of the word rather than this
             for (Document d : webPages) {
                 List<Integer> _flags;
@@ -69,117 +134,70 @@ public class Ranker {
 
 
                 //search in the hashmap for this url or insert it if not found
-                if (url_priority.containsKey(d.getString("URL"))) {
+                if (urlPosition.containsKey(d.getString("URL"))) {
                     //then update the priority
-                    collections url = url_priority.get(d.getString("URL"));
-                    List<Integer> tempFlags = new ArrayList<>(2);
+                    url = rankedPages.get(urlPosition.get(d.getString("URL")));
+
+                    //then update the priority
+                    url.token_count++;
+                    url.priority += priority;
                     url.flags.add(url.flags.get(0) + _flags.get(0));
                     url.flags.add(url.flags.get(1) + _flags.get(1));
+
                     //url.pagerank = pagRank; //no need - already done at the first insertion
-                    url.positions.add(positions);
-                    double prePriority = url_priority.get(d.getString("URL")).priority;
-                    int preTokenCount = url_priority.get(d.getString("URL")).token_count;
-                    //then update the priority
-                    url.token_count = preTokenCount + 1;
-                    url.priority = prePriority + priority;
-                    url_priority.put(d.getString("URL"), url);
-                } else {
-                    collections url = new collections();
+
+
+                }  else {
+                    url = new collections();
                     url.flags = _flags;
-                    url.pagerank = pagRank;
                     url.priority = priority;
+
                     url.positions = new ArrayList<>();
-                    url.positions.add(positions);
+
                     url.token_count = 1;
                     url.url = d.getString("URL");
-                    url_priority.put(d.getString("URL"), url);
+                    rankedPages.add(url);
+                    urlPosition.put(url.url, rankedPages.size() - 1);
                 }
+
+                for (int pos :
+                        positions) {              //starts from 1 as 0 is the phrase ==> we may remove it
+                    url.positions.add(Pair.of(pos, query.size() - 1));
+                }
+
             }
         }
 
 
-        int ifFound = 0;
+    int ifFound = 0;
 
-        for (Map.Entry<String, collections> entry : url_priority.entrySet()) {
-            Pair<String, String> paragraphTitle = getParagraph(entry.getKey(), query, entry.getValue()).getSecond();
-            entry.getValue().title = paragraphTitle.getFirst();
-            entry.getValue().paragraph = paragraphTitle.getSecond();
-            rankedPages.add(Pair.of(entry.getKey(), entry.getValue()));
+    paragraphGetter pGet = null;
+        pGet = new paragraphGetter();
+                pGet.collectionsList = rankedPages;
+                pGet.mongoDB = mongoDB;
+                pGet.phrase = query;
+                pGet.count = Math.max(1, rankedPages.size() / 50);
+
+                ArrayList<Thread> threads = new ArrayList<>(pGet.count);
+                System.out.println(rankedPages.size());
+
+
+        try {
+        for (int i = 0; i < pGet.count; i++) {
+        threads.add(new Thread(pGet));
+        threads.get(i).setName(Integer.toString(i));
+        threads.get(i).start();
         }
+        for (Thread thread : threads) {
+        thread.join();
+        }
+        } catch (InterruptedException e) {
+        System.out.println(e.getMessage());
+        }
+
         rankedPages.sort(urlPriority);
 
         return rankedPages;
-    }
-
-
-    //phrase is array of query words without stop words, the whole phrase is at index 0.
-    Pair<Integer, Pair<String, String>> getParagraph(String url, ArrayList<String> phrase, collections collection) {
-        ArrayList<String> text = mongoDB.getTextUrl(url);
-        boolean found = false;
-        int index = -1;
-        int i = -1, j;
-        int start, end;
-        StringBuilder parag = new StringBuilder();
-
-        collection.wordNear = 0;
-
-
-        for (j = 0; j < phrase.size(); j++) {
-            for (i = 0; i < collection.positions.get(j).size(); i++) {
-
-                start = Math.max(0, collection.positions.get(j).get(i) - 10);
-                end = Math.min(text.size() - 1, collection.positions.get(j).get(i) + 10);
-
-                for (int k = start; k < end; k++) {
-                    parag.append(text.get(k + 1) + " ");
-                }
-                return Pair.of(0, Pair.of(text.get(0), parag.toString()));
-            }
-        }
-        return Pair.of(-1, Pair.of("", ""));
-    }
-
-
-    static String text(String paragragh, String word, int index) {
-        StringBuilder text = new StringBuilder();
-        int counter = 0, i = index - 1;
-        char c, t = 'a';
-        int maxA = 10, maxB = 10;
-        if (index == 0) {
-            maxA = 20;
-            maxB = 0;
-        }
-        if (index + word.length() == paragragh.length()) {
-            maxA = 0;
-            if (maxB == 10) maxB = 20;
-        }
-        while (i > -1 && counter < maxB) {
-            c = paragragh.charAt(i);
-            if (c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0') ;
-            else if (t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
-            i--;
-            t = c;
-        }
-        i++;
-        text.append(paragragh.substring(i, index + word.length()));
-
-        counter = 0;
-
-        i = index + word.length();
-        t = 'a';
-
-        while (i < paragragh.length() && counter < maxA) {
-
-            c = paragragh.charAt(i);
-            if ((c <= 'z' && c >= 'a' || c <= 'Z' && c >= 'A' || c <= '9' && c >= '0')) ;
-            else if (t <= 'z' && t >= 'a' || t <= 'Z' && t >= 'A' || t <= '9' && t >= '0') counter++;
-            i++;
-            t = c;
         }
 
-        text.append(paragragh.substring(index + word.length(), i));
-
-        return text.toString();
-    }
-
-}
+        }

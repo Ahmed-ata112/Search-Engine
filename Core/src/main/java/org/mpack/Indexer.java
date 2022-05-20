@@ -108,9 +108,11 @@ public class Indexer {
     String parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
 
 
-        String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
+        String[] toRemove = {"img", "meta", "iframe", "button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
 
         org.jsoup.nodes.Document parsed;
+        HTMLText = HTMLText.replaceAll("<[^>]*script[^>]*>.*?</script>", "").replaceAll("<[^>]*span[^>]*>.*?</span>", "").replaceAll("<[^>]*style[^>]*>.*?</style>", "");
+
         parsed = Jsoup.parse(HTMLText);
 
         title.add(parsed.title());
@@ -124,8 +126,8 @@ public class Indexer {
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 
+        return parsed.text().replaceAll("<[^>]*>", "");
 
-        return parsed.text();
     }
 
     Pair<List<List<String>>, List<Integer>> extractWords(@NotNull String text) {

@@ -64,10 +64,10 @@ class Api {
                 continue;
             }
 
-            List<Pair<String, collections>> ret = R.ranker2("", v);
+            List<collections> ret = R.ranker2("", v);
             for (var a : ret) {
-                if (resultsUrls.add(a.getFirst())) {
-                    var p = a.getSecond();
+                if (resultsUrls.add(a.url)) {
+                    var p = a;
                     Pojo p1 = new Pojo(p.url, p.title, ts, p.paragraph);
                     objectsList.add(p1);
                 }
