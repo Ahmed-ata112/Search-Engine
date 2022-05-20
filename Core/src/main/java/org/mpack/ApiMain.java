@@ -1,15 +1,9 @@
 package org.mpack;
 
-import com.thedeanda.lorem.Lorem;
-import com.thedeanda.lorem.LoremIpsum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
-import org.mpack.MongoDB;
-import org.mpack.QueryProcessor;
-import org.mpack.Ranker;
-import org.mpack.collections;
+import crawler.MongoDB;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.util.Pair;
@@ -17,9 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.awt.*;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.util.*;
 import java.util.List;
 
@@ -58,7 +50,7 @@ class Api {
 
         QueryProcessor Q = new QueryProcessor();
 
-        List<List<Document>> documents = Q.Stem(List.of(SearchQ.trim().split(" ")));
+        List<List<Document>> documents = Q.Stem(List.of(SearchQ.toLowerCase().trim().split(" ")));
 
         System.out.println("QUERY");
         System.out.println(documents);
@@ -67,7 +59,11 @@ class Api {
         LinkedHashSet<collections> finalResults = new LinkedHashSet<>();
         for (List<Document> v :
                 documents) {
-            PriorityQueue<Pair<String, collections>> ret = R.ranker2("", v);
+            if (v == null || v.isEmpty() || v.get(0) == null) {
+                continue;
+            }
+
+            List<Pair<String, collections>> ret = R.ranker2("", v);
             for (var a :
                     ret) {
                 finalResults.add(a.getSecond());
@@ -85,7 +81,7 @@ class Api {
             Pojo p1 = new Pojo(p.url, p.title, ts, p.paragraph);
             objectsList.add(p1);
         }
-
+        System.out.println("Sending with size: " + objectsList.size());
         return objectsList;
     }
 
