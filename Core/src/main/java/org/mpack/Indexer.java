@@ -218,7 +218,7 @@ public class Indexer {
                     invertedFile.get(tokens.getFirst().get(0).get(i)).get(docURL).incTF();
                 } else {
                     //then create it
-                    WordInfo container = new WordInfo();
+                    WordInfo container = new WordInfo(tokens.getFirst().get(1).size());
                     container.addPosition(tokens.getSecond().get(i));
                     container.incTF();
                     container.setPageRank(pageRank);
@@ -230,7 +230,7 @@ public class Indexer {
 
             } else {
                 HashMap<String, WordInfo> docMap = new HashMap<>();
-                WordInfo container = new WordInfo();
+                WordInfo container = new WordInfo(tokens.getFirst().get(1).size());
                 container.addPosition(tokens.getSecond().get(i));
                 container.incTF();
                 container.setPageRank(pageRank);
