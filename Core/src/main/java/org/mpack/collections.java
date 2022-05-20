@@ -1,5 +1,8 @@
 package org.mpack;
 
+import org.springframework.data.util.Pair;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public
@@ -13,7 +16,7 @@ class collections
     double priority;
     double pagerank;
     List<Integer> flags;
-    List<List<Integer>> positions;
+    ArrayList<Pair<Integer, Integer>> positions;
 
     int wordNear;
 
