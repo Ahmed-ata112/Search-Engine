@@ -31,7 +31,7 @@ public class Crawler implements Runnable {
     static CountDownLatch latch;
 
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 50;
+    static final int MAX_PAGES = 5000;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -141,7 +141,7 @@ public class Crawler implements Runnable {
             return null;
         }
 
-        String hashed = encryptThisString(document.html().trim());
+        String hashed = encryptThisString(document.body().text().trim());
         synchronized (websites_hashes) {
             if (websites_hashes.contains(hashed)) {
                 return null;

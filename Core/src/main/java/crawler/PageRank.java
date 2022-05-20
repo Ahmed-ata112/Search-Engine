@@ -85,7 +85,7 @@ public class PageRank {
         for (Map.Entry<String, PageNode> E : nameToNode.entrySet()) {
             m.setPageRank(E.getKey(), E.getValue().getCurrentScore());
         }
-
+        System.out.println("Finished Ranking");
 
     }
 }

@@ -20,12 +20,12 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
       List<String> resultsUrls = [];
       List<String> resultsParagraphs = [];
       List<String> headers = [];
-      List<List<dynamic>> tokens = [];
+      List<String> tokens = [];
       dynamic result = await DBManager.executeQuery(searchQ);
+
       for (var e in result) {
         resultsUrls.add(e["url"]);
         headers.add(e["header"]);
-        tokens.add(e["tokens"]);
         resultsParagraphs.add(e["paragraph"]);
       }
       ///////////////////////////////////////////////
@@ -49,6 +49,9 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
           '_replacements': replacements
         });
         return;
+      }
+      for (dynamic v in result[0]["tokens"]) {
+        tokens.add(v as String);
       }
 
       Navigator.popAndPushNamed(context, '/results_page', arguments: {
