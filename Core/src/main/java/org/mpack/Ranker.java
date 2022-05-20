@@ -59,8 +59,8 @@ class paragraphGetter implements Runnable {
         collection.wordNear = 0;
 
         collection.title = text.get(0);
-        if (collection.url.equals("https://time.com/6156587/time-studios-to-create-childrens-series-based-on-the-littles-nft/"))
-            System.out.println(collection.title);
+        //if (collection.url.equals("https://time.com/6156587/time-studios-to-create-childrens-series-based-on-the-littles-nft/"))
+
         collection.positions.sort(sortPositions);
         //System.out.println(collection.positions);
         Pair<Integer, Integer> window = Interval.findSmallestWindow(collection.positions, collection.token_count);
@@ -81,7 +81,6 @@ class paragraphGetter implements Runnable {
             start = window.getFirst();
             end = window.getSecond();
         }*/
-        System.out.println(window);
 
 
         for (int k = start - 1; k < end; k++) {

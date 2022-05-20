@@ -50,7 +50,7 @@ class Api {
 
         QueryProcessor Q = new QueryProcessor();
         var ts = new ArrayList<>(List.of(SearchQ.toLowerCase().trim().split(" ")));
-        List<List<Document>> documents = Q.Stem(ts);
+        List<List<Document>> documents = Q.ProcessQuery(ts);
         HashSet<String> resultsUrls = new HashSet<>();
         System.out.println("QUERY");
         System.out.println(documents);

@@ -64,7 +64,7 @@ public class Indexer {
             Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML);
             tokens.getFirst().get(1).add(0, title.get(0));
             mongoDB.storeTextUrl((ArrayList<String>) tokens.getFirst().get(1), set.getKey());
-            obj.removeStopWords(tokens.getFirst().get(0), stopWords);
+            obj.removeStopWords(tokens.getFirst().get(0), stopWords, tokens.getSecond());
             obj.stemWord(tokens.getFirst().get(0));
 
             obj.invertedFile(set.getKey(), tokens, docFlags, set.getValue().getFirst());
@@ -139,6 +139,9 @@ public class Indexer {
         StringBuilder word = new StringBuilder();
         wordList.getFirst().add(new ArrayList<>());
         wordList.getFirst().add(new ArrayList<>());
+        //text.replaceAll("[^a-zA-Z0-9\\s]", " ")
+        //text.replaceAll()
+        //Arrays.stream(text.split(" ")).toList();
         int position = -1;
         char c;
         for (int i = 0; i < text.length(); i++) {
@@ -151,11 +154,13 @@ public class Indexer {
                 position++;
 
                 wordList.getFirst().get(1).add(original.toString());
-                wordList.getSecond().add(position);
+
 
                 if (word.isEmpty()) continue;
                 if (!StringUtils.isNumeric(word.toString()) && !(word.equals('+') || word.equals('-'))) {
                     wordList.getFirst().get(0).add(word.toString().toLowerCase(Locale.ROOT));
+
+                    wordList.getSecond().add(position);
                 }
 
                 word = new StringBuilder();
@@ -167,7 +172,7 @@ public class Indexer {
 
 
     //remove them
-    public static void removeStopWords(List<String> tokens, HashMap<Character, List<String>> stopWords) {
+    public static void removeStopWords(List<String> tokens, HashMap<Character, List<String>> stopWords, List<Integer> positions) {
         for (int i = 0; i < tokens.size(); i++) {
 
             //if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
@@ -178,6 +183,8 @@ public class Indexer {
             {
                 //then remove it
                 tokens.remove(i);
+                if(positions != null)
+                    positions.remove(i);
                 i--;
             }
         }

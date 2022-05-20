@@ -45,7 +45,7 @@ public class QueryProcessor {
             PhraseIndicator = Phrase.stream().map(i -> String.valueOf(i)).collect(Collectors.joining(" "));
         //remove stop words
         stopWords = Indexer.constructStopWords();
-        Indexer.removeStopWords(SearchTokens,stopWords);
+        Indexer.removeStopWords(SearchTokens,stopWords, null);
         //list that contain all equivalent words from data base
         List<List<String>> EquivalentWords = new ArrayList<>();
         for (int i=0;i< Phrase.size();i++)
