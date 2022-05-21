@@ -1,22 +1,17 @@
 package org.mpack;
 
 import ca.rmen.porterstemmer.PorterStemmer;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.*;
-
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class Indexer {
 
@@ -45,7 +40,7 @@ public class Indexer {
         ArrayList<HashMap<String, Integer>> docFlags;
         ArrayList<String> title;
         ArrayList<String> header;
-        HashMap<Character, List<String>> stopWords = obj.constructStopWords();
+        HashMap<Character, List<String>> stopWords = constructStopWords();
 
         //drop this database at the beginning of each run
         mongoDB.removeTextUrl();
@@ -63,8 +58,8 @@ public class Indexer {
             obj.extractFlags(docFlags, title, header);
             Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML);
             tokens.getFirst().get(1).add(0, title.get(0));
-            mongoDB.storeTextUrl((ArrayList<String>) tokens.getFirst().get(1), set.getKey());
-            obj.removeStopWords(tokens.getFirst().get(0), stopWords);
+            mongoDB.storeTextUrl(tokens.getFirst().get(1), set.getKey());
+            removeStopWords(tokens.getFirst().get(0), stopWords, tokens.getSecond());
             obj.stemWord(tokens.getFirst().get(0));
 
             obj.invertedFile(set.getKey(), tokens, docFlags, set.getValue().getFirst());
@@ -108,9 +103,11 @@ public class Indexer {
     String parseHTML(String HTMLText, ArrayList<String> title, ArrayList<String> header) {
 
 
-        String[] toRemove = {"button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
+        String[] toRemove = {"img", "meta", "iframe", "button", "input", "style", "script", "dfn", "span", "svg", "code", "samp", "kbd", "var", "pre"};
 
         org.jsoup.nodes.Document parsed;
+        HTMLText = HTMLText.replaceAll("<[^>]*script[^>]*>.*?</script>", "").replaceAll("<[^>]*span[^>]*>.*?</span>", "").replaceAll("<[^>]*style[^>]*>.*?</style>", "");
+
         parsed = Jsoup.parse(HTMLText);
 
         title.add(parsed.title());
@@ -124,8 +121,8 @@ public class Indexer {
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 
+        return parsed.text().replaceAll("<[^>]*>", "");
 
-        return parsed.text();
     }
 
     Pair<List<List<String>>, List<Integer>> extractWords(@NotNull String text) {
@@ -137,6 +134,9 @@ public class Indexer {
         StringBuilder word = new StringBuilder();
         wordList.getFirst().add(new ArrayList<>());
         wordList.getFirst().add(new ArrayList<>());
+        //text.replaceAll("[^a-zA-Z0-9\\s]", " ")
+        //text.replaceAll()
+        //Arrays.stream(text.split(" ")).toList();
         int position = -1;
         char c;
         for (int i = 0; i < text.length(); i++) {
@@ -149,11 +149,13 @@ public class Indexer {
                 position++;
 
                 wordList.getFirst().get(1).add(original.toString());
-                wordList.getSecond().add(position);
+
 
                 if (word.isEmpty()) continue;
                 if (!StringUtils.isNumeric(word.toString()) && !(word.equals('+') || word.equals('-'))) {
                     wordList.getFirst().get(0).add(word.toString().toLowerCase(Locale.ROOT));
+
+                    wordList.getSecond().add(position);
                 }
 
                 word = new StringBuilder();
@@ -165,7 +167,7 @@ public class Indexer {
 
 
     //remove them
-    public static void removeStopWords(List<String> tokens, HashMap<Character, List<String>> stopWords) {
+    public static void removeStopWords(List<String> tokens, HashMap<Character, List<String>> stopWords, List<Integer> positions) {
         for (int i = 0; i < tokens.size(); i++) {
 
             //if ((tokens.get(i).charAt(0) - 48) >= 0 || (tokens.get(i).charAt(0) - 48) <= 9)
@@ -176,6 +178,8 @@ public class Indexer {
             {
                 //then remove it
                 tokens.remove(i);
+                if (positions != null)
+                    positions.remove(i);
                 i--;
             }
         }
@@ -209,7 +213,7 @@ public class Indexer {
                     invertedFile.get(tokens.getFirst().get(0).get(i)).get(docURL).incTF();
                 } else {
                     //then create it
-                    WordInfo container = new WordInfo();
+                    WordInfo container = new WordInfo(tokens.getFirst().get(1).size());
                     container.addPosition(tokens.getSecond().get(i));
                     container.incTF();
                     container.setPageRank(pageRank);
@@ -221,7 +225,7 @@ public class Indexer {
 
             } else {
                 HashMap<String, WordInfo> docMap = new HashMap<>();
-                WordInfo container = new WordInfo();
+                WordInfo container = new WordInfo(tokens.getFirst().get(1).size());
                 container.addPosition(tokens.getSecond().get(i));
                 container.incTF();
                 container.setPageRank(pageRank);

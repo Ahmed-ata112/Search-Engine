@@ -46,7 +46,7 @@ public class QueryProcessor {
         if (stopWords.isEmpty())
             stopWords = Indexer.constructStopWords();
 
-        Indexer.removeStopWords(searchTokens, stopWords);
+        Indexer.removeStopWords(searchTokens, stopWords,null);
         //list that contain all equivalent words from database
         List<List<String>> EquivalentWords = new ArrayList<>();
 

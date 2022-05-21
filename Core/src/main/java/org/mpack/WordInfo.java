@@ -4,13 +4,15 @@ import java.util.ArrayList;
 public class WordInfo {
     private int TF;
     private float normalizedTF;
+    int wordCount;
     private ArrayList<Integer> flags;
     private ArrayList<Integer> positions;
     private float pageRank;
 
-    WordInfo()
+    WordInfo(int wordCount)
     {
         TF = 0;
+        this.wordCount = wordCount;
         positions = new ArrayList<>();
         flags = new ArrayList<>(2); // title, header.
     }
@@ -24,13 +26,11 @@ public class WordInfo {
     void incTF() {TF++;}
     void setTF(int tf){TF = Math.max(tf, 0);}
     int getTF(){return TF;}
-    float getNormalizedTF() {return normalizedTF;}
-
-    void setNormalizedTF(long docWordCount)
-    {
-        normalizedTF = (int) (((float) TF) * 100000/ docWordCount);
-        normalizedTF /= 100000;
+    float getNormalizedTF() {
+        normalizedTF = (((float) TF) / wordCount);
+        return normalizedTF;
     }
+
     void addPosition(int pos)
     {
         if(pos < 0) return;

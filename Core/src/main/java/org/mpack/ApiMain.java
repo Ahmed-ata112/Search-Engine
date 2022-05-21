@@ -62,7 +62,7 @@ class Api {
         //System.out.println("QUERY");
         //System.out.println(documents);
 
-
+        // window size
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {
