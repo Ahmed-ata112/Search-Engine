@@ -34,8 +34,8 @@ public class MongoDB {
             mongoClient = MongoClients.create(CONNECTION_STRING);
             searchEngineDb = mongoClient.getDatabase("SearchEngine");
 
-            //urlsCollection = searchEngineDb.getCollection("CrawledURLS");
-            urlsCollection = searchEngineDb.getCollection("CrawledURLStest");
+            urlsCollection = searchEngineDb.getCollection("CrawledURLS");
+            //urlsCollection = searchEngineDb.getCollection("CrawledURLStest");
             relationsCollection = searchEngineDb.getCollection("PagesRelations");
             stateCollection = searchEngineDb.getCollection("State");
             stateUrlsCollection = searchEngineDb.getCollection("StateURLS");

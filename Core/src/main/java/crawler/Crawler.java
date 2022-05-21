@@ -31,7 +31,7 @@ public class Crawler implements Runnable {
     static CountDownLatch latch;
 
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 500;
+    static final int MAX_PAGES = 5000;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -75,7 +75,7 @@ public class Crawler implements Runnable {
     public void run() {
 
         if (isReCrawling) {
-            reCrawl(reCrawlingList);
+            reCrawl(initialStrings);
         } else {
             crawl(initialStrings);
         }
@@ -136,7 +136,7 @@ public class Crawler implements Runnable {
 
     private Document parseDocument(String url) throws IOException {
         Document document = Jsoup.connect(url).parser(Parser.xmlParser()).get();
-        if (!document.select("html").attr("lang").contains("en")) {
+        if (!document.select("html").attr("lang").contains("en") || document.title().isEmpty()) {
             // not an english website
             return null;
         }
@@ -185,16 +185,13 @@ public class Crawler implements Runnable {
                 mongoDB.addToRelationsDB(url, neighbors);
                 mongoDB.insertUrl(url, document.html().trim());
             } catch (Exception e) {
-                System.err.println("For '" + url + "': " + e.getMessage());
-                System.out.println(e.getMessage());
+                System.err.println("For '" + url + "': Couldn't fetch");
             }
 
         }
         // Out but with links less than Count
         //state should Remain 0
         System.out.printf("thread finished remained %d and count = %d%n", neededThreads, latch.getCount());
-
-
         latch.countDown();
         //if its responsible for creating any threads - make them finish too
         while (neededThreads > 0) {
@@ -235,7 +232,7 @@ public class Crawler implements Runnable {
                     continue;
                 }
                 Elements linksOnPage = document.select("a[href]");
-                String hashed = encryptThisString(document.html());
+                String hashed = encryptThisString(document.body().text().trim());
                 synchronized (websites_hashes) {
                     if (websites_hashes.contains(hashed)) {
                         continue;

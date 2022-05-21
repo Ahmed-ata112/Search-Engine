@@ -99,11 +99,27 @@ public class CrawlerMain {
         initCrawling(numThreads, seedsArray);
     }
 
-    private static void reCrawl(int numThreads) {
-        mainMongo.getAllArraysBAck();
-        Crawler.setCount((int) mainMongo.getUrlCount());
+    private static void reCrawl(int numThreads) throws FileNotFoundException {
+
+        File file = new File(".\\attaches\\recrawl_seed.txt");    //creates a new file instance
+        FileReader fr = new FileReader(file);   //reads the file
+        ArrayList<String> seedsArray;
         Crawler.setIsReCrawling(true);
-        initCrawling(numThreads, new ArrayList<>());
+        System.out.println("Started Recrawling");
+        try (BufferedReader br = new BufferedReader(fr)) {
+            String line;
+            seedsArray = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                //Read what in The seed
+                seedsArray.add(line);
+            }
+            initCrawling(numThreads, seedsArray);
+            fr.close();    //closes the stream and release the resources
+        }  //creates a buffering character input stream
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

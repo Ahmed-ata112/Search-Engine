@@ -24,6 +24,12 @@ public class QueryProcessor {
     MongoCollection<org.bson.Document> InvertedDocs;
     MongoCollection<org.bson.Document> StemmingCollection;
 
+    public List<String> getAllWords() {
+        return allWords;
+    }
+
+    ArrayList<String> allWords ;
+
     public QueryProcessor() {
         InitMongoDb();
     }
@@ -37,12 +43,9 @@ public class QueryProcessor {
 
     public @NotNull List<List<Document>> ProcessQuery(List<String> Phrase, boolean isPhraseSearching) throws FileNotFoundException {
         //initialize data member variables
+        allWords = new ArrayList<>();
         searchTokens = Phrase;
-        if (Phrase.size() == 1)
-            moreThanOneIndicator = "";
-        else
-            moreThanOneIndicator = Phrase.stream().map(String::valueOf).collect(Collectors.joining(" "));
-        //remove stop words
+    //remove stop words
         if (stopWords.isEmpty())
             stopWords = Indexer.constructStopWords();
 
@@ -70,6 +73,7 @@ public class QueryProcessor {
                 }
                 arr.add(0, currentWord);
                 EquivalentWords.add(arr);
+                allWords.addAll(arr);
             }
 
         }
