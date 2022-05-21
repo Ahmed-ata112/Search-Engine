@@ -42,9 +42,7 @@ class paragraphGetter implements Runnable {
         for (int i = start; i < end; i++) {
             current = collectionsList.get(i);
             getParagraph(current);
-            synchronized (this) {
-                collectionsList.add(current);
-            }
+
         }
 
     }
@@ -204,7 +202,7 @@ public class Ranker {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println(rankedPages.size());
+        //System.out.println(rankedPages.size());
 
         rankedPages.sort(urlPriority);
 
