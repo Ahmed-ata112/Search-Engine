@@ -45,7 +45,6 @@ class paragraphGetter implements Runnable {
             current = collectionsList.get(i);
             if(phrase != null && QueryLen > current.token_count)
             {
-                System.out.println(QueryLen + " " + current.token_count);
                 current.ifDeleted = true;
                 continue;
             }
@@ -150,7 +149,7 @@ public class Ranker {
             //I think there is a more efficient way to get the url of the word rather than this
             for (Document d : webPages) {
 
-                if(allUrls.contains(d.getString("URL"))) System.out.println("jsdklfjskjf");
+                if(allUrls.contains(d.getString("URL"))) continue;
 
                 List<Integer> _flags;
                 /*_flags.set(0, 0);
@@ -170,9 +169,7 @@ public class Ranker {
                     url = rankedPages.get(urlPosition.get(d.getString("URL")));
 
                     //then update the priority
-                    System.out.println(url.token_count + "jsdklfjskjf");
                     url.token_count = url.token_count + 1;
-                    System.out.println(url.token_count+ "4444444");
                     url.priority += priority;
                     url.flags.add(url.flags.get(0) + _flags.get(0));
                     url.flags.add(url.flags.get(1) + _flags.get(1));
@@ -202,9 +199,10 @@ public class Ranker {
             }
         }
 
-        System.out.println(rankedPages);
+
         paragraphGetter pGet = new paragraphGetter();
         pGet.collectionsList = rankedPages;
+
         pGet.QueryLen = retDoc.size();
         pGet.mongoDB = mongoDB;
         if(isPhraseSearching)
