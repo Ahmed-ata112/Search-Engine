@@ -12,7 +12,7 @@ class collections
     String paragraph;
     String title;
     int TF_IDF;
-
+    int flag;
     int token_count;
     double priority;
     double pagerank;
@@ -24,9 +24,9 @@ class collections
 
     public int compare(collections url2){
         //positions --> the whole search query with the same order in sequence
-        if(wordNear > url2.wordNear)
+        if(wordNear < url2.wordNear)
             return 1;
-        else if(wordNear < url2.wordNear)
+        else if(wordNear > url2.wordNear)
             return -1;
 
         //tokenCount
