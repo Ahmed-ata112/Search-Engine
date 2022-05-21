@@ -64,6 +64,8 @@ public class PageRank {
     // One iteration of updating the score.
     public void updateScore() {
         for (PageNode origin : pagesMatrix.keySet()) {
+            if(origin == null)
+                continue;
             for (PageNode dest : pagesMatrix.get(origin)) {
                 int n = pagesMatrix.get(origin).size(); // number of pages current source points to
                 dest.setNewScore(dest.getNewScore() + (0.85) * (origin.getCurrentScore() / n));
