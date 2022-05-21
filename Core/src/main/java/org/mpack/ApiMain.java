@@ -60,27 +60,30 @@ class Api {
         List<List<Document>> documents = queryProcessor.ProcessQuery(ts, isPhraseSearching);
         HashSet<String> resultsUrls = new HashSet<>();
         //System.out.println("QUERY");
-        System.out.println(documents);
+        //System.out.println(documents);
 
         // window size
         var tokens = queryProcessor.getAllWords();
+        int wordsCount = queryProcessor.GetNumberOfRemovedStopWords(ts, documents.get(0).get(0).get("token_name").toString());
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {
                 continue;
             }
 
-            int wordsCount = queryProcessor.NumberOFRemovedStopWords;
+
 
 
             List< collections> ret = ranker.ranker2("", v,ts,isPhraseSearching, wordsCount);
             for (var a : ret) {
+                if(a.url.equals("https://time.com/collection/live-well/5559039/organization-tidying-up-benefits/"))
+                    System.out.println("url is found-------------------------------------------");
                 if (resultsUrls.add(a.url)) {
                     Pojo p1 = new Pojo(a.url, a.title, tokens, a.paragraph);
                     objectsList.add(p1);
                 }
             }
-
+            break;
         }
         Ranker.clearAllUrls();
         System.out.println("Sending  size: " + objectsList.size());

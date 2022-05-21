@@ -82,6 +82,11 @@ class paragraphGetter implements Runnable {
         }
         int windowLen = window.getSecond() - window.getFirst() + 1;
 
+        if(collection.url.equals("https://www.avclub.com/7-new-graphic-novels-to-get-you-through-the-coronavirus-1842526466"))
+        {
+            System.out.println("url is found-------------------------------------------");
+
+        }
         //if phrase searching
         if(isPhraseSearch)
         {
@@ -92,8 +97,8 @@ class paragraphGetter implements Runnable {
             }
 
 
-            startSearch = Math.max(1, window.getFirst() - wordsRemoved + 1);
-            endSearch = Math.min(text.size() - 1, window.getSecond() + phrase.size() - (windowLen - wordsRemoved));
+            startSearch = Math.max(1, window.getFirst() - wordsRemoved);
+            endSearch = Math.min(text.size() - 1, startSearch + phrase.size() );
 
         }
 
@@ -118,10 +123,10 @@ class paragraphGetter implements Runnable {
 */
         int i = 0;
         if(isPhraseSearch)
-       for(int k = startSearch - 1; k < endSearch; k++)
+       for(int k = startSearch; k < endSearch; k++)
         {
             System.out.println(parag.toString());
-            if(!phrase.get(i).equals(text.get(k + 1)))
+            if(!phrase.get(i).toLowerCase(Locale.ROOT).equals(text.get(k).toLowerCase(Locale.ROOT)))
             { collection.paragraph = null;
                 collection.ifDeleted = true;
                 return;
@@ -221,6 +226,15 @@ public class Ranker {
                     rankedPages.add(url);
                     urlPosition.put(url.url, rankedPages.size() - 1);
                 }
+
+/*
+                if(url.url.equals("https://www.avclub.com/7-new-graphic-novels-to-get-you-through-the-coronavirus-1842526466"))
+                {
+                    System.out.println("url is found-------------------------------------------");
+
+                }
+
+*/
 
                 for (int pos :
                         positions) {              //starts from 1 as 0 is the phrase ==> we may remove it

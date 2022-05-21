@@ -80,7 +80,7 @@ public class Indexer {
     //read the stop words
     public static @NotNull HashMap<Character, List<String>> constructStopWords() throws FileNotFoundException {
         //read the file contains stop words
-        File file = new File(".\\attaches\\stopwords.txt");
+        File file = new File("D:\\Academic_college\\second_year_2nd_term\\advanced_programming\\Project\\APT_SEARCH_ENGINE\\APTProject\\Core\\attaches\\stopwords.txt");
 
         Scanner scan = new Scanner(file);
         HashMap<Character, List<String>> stopWords = new HashMap<>();
@@ -121,7 +121,7 @@ public class Indexer {
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 
-        return parsed.text().replaceAll("<[^>]*>", "");
+        return parsed.text();//.replaceAll("<[^>]*>", "");
 
     }
 
@@ -137,7 +137,7 @@ public class Indexer {
         //text.replaceAll("[^a-zA-Z0-9\\s]", " ")
         //text.replaceAll()
         //Arrays.stream(text.split(" ")).toList();
-        int position = -1;
+        int position = 0; //////////////////////////////////////////////////////////////////////////////////////////////////doaa
         char c;
         for (int i = 0; i < text.length(); i++) {
             c = text.charAt(i);
