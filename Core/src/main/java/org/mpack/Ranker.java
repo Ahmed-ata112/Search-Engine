@@ -42,7 +42,6 @@ class paragraphGetter implements Runnable {
         for (int i = start; i < end; i++) {
             current = collectionsList.get(i);
             getParagraph(current);
-
         }
 
     }
@@ -65,17 +64,18 @@ class paragraphGetter implements Runnable {
             return;
         }
         int windowLen = window.getSecond() - window.getFirst() + 1;
+
+        //if phrase searching
         if(phrase != null)
         {
-            if(phrase.size() != windowLen)
+            if(phrase.size() < windowLen)
             {
-                synchronized (this)
-                {
-                    Ranker.urlsToRemove.add(000);
-                }
+                //collection.isDeleted = true;
+                return;
             }
+
         }
-        if (windowLen == collection.token_count) collection.wordNear = 100;
+        collection.wordNear = windowLen;
        /* if(windowLen < 20)
         {*/
         //windowLen = (int) Math.ceil((float)(20 - windowLen - 1) / 2);
@@ -99,7 +99,6 @@ class paragraphGetter implements Runnable {
 
 public class Ranker {
 
-    static ArrayList<Integer> urlsToRemove;
     static final MongodbIndexer mongoDB = new MongodbIndexer();
     static HashSet<String> allUrls = new HashSet<>();
     static public void clearAllUrls(){
@@ -114,7 +113,6 @@ public class Ranker {
 
         HashMap<String, Integer> urlPosition = new HashMap<>();
         ArrayList<collections> rankedPages = new ArrayList<>();
-        urlsToRemove = new ArrayList<>();
 
 
         ArrayList<String> query = new ArrayList<>();
@@ -214,7 +212,7 @@ public class Ranker {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
-        //System.out.println(rankedPages.size());
+
 
         rankedPages.sort(urlPriority);
 
