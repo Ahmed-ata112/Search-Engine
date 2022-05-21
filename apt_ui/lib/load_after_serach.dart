@@ -57,7 +57,7 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
       for (dynamic v in result[0]["tokens"]) {
         tokens.add(v as String);
       }
-
+      print(tokens);
       Navigator.popAndPushNamed(context, '/results_page', arguments: {
         '_wordSearched': searchQ,
         '_urls': resultsUrls,

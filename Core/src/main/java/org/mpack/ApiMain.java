@@ -64,6 +64,7 @@ class Api {
 
         // window size
         var tokens = queryProcessor.getAllWords();
+        tokens.addAll(ts);
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {

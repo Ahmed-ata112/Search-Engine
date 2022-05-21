@@ -31,7 +31,7 @@ public class Crawler implements Runnable {
     static CountDownLatch latch;
 
     ArrayList<String> initialStrings;
-    static final int MAX_PAGES = 5000;
+    static final int MAX_PAGES = 100;
     int neededThreads;
     static final MongoDB mongoDB = new MongoDB();
 
@@ -185,13 +185,13 @@ public class Crawler implements Runnable {
                 mongoDB.addToRelationsDB(url, neighbors);
                 mongoDB.insertUrl(url, document.html().trim());
             } catch (Exception e) {
-                System.err.println("For '" + url + "': Couldn't fetch");
+              //  System.err.println("For '" + url + "': Couldn't fetch");
             }
 
         }
         // Out but with links less than Count
         //state should Remain 0
-        System.out.printf("thread finished remained %d and count = %d%n", neededThreads, latch.getCount());
+//        System.out.printf("thread finished remained %d and count = %d%n", neededThreads, latch.getCount());
         latch.countDown();
         //if its responsible for creating any threads - make them finish too
         while (neededThreads > 0) {
@@ -253,8 +253,7 @@ public class Crawler implements Runnable {
                     }//now we really processed a link
                 }
             } catch (Exception e) {
-                System.err.println("For '" + url + "': " + e.getMessage());
-                System.out.println(e.getMessage());
+               // System.err.println("For '" + url + "': couldn't fetch" );
             }
 
         }

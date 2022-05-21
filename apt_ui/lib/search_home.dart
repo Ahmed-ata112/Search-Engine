@@ -31,6 +31,7 @@ class _SearchHomeState extends State<SearchHome> {
   /// This has to happen only once per app
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
+
     setState(() {});
   }
 
@@ -54,7 +55,11 @@ class _SearchHomeState extends State<SearchHome> {
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
+      if (_lastWords[_lastWords.length - 1] == '.') {
+        _lastWords = _lastWords.substring(0, _lastWords.length - 1);
+      }
       _wordSearched = _lastWords;
+
       _typeAheadController.text = _lastWords;
     });
   }
