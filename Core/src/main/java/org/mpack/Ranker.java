@@ -23,6 +23,7 @@ class paragraphGetter implements Runnable {
     ArrayList<collections> collectionsList;
 
     int count;
+    int QueryLen;
     MongodbIndexer mongoDB;
 
     Comparator<Pair<Integer, Integer>> sortPositions = Comparator.comparingInt(Pair::getFirst);
@@ -40,9 +41,14 @@ class paragraphGetter implements Runnable {
         else
             end = start + collectionsList.size() / count;
         for (int i = start; i < end; i++) {
-            current = collectionsList.get(i);
-            getParagraph(current);
 
+            current = collectionsList.get(i);
+            if(phrase != null && QueryLen > current.token_count)
+            {
+                current.ifDeleted = true;
+                continue;
+            }
+            getParagraph(current);
         }
 
     }
@@ -58,29 +64,35 @@ class paragraphGetter implements Runnable {
 
         collection.title = text.get(0);
 
+        collection.ifDeleted = false;
+
         collection.positions.sort(sortPositions);
+
         Pair<Integer, Integer> window = Interval.findSmallestWindow((ArrayList<Pair<Integer, Integer>>) collection.positions, collection.token_count);
         if (window == null) {
             collection.paragraph = "";
             return;
         }
         int windowLen = window.getSecond() - window.getFirst() + 1;
+
+        //if phrase searching
         if(phrase != null)
         {
-            if(phrase.size() != windowLen)
+            if(phrase.size() < windowLen)
             {
-                synchronized (this)
-                {
-                    Ranker.urlsToRemove.add(000);
-                }
+                collection.ifDeleted = true;
+                return;
             }
+
         }
-        if (windowLen == collection.token_count) collection.wordNear = 100;
+        collection.wordNear = windowLen;
+        collection.subQuery = (windowLen == collection.token_count) ? 1 : 0;
+        System.out.println(windowLen);
        /* if(windowLen < 20)
         {*/
         //windowLen = (int) Math.ceil((float)(20 - windowLen - 1) / 2);
-        start = Math.max(1, window.getFirst() - 4);
-        end = Math.min(text.size() - 1, window.getSecond() + 4);
+        start = Math.max(1, window.getFirst() - 7);
+        end = Math.min(text.size() - 1, window.getSecond() + 7);
       /*  }
         else
         {
@@ -99,7 +111,6 @@ class paragraphGetter implements Runnable {
 
 public class Ranker {
 
-    static ArrayList<Integer> urlsToRemove;
     static final MongodbIndexer mongoDB = new MongodbIndexer();
     static HashSet<String> allUrls = new HashSet<>();
     static public void clearAllUrls(){
@@ -114,7 +125,6 @@ public class Ranker {
 
         HashMap<String, Integer> urlPosition = new HashMap<>();
         ArrayList<collections> rankedPages = new ArrayList<>();
-        urlsToRemove = new ArrayList<>();
 
 
         ArrayList<String> query = new ArrayList<>();
@@ -138,8 +148,9 @@ public class Ranker {
             List<Document> webPages = (List<Document>) document.get("documents");
             //I think there is a more efficient way to get the url of the word rather than this
             for (Document d : webPages) {
+
                 if(allUrls.contains(d.getString("URL"))) continue;
-                allUrls.add(d.getString("URL"));
+
                 List<Integer> _flags;
                 /*_flags.set(0, 0);
                 _flags.set(1, 0);*/
@@ -158,10 +169,11 @@ public class Ranker {
                     url = rankedPages.get(urlPosition.get(d.getString("URL")));
 
                     //then update the priority
-                    url.token_count++;
+                    url.token_count = url.token_count + 1;
                     url.priority += priority;
                     url.flags.add(url.flags.get(0) + _flags.get(0));
                     url.flags.add(url.flags.get(1) + _flags.get(1));
+                    rankedPages.set(urlPosition.get(d.getString("URL")), url);
 
                     //url.pagerank = pagRank; //no need - already done at the first insertion
 
@@ -188,10 +200,10 @@ public class Ranker {
         }
 
 
-        int ifFound = 0;
-
         paragraphGetter pGet = new paragraphGetter();
         pGet.collectionsList = rankedPages;
+
+        pGet.QueryLen = retDoc.size();
         pGet.mongoDB = mongoDB;
         if(isPhraseSearching)
             pGet.phrase = originalTokens;
@@ -214,7 +226,18 @@ public class Ranker {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
-        //System.out.println(rankedPages.size());
+        ArrayList<collections> temp = null;
+        if(isPhraseSearching) {
+            temp = new ArrayList<>();
+
+            for (collections rankedPage : rankedPages) {
+
+                if (!rankedPage.ifDeleted) temp.add(rankedPage);
+
+            }
+            rankedPages = temp;
+        }
+        allUrls.addAll(urlPosition.keySet());
 
         rankedPages.sort(urlPriority);
 
