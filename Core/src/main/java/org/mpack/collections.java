@@ -12,7 +12,10 @@ class collections
     String paragraph;
     String title;
     int TF_IDF;
-    int flag;
+
+    int sub_query;
+
+    int if_deleted;
     int token_count;
     double priority;
     double pagerank;
@@ -23,13 +26,19 @@ class collections
 
 
     public int compare(collections url2){
-        //positions --> the whole search query with the same order in sequence
-        if(wordNear < url2.wordNear)
+            //positions --> the whole search query with the same order in sequence
+        if(sub_query > url2.sub_query)
+            return 1;
+        else if(sub_query < url2.sub_query)
+            return -1;
+
+            //window size
+        else if(wordNear < url2.wordNear)
             return 1;
         else if(wordNear > url2.wordNear)
             return -1;
 
-        //tokenCount
+            //tokenCount
         if(token_count > url2.token_count)
             return 1;
         else if (token_count < url2.token_count)

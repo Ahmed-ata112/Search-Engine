@@ -19,7 +19,7 @@ import java.util.*;
 
 
 class paragraphGetter implements Runnable {
-    ArrayList<String> phrase;
+    List<String> phrase;
     ArrayList<collections> collectionsList;
 
     int count;
@@ -57,16 +57,24 @@ class paragraphGetter implements Runnable {
         collection.wordNear = 0;
 
         collection.title = text.get(0);
-        //if (collection.url.equals("https://time.com/6156587/time-studios-to-create-childrens-series-based-on-the-littles-nft/"))
 
         collection.positions.sort(sortPositions);
-        //System.out.println(collection.positions);
         Pair<Integer, Integer> window = Interval.findSmallestWindow((ArrayList<Pair<Integer, Integer>>) collection.positions, collection.token_count);
         if (window == null) {
             collection.paragraph = "";
             return;
         }
         int windowLen = window.getSecond() - window.getFirst() + 1;
+        if(phrase != null)
+        {
+            if(phrase.size() != windowLen)
+            {
+                synchronized (this)
+                {
+                    Ranker.urlsToRemove.add(000);
+                }
+            }
+        }
         if (windowLen == collection.token_count) collection.wordNear = 100;
        /* if(windowLen < 20)
         {*/
@@ -90,6 +98,8 @@ class paragraphGetter implements Runnable {
 }
 
 public class Ranker {
+
+    static ArrayList<Integer> urlsToRemove;
     static final MongodbIndexer mongoDB = new MongodbIndexer();
     static HashSet<String> allUrls = new HashSet<>();
     static public void clearAllUrls(){
@@ -99,11 +109,12 @@ public class Ranker {
     Comparator<collections> urlPriority = (url2, url1) -> url1.compare(url2);
 
 
-    public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> oroginalTokens, boolean isPhraseSearching) {
+    public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> originalTokens, boolean isPhraseSearching) {
 
 
         HashMap<String, Integer> urlPosition = new HashMap<>();
         ArrayList<collections> rankedPages = new ArrayList<>();
+        urlsToRemove = new ArrayList<>();
 
 
         ArrayList<String> query = new ArrayList<>();
@@ -179,11 +190,12 @@ public class Ranker {
 
         int ifFound = 0;
 
-        paragraphGetter pGet = null;
-        pGet = new paragraphGetter();
+        paragraphGetter pGet = new paragraphGetter();
         pGet.collectionsList = rankedPages;
         pGet.mongoDB = mongoDB;
-        pGet.phrase = query;
+        if(isPhraseSearching)
+            pGet.phrase = originalTokens;
+        else pGet.phrase = null;
         pGet.count = Math.max(1, rankedPages.size() / 100);
 
         ArrayList<Thread> threads = new ArrayList<>(pGet.count);
