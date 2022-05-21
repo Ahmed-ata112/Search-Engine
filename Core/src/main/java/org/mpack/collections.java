@@ -40,9 +40,9 @@ class collections
             return -1;
 
             //window size
-        else if(wordNear < url2.wordNear)
+        else if(wordNear < url2.wordNear && wordNear >= token_count)
             return 1;
-        else if(wordNear > url2.wordNear)
+        else if(wordNear > url2.wordNear && wordNear >= token_count)
             return -1;
 
 
