@@ -18,11 +18,19 @@ import java.util.stream.Collectors;
 public class QueryProcessor {
     String moreThanOneIndicator;
     List<String> searchTokens;
+    int NumberOFRemovedStopWords;
     static HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
+
     MongoCollection<org.bson.Document> InvertedDocs;
     MongoCollection<org.bson.Document> StemmingCollection;
+
+    public List<String> getAllWords() {
+        return allWords;
+    }
+
+    ArrayList<String> allWords ;
 
     public QueryProcessor() {
         InitMongoDb();
@@ -37,11 +45,8 @@ public class QueryProcessor {
 
     public @NotNull List<List<Document>> ProcessQuery(List<String> Phrase, boolean isPhraseSearching) throws FileNotFoundException {
         //initialize data member variables
-        searchTokens = Phrase;
-        if (Phrase.size() == 1)
-            moreThanOneIndicator = "";
-        else
-            moreThanOneIndicator = Phrase.stream().map(String::valueOf).collect(Collectors.joining(" "));
+        allWords = new ArrayList<>();
+        searchTokens = new ArrayList<>(Phrase);
         //remove stop words
         if (stopWords.isEmpty())
             stopWords = Indexer.constructStopWords();
@@ -70,6 +75,7 @@ public class QueryProcessor {
                 }
                 arr.add(0, currentWord);
                 EquivalentWords.add(arr);
+                allWords.addAll(arr);
             }
 
         }
@@ -127,14 +133,27 @@ public class QueryProcessor {
         return nameToDocsHM;
     }
 
+    private int GetNumberOfRemovedStopWords(List<String>Phrase,String FirstOriginalWords)
+    {
+        int counter = 0;
+        for (int i=0;i< Phrase.size();i++)
+        {
+            if (Phrase.get(i)==FirstOriginalWords)
+                break;
+            else
+                counter++;
+        }
+        return counter;
+    }
+
+    public int NumberOfRemovedStopWords(){return NumberOFRemovedStopWords;}
+
     public List<String> GetSearchTokens() {
         return searchTokens;
     }
 
     //if the search query is one word return en ampty string otherwise it return the search query as is is
-    public String GetQueryPhraseIndicator() {
-        return moreThanOneIndicator;
-    }
+
 
     public static void main(String[] arg) throws FileNotFoundException {
         QueryProcessor q = new QueryProcessor();
