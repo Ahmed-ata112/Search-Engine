@@ -10,9 +10,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1cc603b1-0f0c-4717-b7e6-c8eeaf4a1578" name="Changes" comment="..">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_api_1_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__log4j_log4j_1_2_12.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_xbean_xbean_reflect_3_4.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_8_2022_12_41_PM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_8_2022_12_41_PM__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_9_2022_6_25_PM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_9_2022_6_25_PM__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_9_2022_6_28_PM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_9_2022_6_28_PM__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/9/09f3efe80ad33bb38232d2ec961ad48efa46176b" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/1/91fcac4dc2635a92d415b0c5a807c31da691ad7e" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Indexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/MongodbIndexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/MongodbIndexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" beforeDir="false" afterPath="$PROJECT_DIR$/Core/src/main/java/org/mpack/Ranker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apt_ui/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/apt_ui/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apt_ui/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/apt_ui/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apt_ui/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/apt_ui/windows/flutter/generated_plugins.cmake" afterDir="false" />
@@ -32,11 +45,44 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Rufaida" />
+        <entry key="$PROJECT_DIR$" value="atta-branch" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="SET_USER_NAME_GLOBALLY" value="false" />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="Doaa" />
+                    <option name="lastUsedInstant" value="1652973358" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="atta-branch" />
+                    <option name="lastUsedInstant" value="1652971418" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="Rufaida" />
+                    <option name="lastUsedInstant" value="1652898679" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://C:/Flutter/flutter/.pub-cache/hosted/pub.dartlang.org/stack_trace-1.10.0/lib/src/stack_zone_specification.dart" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -47,12 +93,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/aatta/eclipse-workspace/project222/APTProject/Core"
-  }
-}]]></component>
+  <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="dart.analysis.tool.window.visible" value="false" />
+    <property name="show.migrate.to.gradle.popup" value="false" />
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Academic_college\second_year_2nd_term\advanced_programming\Project\APT_Project_Last\Core\src\main\java\org\mpack" />
@@ -138,13 +189,13 @@
     </configuration>
     <configuration name="ApiMain (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="APTProject2" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="org.mpack.ApiMain" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="org.mpack.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="org.mpack.ApiMain" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -159,14 +210,16 @@
     <list>
       <item itemvalue="Application.Indexer" />
       <item itemvalue="Application.CrawlerMain" />
+      <item itemvalue="Flutter.main.dart" />
       <item itemvalue="Spring Boot.ApiMain" />
       <item itemvalue="Spring Boot.ApiMain (1)" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Spring Boot.ApiMain (1)" />
-        <item itemvalue="Spring Boot.ApiMain" />
         <item itemvalue="Application.Indexer" />
+        <item itemvalue="Spring Boot.ApiMain" />
+        <item itemvalue="Flutter.main.dart" />
         <item itemvalue="Application.CrawlerMain" />
       </list>
     </recent_temporary>
@@ -202,7 +255,10 @@
       <workItem from="1652220868508" duration="5607000" />
       <workItem from="1652360009769" duration="4346000" />
       <workItem from="1652369843300" duration="5060000" />
-      <workItem from="1653090483855" duration="74000" />
+      <workItem from="1652910220106" duration="820000" />
+      <workItem from="1652971387889" duration="2254000" />
+      <workItem from="1653043280122" duration="1295000" />
+      <workItem from="1653086479336" duration="655000" />
     </task>
     <task id="LOCAL-00001" summary="All new Project with Spring boot and MongoDBB">
       <created>1650219025204</created>
@@ -330,6 +386,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="All new Project with Spring boot and MongoDBB" />
@@ -349,7 +406,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Core/src/main/java/org/mpack/ApiMain.java</url>
-          <line>88</line>
+          <line>85</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
