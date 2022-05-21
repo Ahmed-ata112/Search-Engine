@@ -69,7 +69,7 @@ class Api {
                 continue;
             }
 
-            List< collections> ret = ranker.ranker2("", v);
+            List< collections> ret = ranker.ranker2("", v,ts,isPhraseSearching);
             for (var a : ret) {
                 if (resultsUrls.add(a.url)) {
                     Pojo p1 = new Pojo(a.url, a.title, ts, a.paragraph);

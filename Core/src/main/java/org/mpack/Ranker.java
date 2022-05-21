@@ -99,7 +99,7 @@ public class Ranker {
     Comparator<collections> urlPriority = (url2, url1) -> url1.compare(url2);
 
 
-    public List<collections> ranker2(String phrase, List<Document> retDoc) {
+    public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> oroginalTokens, boolean isPhraseSearching) {
 
 
         HashMap<String, Integer> urlPosition = new HashMap<>();
@@ -208,5 +208,6 @@ public class Ranker {
 
         return rankedPages;
     }
+
 
 }
