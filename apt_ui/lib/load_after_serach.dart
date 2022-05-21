@@ -24,9 +24,13 @@ class _LoadAfterLoginState extends State<LoadAfterLogin> {
       dynamic result = await DBManager.executeQuery(searchQ);
 
       for (var e in result) {
-        resultsUrls.add(e["url"]);
-        headers.add(e["header"]);
-        resultsParagraphs.add(e["paragraph"]);
+        print(e);
+        resultsUrls.add(e["url"] ?? "");
+        headers.add(e["header"] ?? "");
+        resultsParagraphs.add(e["paragraph"] ?? "");
+        print(resultsUrls.last);
+        print(headers.last);
+        print(resultsParagraphs.last);
       }
       ///////////////////////////////////////////////
 

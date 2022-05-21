@@ -78,7 +78,7 @@ class Api {
             }
 
         }
-
+        Ranker.clearAllUrls();
         System.out.println("Sending  size: " + objectsList.size());
         return objectsList;
     }

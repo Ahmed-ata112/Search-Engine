@@ -94,7 +94,9 @@ class paragraphGetter implements Runnable {
 public class Ranker {
     static final MongodbIndexer mongoDB = new MongodbIndexer();
     static HashSet<String> allUrls = new HashSet<>();
-
+    static public void clearAllUrls(){
+        allUrls = new HashSet<>();
+    }
 
     Comparator<collections> urlPriority = (url2, url1) -> url1.compare(url2);
 
