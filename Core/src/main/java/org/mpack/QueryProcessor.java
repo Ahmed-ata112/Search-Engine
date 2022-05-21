@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 public class QueryProcessor {
     String PhraseIndicator;
     List<String> SearchTokens;
+
+    int NumberOFRemovedStopWords;
     HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
@@ -38,7 +40,7 @@ public class QueryProcessor {
         for (int i = 0;i<Phrase.size();i++)
             Phrase.set(i,Phrase.get(i).trim());
         //intialzie data member variables
-        SearchTokens = Phrase;
+        SearchTokens = new ArrayList<>(Phrase);
         if (Phrase.size()==1)
             PhraseIndicator = "";
         else
@@ -46,12 +48,13 @@ public class QueryProcessor {
         //remove stop words
         stopWords = Indexer.constructStopWords();
         Indexer.removeStopWords(SearchTokens,stopWords);
-        //list that contain all equivalent words from data base
+        NumberOFRemovedStopWords = GetNumberOfRemovedStopWords(Phrase, SearchTokens.get(0));
+        //list that contain all equivalent words from database
         List<List<String>> EquivalentWords = new ArrayList<>();
-        for (int i=0;i< Phrase.size();i++)
+        for (int i=0;i< SearchTokens.size();i++)
         {
             //get the original word , its stemming , the equivalent words and put all of them in the EquWords List
-            String OriginalWord = Phrase.get(i);
+            String OriginalWord = SearchTokens.get(i);
             PorterStemmer stem = new PorterStemmer();
             String StemmedWord = stem.stemWord(OriginalWord);
             StemmedWord = StemmedWord.toLowerCase();
@@ -86,7 +89,7 @@ public class QueryProcessor {
         {
             String[] splitedString = QueryEquivalentWordsPermutation.get(i).trim().split(" ");
             List<Document> temp = new ArrayList<>();
-            for (int j = 0;j<Phrase.size();j++)
+            for (int j = 0;j<SearchTokens.size();j++)
             {
                 temp.add(NameToDoc.get(splitedString[j]));
             }
@@ -130,6 +133,19 @@ public class QueryProcessor {
         return NameToDocsHM;
     }
 
+    private int GetNumberOfRemovedStopWords(List<String>Phrase,String FirstOriginalWords)
+    {
+        int counter = 0;
+        for (int i=0;i< Phrase.size();i++)
+        {
+            if (Phrase.get(i)==FirstOriginalWords)
+                break;
+            else
+                counter++;
+        }
+        return counter;
+    }
+
     public List<String> GetSearchTokens()
     {
         return SearchTokens;
@@ -139,6 +155,8 @@ public class QueryProcessor {
     public String GetQueryPhraseIndicator(){
         return PhraseIndicator;
     }
+
+    public int NumberOfRemovedStopWords(){return NumberOFRemovedStopWords;}
 
     public static void main(String[] arg) throws FileNotFoundException {
         QueryProcessor q = new QueryProcessor();
