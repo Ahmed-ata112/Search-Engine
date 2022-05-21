@@ -45,7 +45,8 @@ public class QueryProcessor {
     public @NotNull List<List<Document>> ProcessQuery(List<String> Phrase, boolean isPhraseSearching) throws FileNotFoundException {
         //initialize data member variables
         allWords = new ArrayList<>();
-        searchTokens = Phrase;
+        searchTokens = new ArrayList<>();
+        searchTokens.addAll(Phrase);
     //remove stop words
         if (stopWords.isEmpty())
             stopWords = Indexer.constructStopWords();

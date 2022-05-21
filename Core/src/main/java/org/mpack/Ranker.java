@@ -42,11 +42,13 @@ class paragraphGetter implements Runnable {
             end = collectionsList.size();
         else
             end = start + collectionsList.size() / count;
+        int j = 0;
         for (int i = start; i < end; i++) {
 
             current = collectionsList.get(i);
             if(isPhraseSearch && queryLen > current.token_count)
             {
+
                 current.ifDeleted = true;
                 continue;
             }
@@ -56,10 +58,13 @@ class paragraphGetter implements Runnable {
     }
 
     void getParagraph(collections collection) {
+
         ArrayList<String> text = mongoDB.getTextUrl(collection.url);
 
-        int start;
-        int end;
+        int startParagraph;
+        int endParagraph;
+        int startSearch = 0;
+        int endSearch = 0;
         StringBuilder parag = new StringBuilder();
 
         collection.wordNear = 0;
@@ -81,19 +86,20 @@ class paragraphGetter implements Runnable {
         if(isPhraseSearch)
         {
             if(phrase.size() < windowLen)
-            {
+            {System.out.println(phrase.size() + " " + windowLen);
                 collection.ifDeleted = true;
                 return;
             }
 
 
-            start = Math.max(1, window.getFirst() - wordsRemoved);
-            end = Math.min(text.size() - 1, window.getSecond() + phrase.size() - (windowLen - wordsRemoved));
+            startSearch = Math.max(1, window.getFirst() - wordsRemoved + 1);
+            endSearch = Math.min(text.size() - 1, window.getSecond() + phrase.size() - (windowLen - wordsRemoved));
 
         }
-        else
-            start = Math.max(1, window.getFirst() - 7);
-            end = Math.min(text.size() - 1, window.getSecond() + 7);
+
+        startParagraph = Math.max(1, window.getFirst() - 20);
+        endParagraph = Math.min(text.size() - 2, window.getSecond() + 20);
+
         collection.wordNear = windowLen;
 
         collection.subQuery = (windowLen == phrase.size()) ? 1 : 0;
@@ -110,10 +116,24 @@ class paragraphGetter implements Runnable {
             end = window.getSecond();
         }*//*
 */
-
-        for (int k = start - 1; k < end; k++) {
-            parag.append(text.get(k + 1)).append(" ");
+        int i = 0;
+        if(isPhraseSearch)
+       for(int k = startSearch - 1; k < endSearch; k++)
+        {
+            System.out.println(parag.toString());
+            if(!phrase.get(i).equals(text.get(k + 1)))
+            { collection.paragraph = null;
+                collection.ifDeleted = true;
+                return;
+            }
+            i++;
         }
+        for (int k = startParagraph - 1; k <= endParagraph; k++) {
+
+            parag.append(text.get(k + 1)).append(" ");
+
+        }
+        System.out.println(parag.toString());
         collection.paragraph = parag.toString();
     }
 
@@ -133,6 +153,7 @@ public class Ranker {
     public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> originalTokens, boolean isPhraseSearching, int wordsRem) {
 
 
+        System.out.println(isPhraseSearching);
         HashMap<String, Integer> urlPosition = new HashMap<>();
         ArrayList<collections> rankedPages = new ArrayList<>();
 
@@ -140,7 +161,6 @@ public class Ranker {
         ArrayList<String> query = new ArrayList<>();
 
 
-        query.add(phrase);
 
 
         double IDF = 0;
@@ -180,6 +200,7 @@ public class Ranker {
 
                     //then update the priority
                     url.token_count = url.token_count + 1;
+                    System.out.println(url.token_count);
                     url.priority += priority;
                     url.flags.add(url.flags.get(0) + _flags.get(0));
                     url.flags.add(url.flags.get(1) + _flags.get(1));
@@ -208,12 +229,11 @@ public class Ranker {
 
             }
         }
-
+        System.out.println(rankedPages.size());
 
         paragraphGetter pGet = new paragraphGetter();
-        if(isPhraseSearching)
-            pGet.isPhraseSearch = true;
-        else pGet.isPhraseSearch = false;
+        pGet.isPhraseSearch = isPhraseSearching;
+
         pGet.collectionsList = rankedPages;
 
         pGet.queryLen = retDoc.size();
