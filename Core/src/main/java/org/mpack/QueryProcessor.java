@@ -1,5 +1,5 @@
-
 package org.mpack;
+
 import ca.rmen.porterstemmer.PorterStemmer;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -7,82 +7,97 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
+
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class QueryProcessor {
-    HashMap<Integer,ArrayList<Document>> result = new HashMap<>();
-    String Phrase;
-    List<String> SearchTokens;
-    HashMap<Character, List<String>> stopWords = new HashMap<>();
+    String moreThanOneIndicator;
+    List<String> searchTokens;
+    static HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
     MongoCollection<org.bson.Document> InvertedDocs;
     MongoCollection<org.bson.Document> StemmingCollection;
-    public QueryProcessor()
-    {
+
+    public QueryProcessor() {
         InitMongoDb();
     }
 
-    private void InitMongoDb()
-    {
+    private void InitMongoDb() {
         mongoClient = MongoClients.create(MongodbIndexer.CONNECTION_STRING);
         DataBase = mongoClient.getDatabase("SearchEngine");
         InvertedDocs = DataBase.getCollection("InvertedFile");
         StemmingCollection = DataBase.getCollection("StemmingCollection");
     }
 
-    public @NotNull List<List<Document>> Stem(List<String> Phrase)
-    {
-        //list that contain all equivalent words from data base
+    public @NotNull List<List<Document>> ProcessQuery(List<String> Phrase, boolean isPhraseSearching) throws FileNotFoundException {
+        //initialize data member variables
+        searchTokens = Phrase;
+        if (Phrase.size() == 1)
+            moreThanOneIndicator = "";
+        else
+            moreThanOneIndicator = Phrase.stream().map(String::valueOf).collect(Collectors.joining(" "));
+        //remove stop words
+        if (stopWords.isEmpty())
+            stopWords = Indexer.constructStopWords();
+
+        Indexer.removeStopWords(searchTokens, stopWords,null);
+        //list that contain all equivalent words from database
         List<List<String>> EquivalentWords = new ArrayList<>();
-        for (int i=0;i< Phrase.size();i++)
-        {
+
+        PorterStemmer stem = new PorterStemmer();
+        for (String currentWord : searchTokens) {
             //get the original word , its stemming , the equivalent words and put all of them in the EquWords List
-            String OriginalWord = Phrase.get(i);
-            PorterStemmer stem = new PorterStemmer();
-            String StemmedWord = stem.stemWord(OriginalWord);
-            StemmedWord = StemmedWord.toLowerCase();
-            Document Doc;
-            Doc = StemmingCollection.find(new Document("stem_word", StemmedWord)).projection(Document.parse("{Equivalent_words: 1 ,_id: 0}")).first();
-            if (Doc != null) {
+
+
+            String currentRoot = stem.stemWord(currentWord).toLowerCase();
+
+            //TODO Replace this with a function from the database handler
+            Document doc = StemmingCollection.find(new Document("stem_word", currentRoot)).projection(Document.parse("{Equivalent_words: 1 ,_id: 0}")).first();
+
+            if (doc != null) {
                 //make an array list of all Equivalent words with original word in the beginning of it
-                ArrayList<String> arr = (ArrayList<String>) Doc.get("Equivalent_words");
-                arr.remove(OriginalWord);
-                arr.add(0,OriginalWord);
+                ArrayList<String> arr = new ArrayList<>();
+                if (!isPhraseSearching) {
+                    arr = (ArrayList<String>) doc.get("Equivalent_words");
+                    arr.add(currentRoot);
+                    arr.remove(currentWord);
+                }
+                arr.add(0, currentWord);
                 EquivalentWords.add(arr);
             }
-            else {
-                EquivalentWords.add(new ArrayList<String>());
-            }
-        }
 
+        }
         //get all combinations of equivalent words of the search query
         String current = "";
-        List<String> result = new ArrayList<>();
-        generatePermutations(EquivalentWords,result,0,current);
+        List<String> queryEquivalentWordsPermutation = new ArrayList<>();
+        generatePermutations(EquivalentWords, queryEquivalentWordsPermutation, 0, current);
 
         //construct a hashmap that contain docs mapped to its word
-        HashMap<String,Document> NameToDoc = ConstructNameToDocsHashMap(EquivalentWords);
-
+        HashMap<String, Document> nameToDocsHashMap = constructNameToDocsHashMap(EquivalentWords);
         //create a list of list document which express the search query
-        List<List<Document>> DocsList = new ArrayList<>();
+        List<List<Document>> docslist = new ArrayList<>();
 
-        //loop on the result list and fill DocsList with the right documents
-        for (int i=0;i<result.size();i++)
-        {
-            String[] splitedString = result.get(i).trim().split(" ");
+        //loop on the QueryEquivalentWordsPermutation list and fill DocsList with the right documents
+        for (String value : queryEquivalentWordsPermutation) {
+
+            String[] splitString = value.trim().split(" ");
             List<Document> temp = new ArrayList<>();
-            for (int j = 0;j<Phrase.size();j++)
-            {
-                temp.add(NameToDoc.get(splitedString[j]));
+
+            for (String s : splitString) {
+                var t = nameToDocsHashMap.get(s);
+                if (t != null)
+                    temp.add(t);
             }
-            DocsList.add(temp);
+            docslist.add(temp);
         }
 
-        return DocsList;
+        return docslist;
     }
 
 
@@ -94,112 +109,39 @@ public class QueryProcessor {
         }
 
         for (int i = 0; i < lists.get(depth).size(); i++) {
-            generatePermutations(lists, result, depth + 1, current+" "+lists.get(depth).get(i));
+            generatePermutations(lists, result, depth + 1, current + " " + lists.get(depth).get(i));
         }
     }
 
-    private HashMap<String,Document> ConstructNameToDocsHashMap(List<List<String>> EquivalentWords)
-    {
+    private HashMap<String, Document> constructNameToDocsHashMap(List<List<String>> equivalentWords) {
 
-        HashMap<String,Document> NameToDocsHM = new HashMap<>();
-        for (int i = 0;i<EquivalentWords.size();i++)
-        {
-            for (int j=0;j<EquivalentWords.get(i).size();j++)
-            {
-                Document Doc = InvertedDocs.find(new Document("token_name",  EquivalentWords.get(i).get(j))).first();
-                if (Doc != null) {
-                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i).get(j),Doc);
-                }
-                else
-                {
-                    NameToDocsHM.putIfAbsent(EquivalentWords.get(i).get(j),null);
-                }
+        HashMap<String, Document> nameToDocsHM = new HashMap<>();
+        Document doc;
+
+        for (List<String> equivalentWord : equivalentWords) {
+            for (String s : equivalentWord) {
+                doc = InvertedDocs.find(new Document("token_name", s)).first();
+                nameToDocsHM.putIfAbsent(s, doc);
             }
         }
-        return NameToDocsHM;
+        return nameToDocsHM;
     }
 
-    public List<String> GetSearchTokens()
-    {
-        return SearchTokens;
+    public List<String> GetSearchTokens() {
+        return searchTokens;
     }
 
-
-
-/*void generatePermutations(@NotNull List<List<String>> lists, List<List<Document>> result, int depth, List<Document> current) {
-        if (depth == lists.size()) {
-            List<Document> temp = new ArrayList<>();
-            temp.addAll(current);
-            result.add(temp);
-            return;
-        }
-
-        for (int i = 0; i < lists.get(depth).size(); i++) {
-
-            Document Doc = InvertedDocs.find(new Document("token_name",  lists.get(depth).get(i))).first();
-            if (Doc != null) {
-                current.add(Doc);
-            }
-            else
-            {
-                current.add(null);
-            }
-            generatePermutations(lists, result, depth + 1, current);
-            current.remove(current.size()-1);
-        }
-    }*//*
-
-
-
-   */
-/* public HashMap<Integer,ArrayList<Document>> QueryProcessingFunction (String SearchQuery) throws FileNotFoundException {
-        stopWords = Indexer.constructStopWords();
-        SearchTokens = List.of(SearchQuery.toLowerCase().split(" "));
-        Indexer.removeStopWords(SearchTokens,stopWords);
-        ArrayList<Document> OriginalWords = new ArrayList<>();
-        ArrayList<Document> StemmedWords = new ArrayList<>();
-        for (int i=0;i<SearchTokens.size();i++) {
-            //1- retrieve the original word document and put it in hashmap
-            Document Doc = InvertedDocs.find(new Document("token_name", SearchTokens.get(i))).first();
-            if (Doc != null) {
-                OriginalWords.add(Doc);
-            }
-            //2-stemming process
-            String StemmedWord = Stem(SearchTokens);
-            //3- retrieve documents for stemmed words from stemming collection
-            Doc = StemmingCollection.find(new Document("stem_word", StemmedWord)).projection(Document.parse("{Equivalent_words: 1 ,_id: 0}")).first();
-            if (Doc != null) {
-                //4-make an array list of stemming words
-                ArrayList<String> arr = (ArrayList<String>) Doc.get("Equivalent_words");
-                for (String s : arr) {
-                    //5- retrieve documents for stemmed words from inverted file and put it in the hashmap
-                    Doc = InvertedDocs.find(new Document("token_name", s)).first();
-                    StemmedWords.add(Doc);
-                }
-            }
-            result.putIfAbsent(0,OriginalWords);
-            result.putIfAbsent(1,StemmedWords);
-        }
-        return result;
-    }*/
-
-
-    public HashMap<Integer,ArrayList<Document>> PhraseProcessing (String SearchQuery) {
-        //1-construct and remove stop words
-        //2-split the phrase into array of words
-        //3-search for a certain word in the database
-        //4-parse retrieved URLs
-        //5- if it contain the whole phrase put it into the hashmap else parse the next URL
-        return result;
+    //if the search query is one word return en ampty string otherwise it return the search query as is is
+    public String GetQueryPhraseIndicator() {
+        return moreThanOneIndicator;
     }
-
 
     public static void main(String[] arg) throws FileNotFoundException {
         QueryProcessor q = new QueryProcessor();
         List<String> temp = new ArrayList<>();
         temp.add("cancelled");
         temp.add("tree");
-        q.Stem(temp);
+        q.ProcessQuery(temp, false);
 
     }
 }

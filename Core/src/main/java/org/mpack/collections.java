@@ -1,5 +1,8 @@
 package org.mpack;
 
+
+import org.springframework.data.util.Pair;
+
 import java.util.List;
 
 public
@@ -9,11 +12,12 @@ class collections
     String paragraph;
     String title;
     int TF_IDF;
+
     int token_count;
     double priority;
     double pagerank;
     List<Integer> flags;
-    List<List<Integer>> positions;
+    List<Pair<Integer,Integer>> positions;
 
     int wordNear;
 
