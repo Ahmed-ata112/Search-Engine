@@ -86,7 +86,7 @@ class paragraphGetter implements Runnable {
 
         }
         collection.wordNear = windowLen;
-        collection.subQuery = (windowLen == collection.token_count) ? 1 : 0;
+        collection.subQuery = (windowLen == phrase.size()) ? 1 : 0;
         System.out.println(windowLen);
        /* if(windowLen < 20)
         {*/

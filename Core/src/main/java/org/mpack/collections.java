@@ -27,16 +27,16 @@ class collections
 
     public int compare(collections url2){
 
-        //tokenCount
-        if(token_count > url2.token_count)
-            return 1;
-        else if (token_count < url2.token_count)
-            return -1;
-
         //positions --> the whole search query with the same order in sequence
         if(subQuery > url2.subQuery)
             return 1;
         else if(subQuery < url2.subQuery)
+            return -1;
+
+            //tokenCount
+        else if(token_count > url2.token_count)
+            return 1;
+        else if (token_count < url2.token_count)
             return -1;
 
             //window size
@@ -59,9 +59,9 @@ class collections
             return -1;
 
             //priority  IDF-TF -- pagerank
-        else if (TF_IDF + ((1/3) * pagerank) > url2.TF_IDF + ((1/3) * url2.pagerank))
+        else if (TF_IDF + (((float)1/3) * pagerank) > url2.TF_IDF + (((float)1/3) * url2.pagerank))
             return 1;
-        else if (TF_IDF + ((1/3) * pagerank) < url2.TF_IDF + ((1/3) * url2.pagerank))
+        else if (TF_IDF + (((float)1/3) * pagerank) < url2.TF_IDF + (((float)1/3) * url2.pagerank))
             return -1;
 
         else if (TF_IDF > url2.TF_IDF)
