@@ -1,4 +1,3 @@
-
 package org.mpack;
 
 import ca.rmen.porterstemmer.PorterStemmer;
@@ -10,7 +9,9 @@ import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -89,7 +90,9 @@ public class QueryProcessor {
             List<Document> temp = new ArrayList<>();
 
             for (String s : splitString) {
-                temp.add(nameToDocsHashMap.get(s));
+                var t = nameToDocsHashMap.get(s);
+                if (t != null)
+                    temp.add(t);
             }
             docslist.add(temp);
         }

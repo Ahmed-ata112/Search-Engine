@@ -69,11 +69,10 @@ class Api {
                 continue;
             }
 
-            List<Pair<String, collections>> ret = ranker.ranker2("", v);
+            List< collections> ret = ranker.ranker2("", v);
             for (var a : ret) {
-                if (resultsUrls.add(a.getFirst())) {
-                    var p = a.getSecond();
-                    Pojo p1 = new Pojo(p.url, p.title, ts, p.paragraph);
+                if (resultsUrls.add(a.url)) {
+                    Pojo p1 = new Pojo(a.url, a.title, ts, a.paragraph);
                     objectsList.add(p1);
                 }
             }
