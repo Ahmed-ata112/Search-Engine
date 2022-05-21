@@ -23,6 +23,7 @@ class paragraphGetter implements Runnable {
     ArrayList<collections> collectionsList;
 
     int count;
+    int QueryLen;
     MongodbIndexer mongoDB;
 
     Comparator<Pair<Integer, Integer>> sortPositions = Comparator.comparingInt(Pair::getFirst);
@@ -40,7 +41,14 @@ class paragraphGetter implements Runnable {
         else
             end = start + collectionsList.size() / count;
         for (int i = start; i < end; i++) {
+
             current = collectionsList.get(i);
+            if(phrase != null && QueryLen > current.token_count)
+            {
+                System.out.println(QueryLen + " " + current.token_count);
+                current.ifDeleted = true;
+                continue;
+            }
             getParagraph(current);
         }
 
@@ -57,7 +65,10 @@ class paragraphGetter implements Runnable {
 
         collection.title = text.get(0);
 
+        collection.ifDeleted = false;
+
         collection.positions.sort(sortPositions);
+
         Pair<Integer, Integer> window = Interval.findSmallestWindow((ArrayList<Pair<Integer, Integer>>) collection.positions, collection.token_count);
         if (window == null) {
             collection.paragraph = "";
@@ -70,17 +81,19 @@ class paragraphGetter implements Runnable {
         {
             if(phrase.size() < windowLen)
             {
-                //collection.isDeleted = true;
+                collection.ifDeleted = true;
                 return;
             }
 
         }
         collection.wordNear = windowLen;
+        collection.subQuery = (windowLen == collection.token_count) ? 1 : 0;
+        System.out.println(windowLen);
        /* if(windowLen < 20)
         {*/
         //windowLen = (int) Math.ceil((float)(20 - windowLen - 1) / 2);
-        start = Math.max(1, window.getFirst() - 4);
-        end = Math.min(text.size() - 1, window.getSecond() + 4);
+        start = Math.max(1, window.getFirst() - 7);
+        end = Math.min(text.size() - 1, window.getSecond() + 7);
       /*  }
         else
         {
@@ -136,8 +149,9 @@ public class Ranker {
             List<Document> webPages = (List<Document>) document.get("documents");
             //I think there is a more efficient way to get the url of the word rather than this
             for (Document d : webPages) {
-                if(allUrls.contains(d.getString("URL"))) continue;
-                allUrls.add(d.getString("URL"));
+
+                if(allUrls.contains(d.getString("URL"))) System.out.println("jsdklfjskjf");
+
                 List<Integer> _flags;
                 /*_flags.set(0, 0);
                 _flags.set(1, 0);*/
@@ -156,10 +170,13 @@ public class Ranker {
                     url = rankedPages.get(urlPosition.get(d.getString("URL")));
 
                     //then update the priority
-                    url.token_count++;
+                    System.out.println(url.token_count + "jsdklfjskjf");
+                    url.token_count = url.token_count + 1;
+                    System.out.println(url.token_count+ "4444444");
                     url.priority += priority;
                     url.flags.add(url.flags.get(0) + _flags.get(0));
                     url.flags.add(url.flags.get(1) + _flags.get(1));
+                    rankedPages.set(urlPosition.get(d.getString("URL")), url);
 
                     //url.pagerank = pagRank; //no need - already done at the first insertion
 
@@ -185,11 +202,10 @@ public class Ranker {
             }
         }
 
-
-        int ifFound = 0;
-
+        System.out.println(rankedPages);
         paragraphGetter pGet = new paragraphGetter();
         pGet.collectionsList = rankedPages;
+        pGet.QueryLen = retDoc.size();
         pGet.mongoDB = mongoDB;
         if(isPhraseSearching)
             pGet.phrase = originalTokens;
@@ -212,7 +228,18 @@ public class Ranker {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
+        ArrayList<collections> temp = null;
+        if(isPhraseSearching) {
+            temp = new ArrayList<>();
 
+            for (collections rankedPage : rankedPages) {
+
+                if (!rankedPage.ifDeleted) temp.add(rankedPage);
+
+            }
+            rankedPages = temp;
+        }
+        allUrls.addAll(urlPosition.keySet());
 
         rankedPages.sort(urlPriority);
 
