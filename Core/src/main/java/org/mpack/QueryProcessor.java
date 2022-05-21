@@ -22,7 +22,6 @@ public class QueryProcessor {
     static HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
-
     MongoCollection<org.bson.Document> InvertedDocs;
     MongoCollection<org.bson.Document> StemmingCollection;
 
@@ -46,8 +45,8 @@ public class QueryProcessor {
     public @NotNull List<List<Document>> ProcessQuery(List<String> Phrase, boolean isPhraseSearching) throws FileNotFoundException {
         //initialize data member variables
         allWords = new ArrayList<>();
-        searchTokens = new ArrayList<>(Phrase);
-        //remove stop words
+        searchTokens = Phrase;
+    //remove stop words
         if (stopWords.isEmpty())
             stopWords = Indexer.constructStopWords();
 
