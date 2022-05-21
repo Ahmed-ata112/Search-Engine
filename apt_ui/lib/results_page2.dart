@@ -7,12 +7,14 @@ import 'package:number_paginator/number_paginator.dart';
 
 Widget resultCard(ResultTile art, context) {
   return GFCard(
+    borderRadius: BorderRadius.circular(30),
     boxFit: BoxFit.cover,
     titlePosition: GFPosition.start,
     showOverlayImage: false,
     title: GFListTile(
       // avatar: GFAvatar(),
       titleText: art.header,
+      // color: Colors.lightBlue[200],
       subTitleText: art.url,
     ),
     content: Column(
@@ -22,25 +24,27 @@ Widget resultCard(ResultTile art, context) {
           height: 15,
         ),
         SubstringHighlight(
-            caseSensitive: false,
-            maxLines: 6,
-            overflow: TextOverflow.ellipsis,
-            terms: art.tokens,
-            text: art.para,
-            // text: 'ee e!',
-            textAlign: TextAlign.right,
-            textStyleHighlight: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
-            textStyle: const TextStyle(
-              // non-highlight style
-              color: Colors.grey,
-            ),
-            words: true),
+          caseSensitive: false,
+          maxLines: 6,
+          overflow: TextOverflow.ellipsis,
+          terms: art.tokens,
+          text: art.para,
+          // text: 'ee e!',
+          textAlign: TextAlign.right,
+          textStyleHighlight:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          textStyle: const TextStyle(
+            // non-highlight style
+            color: Colors.grey,
+          ),
+        ),
       ],
     ),
     buttonBar: GFButtonBar(
       children: <Widget>[
         GFButton(
+          borderShape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onPressed: () {
             //Go to the URLs
             //TODO: Change this to the Url
@@ -115,7 +119,7 @@ class _ResultsPageState extends State<ResultsPage> {
     );
     return Scaffold(
       appBar: AppBar(
-        title: Text("${_urls.length} Results for '" + wordSearched + '\''),
+        title: Text("${_urls.length} Results for ' " + wordSearched + " '"),
         leading: BackButton(
           onPressed: () {
             Navigator.popUntil(context, ModalRoute.withName("/search_home"));

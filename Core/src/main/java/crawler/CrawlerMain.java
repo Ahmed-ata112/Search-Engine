@@ -34,7 +34,7 @@ public class CrawlerMain {
                     //The last threads takes all the remaining
                     ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
                 }
-                System.out.println("Created Thread num: " + i);
+//                System.out.println("Created Thread num: " + i);
                 new Thread(new Crawler(ss)).start();
 
             }
@@ -144,7 +144,8 @@ public class CrawlerMain {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
         //initialize Connection with The Database
-        int numThreads = 20;
+        int numThreads = 15;
+
         Crawler.latch = new CountDownLatch(numThreads);
         System.out.printf("Number of Threads is: %d%n", numThreads);
 

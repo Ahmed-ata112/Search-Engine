@@ -4,10 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,10 +67,13 @@ public class RobotHandler {
         URL url = null;
         try {
             url = new URL(Link);
+
+            if((url.getHost().contains("pinterest")))
+                return true;
             if (!preVisitedUrls.containsKey(url.getHost())) {
                 ReadRobotFile(Link);
             }
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             return true;
         }
         RobotRules robotrules = preVisitedUrls.get(url.getHost());
@@ -94,7 +99,9 @@ class RobotRules {
         // Ignore Directive if path is empty
         if (path.isEmpty() || !path.startsWith("/"))
             return false;
-        disallowed.add(createPattern(path));
+        var a = createPattern(path);
+        if (a != null)
+            disallowed.add(a);
         return true;
     }
 
@@ -102,7 +109,9 @@ class RobotRules {
         // Ignore Directive if path is empty
         if (path.isEmpty() || !path.startsWith("/"))
             return false;
-        Allowed.add(createPattern(path));
+        var a = createPattern(path);
+        if (a != null)
+            Allowed.add(a);
         return true;
     }
 
@@ -122,7 +131,14 @@ class RobotRules {
         // * in robots.txt --> zero or more character
         // .*in regex --> zero or more character
         // note to escape especial characters
-        return Pattern.compile(path.replace("*", ".*").replace("?", "\\?").replace("+", "\\+"));
+        try {
+            return Pattern.compile(path.replace("*", ".*").replace("?", "\\?").replace("+", "\\+"));
+
+        } catch (Exception e) {
+            return null;
+        }
+
+
     }
 
     public boolean isDisallowed(String path) {
