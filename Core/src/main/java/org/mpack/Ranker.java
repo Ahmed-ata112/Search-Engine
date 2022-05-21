@@ -23,6 +23,7 @@ class paragraphGetter implements Runnable {
     ArrayList<collections> collectionsList;
 
     int count;
+    int wordsRemoved;
     int queryLen;
     boolean isPhraseSearch;
     MongodbIndexer mongoDB;
@@ -85,23 +86,30 @@ class paragraphGetter implements Runnable {
                 return;
             }
 
+
+            start = Math.max(1, window.getFirst() - wordsRemoved);
+            end = Math.min(text.size() - 1, window.getSecond() + phrase.size() - (windowLen - wordsRemoved));
+
         }
+        else
+            start = Math.max(1, window.getFirst() - 7);
+            end = Math.min(text.size() - 1, window.getSecond() + 7);
         collection.wordNear = windowLen;
 
         collection.subQuery = (windowLen == phrase.size()) ? 1 : 0;
-        System.out.println(windowLen);
-       /* if(windowLen < 20)
-        {*/
+
+        /*System.out.println(windowLen);
+       *//* if(windowLen < 20)
+        {*//*
         //windowLen = (int) Math.ceil((float)(20 - windowLen - 1) / 2);
-        start = Math.max(1, window.getFirst() - 7);
-        end = Math.min(text.size() - 1, window.getSecond() + 7);
-      /*  }
+
+      *//*  }
         else
         {
             start = window.getFirst();
             end = window.getSecond();
-        }*/
-
+        }*//*
+*/
 
         for (int k = start - 1; k < end; k++) {
             parag.append(text.get(k + 1)).append(" ");
@@ -212,6 +220,7 @@ public class Ranker {
         pGet.mongoDB = mongoDB;
 
         pGet.phrase = originalTokens;
+        pGet.wordsRemoved = wordsRem;
 
         pGet.count = Math.max(1, rankedPages.size() / 100);
 
