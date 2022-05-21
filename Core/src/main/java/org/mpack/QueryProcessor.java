@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class QueryProcessor {
     String moreThanOneIndicator;
     List<String> searchTokens;
+    int NumberOFRemovedStopWords;
     static HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
@@ -131,14 +132,27 @@ public class QueryProcessor {
         return nameToDocsHM;
     }
 
+    private int GetNumberOfRemovedStopWords(List<String>Phrase,String FirstOriginalWords)
+    {
+        int counter = 0;
+        for (int i=0;i< Phrase.size();i++)
+        {
+            if (Phrase.get(i)==FirstOriginalWords)
+                break;
+            else
+                counter++;
+        }
+        return counter;
+    }
+
+    public int NumberOfRemovedStopWords(){return NumberOFRemovedStopWords;}
+
     public List<String> GetSearchTokens() {
         return searchTokens;
     }
 
     //if the search query is one word return en ampty string otherwise it return the search query as is is
-    public String GetQueryPhraseIndicator() {
-        return moreThanOneIndicator;
-    }
+
 
     public static void main(String[] arg) throws FileNotFoundException {
         QueryProcessor q = new QueryProcessor();

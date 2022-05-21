@@ -23,7 +23,8 @@ class paragraphGetter implements Runnable {
     ArrayList<collections> collectionsList;
 
     int count;
-    int QueryLen;
+    int queryLen;
+    boolean isPhraseSearch;
     MongodbIndexer mongoDB;
 
     Comparator<Pair<Integer, Integer>> sortPositions = Comparator.comparingInt(Pair::getFirst);
@@ -43,7 +44,7 @@ class paragraphGetter implements Runnable {
         for (int i = start; i < end; i++) {
 
             current = collectionsList.get(i);
-            if(phrase != null && QueryLen > current.token_count)
+            if(isPhraseSearch && queryLen > current.token_count)
             {
                 current.ifDeleted = true;
                 continue;
@@ -76,7 +77,7 @@ class paragraphGetter implements Runnable {
         int windowLen = window.getSecond() - window.getFirst() + 1;
 
         //if phrase searching
-        if(phrase != null)
+        if(isPhraseSearch)
         {
             if(phrase.size() < windowLen)
             {
@@ -86,6 +87,7 @@ class paragraphGetter implements Runnable {
 
         }
         collection.wordNear = windowLen;
+
         collection.subQuery = (windowLen == phrase.size()) ? 1 : 0;
         System.out.println(windowLen);
        /* if(windowLen < 20)
@@ -120,7 +122,7 @@ public class Ranker {
     Comparator<collections> urlPriority = (url2, url1) -> url1.compare(url2);
 
 
-    public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> originalTokens, boolean isPhraseSearching) {
+    public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> originalTokens, boolean isPhraseSearching, int wordsRem) {
 
 
         HashMap<String, Integer> urlPosition = new HashMap<>();
@@ -201,13 +203,16 @@ public class Ranker {
 
 
         paragraphGetter pGet = new paragraphGetter();
+        if(isPhraseSearching)
+            pGet.isPhraseSearch = true;
+        else pGet.isPhraseSearch = false;
         pGet.collectionsList = rankedPages;
 
-        pGet.QueryLen = retDoc.size();
+        pGet.queryLen = retDoc.size();
         pGet.mongoDB = mongoDB;
-        if(isPhraseSearching)
-            pGet.phrase = originalTokens;
-        else pGet.phrase = null;
+
+        pGet.phrase = originalTokens;
+
         pGet.count = Math.max(1, rankedPages.size() / 100);
 
         ArrayList<Thread> threads = new ArrayList<>(pGet.count);
