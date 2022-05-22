@@ -82,6 +82,11 @@ class paragraphGetter implements Runnable {
         }
         int windowLen = window.getSecond() - window.getFirst() + 1;
 
+        if(collection.url.equals("https://www.avclub.com/7-new-graphic-novels-to-get-you-through-the-coronavirus-1842526466"))
+        {
+            System.out.println("url is found-------------------------------------------");
+
+        }
         //if phrase searching
         if(isPhraseSearch)
         {
@@ -92,48 +97,51 @@ class paragraphGetter implements Runnable {
             }
 
 
-            startSearch = Math.max(1, window.getFirst() - wordsRemoved + 1);
-            endSearch = Math.min(text.size() - 1, window.getSecond() + phrase.size() - (windowLen - wordsRemoved));
+            startSearch = Math.max(1, window.getFirst() - wordsRemoved);
+            endSearch = Math.min(text.size(), startSearch + phrase.size() );
 
         }
 
         startParagraph = Math.max(1, window.getFirst() - 20);
-        endParagraph = Math.min(text.size() - 2, window.getSecond() + 20);
+        endParagraph = Math.min(text.size(), window.getSecond() + 21);
 
         collection.wordNear = windowLen;
 
         collection.subQuery = (windowLen == phrase.size()) ? 1 : 0;
 
-        /*System.out.println(windowLen);
-       *//* if(windowLen < 20)
-        {*//*
-        //windowLen = (int) Math.ceil((float)(20 - windowLen - 1) / 2);
 
-      *//*  }
-        else
-        {
-            start = window.getFirst();
-            end = window.getSecond();
-        }*//*
-*/
-        int i = 0;
+        int i = 1;
         if(isPhraseSearch)
-       for(int k = startSearch - 1; k < endSearch; k++)
         {
-            System.out.println(parag.toString());
-            if(!phrase.get(i).equals(text.get(k + 1)))
-            { collection.paragraph = null;
+
+            String ptemp, ttemp;
+           for(int k = startSearch + 1; k < endSearch - 1; k++)
+            {
+                if(!phrase.get(i).equals(text.get(k).toLowerCase(Locale.ROOT)))
+                { collection.paragraph = null;
+                    collection.ifDeleted = true;
+                    return;
+                }
+                i++;
+            }
+           ptemp = phrase.get(0).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+           ttemp = text.get(startSearch).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+           if(!ptemp.equals(ttemp)) { collection.paragraph = null;
+               collection.ifDeleted = true;
+               return;
+           }
+            ptemp = phrase.get(phrase.size() - 1).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+            ttemp = text.get(endSearch - 1).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+            if(!ptemp.equals(ttemp)) { collection.paragraph = null;
                 collection.ifDeleted = true;
                 return;
             }
-            i++;
         }
-        for (int k = startParagraph - 1; k <= endParagraph; k++) {
+        for (int k = startParagraph; k < endParagraph; k++) {
 
-            parag.append(text.get(k + 1)).append(" ");
+            parag.append(text.get(k)).append(" ");
 
         }
-        System.out.println(parag.toString());
         collection.paragraph = parag.toString();
     }
 
@@ -221,6 +229,15 @@ public class Ranker {
                     rankedPages.add(url);
                     urlPosition.put(url.url, rankedPages.size() - 1);
                 }
+
+/*
+                if(url.url.equals("https://www.avclub.com/7-new-graphic-novels-to-get-you-through-the-coronavirus-1842526466"))
+                {
+                    System.out.println("url is found-------------------------------------------");
+
+                }
+
+*/
 
                 for (int pos :
                         positions) {              //starts from 1 as 0 is the phrase ==> we may remove it

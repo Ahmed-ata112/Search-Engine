@@ -133,12 +133,12 @@ public class QueryProcessor {
         return nameToDocsHM;
     }
 
-    private int GetNumberOfRemovedStopWords(List<String>Phrase,String FirstOriginalWords)
+    public static int GetNumberOfRemovedStopWords(List<String>Phrase,String FirstOriginalWords)
     {
         int counter = 0;
         for (int i=0;i< Phrase.size();i++)
         {
-            if (Phrase.get(i)==FirstOriginalWords)
+            if (Phrase.get(i).equals(FirstOriginalWords))
                 break;
             else
                 counter++;

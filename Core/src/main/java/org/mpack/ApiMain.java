@@ -60,11 +60,10 @@ class Api {
         List<List<Document>> documents = queryProcessor.ProcessQuery(ts, isPhraseSearching);
         HashSet<String> resultsUrls = new HashSet<>();
         //System.out.println("QUERY");
-        System.out.println(documents);
+        //System.out.println(documents);
 
         // window size
         var tokens = queryProcessor.getAllWords();
-        tokens.addAll(ts);
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {
