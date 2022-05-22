@@ -75,74 +75,70 @@ class paragraphGetter implements Runnable {
 
         collection.positions.sort(sortPositions);
 
-        Pair<Integer, Integer> window = Interval.findSmallestWindow((ArrayList<Pair<Integer, Integer>>) collection.positions, collection.token_count);
-        if (window == null) {
-            collection.paragraph = "";
-            return;
-        }
-        int windowLen = window.getSecond() - window.getFirst() + 1;
+        ArrayList<Pair<Integer, Integer>> windowList = Interval.findSmallestWindow((ArrayList<Pair<Integer, Integer>>) collection.positions, collection.token_count, isPhraseSearch);
 
-        if(collection.url.equals("https://www.avclub.com/7-new-graphic-novels-to-get-you-through-the-coronavirus-1842526466"))
-        {
-            System.out.println("url is found-------------------------------------------");
-
-        }
-        //if phrase searching
-        if(isPhraseSearch)
-        {
-            if(phrase.size() < windowLen)
-            {System.out.println(phrase.size() + " " + windowLen);
-                collection.ifDeleted = true;
+        for(int l = 0; l < windowList.size(); l++) {
+            Pair<Integer, Integer> window = windowList.get(l);
+            if (window == null) {
+                collection.paragraph = "";
                 return;
             }
+            int windowLen = window.getSecond() - window.getFirst() + 1;
 
 
-            startSearch = Math.max(1, window.getFirst() - wordsRemoved);
-            endSearch = Math.min(text.size(), startSearch + phrase.size() );
-
-        }
-
-        startParagraph = Math.max(1, window.getFirst() - 20);
-        endParagraph = Math.min(text.size(), window.getSecond() + 21);
-
-        collection.wordNear = windowLen;
-
-        collection.subQuery = (windowLen == phrase.size()) ? 1 : 0;
-
-
-        int i = 1;
-        if(isPhraseSearch)
-        {
-
-            String ptemp, ttemp;
-           for(int k = startSearch + 1; k < endSearch - 1; k++)
-            {
-                if(!phrase.get(i).equals(text.get(k).toLowerCase(Locale.ROOT)))
-                { collection.paragraph = null;
-                    collection.ifDeleted = true;
-                    return;
+            //if phrase searching
+            if (isPhraseSearch) {
+                if (phrase.size() < windowLen) {
+                    continue;
                 }
-                i++;
-            }
-           ptemp = phrase.get(0).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
-           ttemp = text.get(startSearch).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
-           if(!ptemp.equals(ttemp)) { collection.paragraph = null;
-               collection.ifDeleted = true;
-               return;
-           }
-            ptemp = phrase.get(phrase.size() - 1).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
-            ttemp = text.get(endSearch - 1).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
-            if(!ptemp.equals(ttemp)) { collection.paragraph = null;
-                collection.ifDeleted = true;
-                return;
-            }
-        }
-        for (int k = startParagraph; k < endParagraph; k++) {
 
-            parag.append(text.get(k)).append(" ");
 
+                startSearch = Math.max(1, window.getFirst() - wordsRemoved);
+                endSearch = Math.min(text.size(), startSearch + phrase.size());
+
+            }
+
+            startParagraph = Math.max(1, window.getFirst() - 20);
+            endParagraph = Math.min(text.size(), window.getSecond() + 21);
+
+            collection.wordNear = windowLen;
+
+            collection.subQuery = (windowLen == phrase.size()) ? 1 : 0;
+
+
+            int i = 1;
+            if (isPhraseSearch) {
+
+                String ptemp, ttemp;
+                int k;
+                for (k = startSearch + 1; k < endSearch - 1; k++) {
+                    if (!phrase.get(i).equals(text.get(k).toLowerCase(Locale.ROOT))) {
+                        break;
+                    }
+                    i++;
+                }
+                if(k < endSearch - 1) continue;
+                ptemp = phrase.get(0).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+                ttemp = text.get(startSearch).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+                if (!ptemp.equals(ttemp)) {
+                   continue;
+                }
+                ptemp = phrase.get(phrase.size() - 1).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+                ttemp = text.get(endSearch - 1).toLowerCase(Locale.ROOT).replaceAll("[^a-zA-Z0-9]", "");
+                if (!ptemp.equals(ttemp)) {
+                    continue;
+                }
+            }
+            for (int k = startParagraph; k < endParagraph; k++) {
+
+                parag.append(text.get(k)).append(" ");
+
+            }
+            if(!isPhraseSearch) break;
         }
+        if(isPhraseSearch && parag.toString().isEmpty()) {collection.ifDeleted = true; return;}
         collection.paragraph = parag.toString();
+        return;
     }
 
 }
