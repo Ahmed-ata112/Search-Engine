@@ -34,19 +34,19 @@ public class MongodbIndexer {
     }
 
     public long getDocCount() {
-        return searchEngineDb.getCollection("CrawledURLStest").countDocuments();
+        return searchEngineDb.getCollection("CrawledURLS").countDocuments();
     }
 
 
     public HashMap<String, Pair<Float, String>> getHTML() {
-        crawledCollection = searchEngineDb.getCollection("CrawledURLStest");
+        crawledCollection = searchEngineDb.getCollection("CrawledURLS");
         HashMap<String, Pair<Float, String>> HTMLmap = new HashMap<>(5100);
 
         Consumer<Document> getContent = doc -> {
             HTMLmap.put(doc.get("url_link").toString(), Pair.of(Float.parseFloat(doc.get("page_rank").toString()), doc.get("html_body").toString()));
         };
 
-        crawledCollection.find().limit(5000).forEach(getContent);
+        crawledCollection.find().forEach(getContent);
         return HTMLmap;
     }
 
