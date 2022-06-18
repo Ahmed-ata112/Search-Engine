@@ -56,7 +56,7 @@ public class Indexer {
             String parsedHTML = obj.parseHTML(set.getValue().getSecond(), title, header);
 
             obj.extractFlags(docFlags, title, header);
-            Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(parsedHTML);
+            Pair<List<List<String>>, List<Integer>> tokens = obj.extractWords(title.get(0) + " " + parsedHTML);
             tokens.getFirst().get(1).add(0, title.get(0));
             mongoDB.storeTextUrl(tokens.getFirst().get(1), set.getKey());
             removeStopWords(tokens.getFirst().get(0), stopWords, tokens.getSecond());
@@ -121,11 +121,15 @@ public class Indexer {
         header.addAll(parsed.getElementsByTag("header").eachText());
         header.addAll(parsed.getElementsByTag("h1").eachText());
 
+        parsed.select("title").remove();
+
         return parsed.text().replaceAll("<[^>]*>", "");
 
     }
 
     Pair<List<List<String>>, List<Integer>> extractWords(@NotNull String text) {
+
+
 
         Pair<List<List<String>>, List<Integer>> wordList;
         wordList = Pair.of(new ArrayList<>(), new ArrayList<>());
@@ -137,7 +141,7 @@ public class Indexer {
         //text.replaceAll("[^a-zA-Z0-9\\s]", " ")
         //text.replaceAll()
         //Arrays.stream(text.split(" ")).toList();
-        int position = -1;
+        int position = 0; //////////////////////////////////////////////////////////////////////////////////////////////////doaa
         char c;
         for (int i = 0; i < text.length(); i++) {
             c = text.charAt(i);
@@ -150,6 +154,7 @@ public class Indexer {
 
                 wordList.getFirst().get(1).add(original.toString());
 
+                original = new StringBuilder();
 
                 if (word.isEmpty()) continue;
                 if (!StringUtils.isNumeric(word.toString()) && !(word.equals('+') || word.equals('-'))) {
@@ -159,7 +164,7 @@ public class Indexer {
                 }
 
                 word = new StringBuilder();
-                original = new StringBuilder();
+
             } else original.append(c);
         }
         return wordList;

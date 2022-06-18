@@ -13,6 +13,11 @@ class collections
     String title;
     int TF_IDF;
 
+
+    int subQuery;
+
+    boolean ifDeleted;
+
     int token_count;
     double priority;
     double pagerank;
@@ -23,17 +28,25 @@ class collections
 
 
     public int compare(collections url2){
+
         //positions --> the whole search query with the same order in sequence
-        if(wordNear > url2.wordNear)
+        if(subQuery > url2.subQuery)
             return 1;
-        else if(wordNear < url2.wordNear)
+        else if(subQuery < url2.subQuery)
             return -1;
 
-        //tokenCount
-        if(token_count > url2.token_count)
+            //tokenCount
+        else if(token_count > url2.token_count)
             return 1;
         else if (token_count < url2.token_count)
             return -1;
+
+            //window size
+        else if(wordNear < url2.wordNear && wordNear >= token_count)
+            return 1;
+        else if(wordNear > url2.wordNear && wordNear >= token_count)
+            return -1;
+
 
             //title
         else if (flags.get(0) > url2.flags.get(0))
@@ -48,9 +61,9 @@ class collections
             return -1;
 
             //priority  IDF-TF -- pagerank
-        else if (TF_IDF + ((1/3) * pagerank) > url2.TF_IDF + ((1/3) * url2.pagerank))
+        else if (TF_IDF + (((float)1/3) * pagerank) > url2.TF_IDF + (((float)1/3) * url2.pagerank))
             return 1;
-        else if (TF_IDF + ((1/3) * pagerank) < url2.TF_IDF + ((1/3) * url2.pagerank))
+        else if (TF_IDF + (((float)1/3) * pagerank) < url2.TF_IDF + (((float)1/3) * url2.pagerank))
             return -1;
 
         else if (TF_IDF > url2.TF_IDF)

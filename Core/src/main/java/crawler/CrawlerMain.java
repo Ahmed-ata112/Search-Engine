@@ -34,7 +34,7 @@ public class CrawlerMain {
                     //The last threads takes all the remaining
                     ss = new ArrayList<>(seedsArray.subList(i * ratio, seedsArray.size()));
                 }
-                System.out.println("Created Thread num: " + i);
+//                System.out.println("Created Thread num: " + i);
                 new Thread(new Crawler(ss)).start();
 
             }
@@ -99,11 +99,27 @@ public class CrawlerMain {
         initCrawling(numThreads, seedsArray);
     }
 
-    private static void reCrawl(int numThreads) {
-        mainMongo.getAllArraysBAck();
-        Crawler.setCount((int) mainMongo.getUrlCount());
+    private static void reCrawl(int numThreads) throws FileNotFoundException {
+
+        File file = new File(".\\attaches\\recrawl_seed.txt");    //creates a new file instance
+        FileReader fr = new FileReader(file);   //reads the file
+        ArrayList<String> seedsArray;
         Crawler.setIsReCrawling(true);
-        initCrawling(numThreads, new ArrayList<>());
+        System.out.println("Started Recrawling");
+        try (BufferedReader br = new BufferedReader(fr)) {
+            String line;
+            seedsArray = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                //Read what in The seed
+                seedsArray.add(line);
+            }
+            initCrawling(numThreads, seedsArray);
+            fr.close();    //closes the stream and release the resources
+        }  //creates a buffering character input stream
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -128,7 +144,8 @@ public class CrawlerMain {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
         //initialize Connection with The Database
-        int numThreads = 20;
+        int numThreads = 15;
+
         Crawler.latch = new CountDownLatch(numThreads);
         System.out.printf("Number of Threads is: %d%n", numThreads);
 

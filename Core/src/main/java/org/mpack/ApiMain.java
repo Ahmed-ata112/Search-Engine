@@ -63,16 +63,24 @@ class Api {
         //System.out.println(documents);
 
         // window size
+
+        var tokens = queryProcessor.getAllWords();
+
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {
                 continue;
             }
 
-            List< collections> ret = ranker.ranker2("", v,ts,isPhraseSearching);
+
+            int wordsCount = queryProcessor.NumberOFRemovedStopWords;
+
+
+            List< collections> ret = ranker.ranker2("", v,ts,isPhraseSearching, wordsCount);
             for (var a : ret) {
                 if (resultsUrls.add(a.url)) {
-                    Pojo p1 = new Pojo(a.url, a.title, ts, a.paragraph);
+                    Pojo p1 = new Pojo(a.url, a.title, tokens, a.paragraph);
+
                     objectsList.add(p1);
                 }
             }
