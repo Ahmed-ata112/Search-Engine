@@ -63,12 +63,15 @@ class Api {
         //System.out.println(documents);
 
         // window size
+
         var tokens = queryProcessor.getAllWords();
+
         for (List<Document> v :
                 documents) {
             if (v == null || v.isEmpty() || v.get(0) == null) {
                 continue;
             }
+
 
             int wordsCount = queryProcessor.NumberOFRemovedStopWords;
 
@@ -77,6 +80,7 @@ class Api {
             for (var a : ret) {
                 if (resultsUrls.add(a.url)) {
                     Pojo p1 = new Pojo(a.url, a.title, tokens, a.paragraph);
+
                     objectsList.add(p1);
                 }
             }

@@ -13,9 +13,11 @@ class collections
     String title;
     int TF_IDF;
 
+
     int subQuery;
 
     boolean ifDeleted;
+
     int token_count;
     double priority;
     double pagerank;

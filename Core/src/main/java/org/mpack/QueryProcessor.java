@@ -18,18 +18,22 @@ import java.util.stream.Collectors;
 public class QueryProcessor {
     String moreThanOneIndicator;
     List<String> searchTokens;
+
     int NumberOFRemovedStopWords;
+
     static HashMap<Character, List<String>> stopWords = new HashMap<>();
     MongoClient mongoClient;
     MongoDatabase DataBase;
     MongoCollection<org.bson.Document> InvertedDocs;
     MongoCollection<org.bson.Document> StemmingCollection;
 
+
     public List<String> getAllWords() {
         return allWords;
     }
 
     ArrayList<String> allWords ;
+
 
     public QueryProcessor() {
         InitMongoDb();
@@ -44,10 +48,12 @@ public class QueryProcessor {
 
     public @NotNull List<List<Document>> ProcessQuery(List<String> Phrase, boolean isPhraseSearching) throws FileNotFoundException {
         //initialize data member variables
+
         allWords = new ArrayList<>();
         searchTokens = new ArrayList<>();
         searchTokens.addAll(Phrase);
     //remove stop words
+
         if (stopWords.isEmpty())
             stopWords = Indexer.constructStopWords();
 
@@ -133,6 +139,7 @@ public class QueryProcessor {
         return nameToDocsHM;
     }
 
+
     public static int GetNumberOfRemovedStopWords(List<String>Phrase,String FirstOriginalWords)
     {
         int counter = 0;
@@ -150,6 +157,7 @@ public class QueryProcessor {
 
     public List<String> GetSearchTokens() {
         return searchTokens;
+
     }
 
     //if the search query is one word return en ampty string otherwise it return the search query as is is

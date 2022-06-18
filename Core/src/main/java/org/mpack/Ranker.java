@@ -46,6 +46,7 @@ class paragraphGetter implements Runnable {
         for (int i = start; i < end; i++) {
 
             current = collectionsList.get(i);
+
             if(isPhraseSearch && queryLen > current.token_count)
             {
 
@@ -53,6 +54,7 @@ class paragraphGetter implements Runnable {
                 continue;
             }
             getParagraph(current);
+
         }
 
     }
@@ -74,6 +76,7 @@ class paragraphGetter implements Runnable {
         collection.ifDeleted = false;
 
         collection.positions.sort(sortPositions);
+
 
         ArrayList<Pair<Integer, Integer>> windowList = Interval.findSmallestWindow((ArrayList<Pair<Integer, Integer>>) collection.positions, collection.token_count, isPhraseSearch);
 
@@ -154,6 +157,7 @@ public class Ranker {
     Comparator<collections> urlPriority = (url2, url1) -> url1.compare(url2);
 
 
+
     public List<collections> ranker2(String phrase, List<Document> retDoc, List<String> originalTokens, boolean isPhraseSearching, int wordsRem) {
 
 
@@ -184,6 +188,7 @@ public class Ranker {
             for (Document d : webPages) {
 
                 if(allUrls.contains(d.getString("URL"))) continue;
+
 
                 List<Integer> _flags;
                 /*_flags.set(0, 0);
@@ -255,6 +260,7 @@ public class Ranker {
         pGet.phrase = originalTokens;
         pGet.wordsRemoved = wordsRem;
 
+
         pGet.count = Math.max(1, rankedPages.size() / 100);
 
         ArrayList<Thread> threads = new ArrayList<>(pGet.count);
@@ -273,6 +279,7 @@ public class Ranker {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
+
         ArrayList<collections> temp = null;
         if(isPhraseSearching) {
             temp = new ArrayList<>();
@@ -285,6 +292,7 @@ public class Ranker {
             rankedPages = temp;
         }
         allUrls.addAll(urlPosition.keySet());
+
 
         rankedPages.sort(urlPriority);
 
